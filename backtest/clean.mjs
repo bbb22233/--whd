@@ -74,6 +74,11 @@ export function cleanOkxRaw(rawPayload) {
   let extremeRows = 0;
   let unconfirmedRows = 0;
   const barMs = barToMs(rawPayload.bar);
+  const truncationKnown = typeof rawPayload.truncated === "boolean";
+  const legacyPageLimitHit = !truncationKnown &&
+    rawPayload.bar === "4H" &&
+    Number(rawPayload.pageCount) >= 80;
+  const truncated = truncationKnown ? rawPayload.truncated : legacyPageLimitHit;
 
   for (const row of rawPayload.rows || []) {
     const candle = normalizeRow(row, rawPayload.bar);
@@ -117,7 +122,18 @@ export function cleanOkxRaw(rawPayload) {
       instrument: rawPayload.instrument,
       bar: rawPayload.bar,
       requestedDays: rawPayload.requestedDays,
+      requestedStartMs: rawPayload.requestedStartMs,
+      requestedStartDate: rawPayload.requestedStartDate,
       downloadedAt: rawPayload.downloadedAt,
+      pageCount: rawPayload.pageCount,
+      requestLimit: rawPayload.requestLimit,
+      maxPages: rawPayload.maxPages,
+      retryCount: rawPayload.retryCount,
+      oldestReached: rawPayload.oldestReached,
+      oldestReachedDate: rawPayload.oldestReachedDate,
+      truncated,
+      truncationKnown,
+      truncationReason: truncated ? (legacyPageLimitHit ? "legacy_page_limit" : "requested_start_not_reached") : null,
       cleanedAt: new Date().toISOString(),
       rawRows: rawPayload.rows?.length || 0,
       cleanRows: candles.length,

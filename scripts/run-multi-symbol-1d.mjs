@@ -181,18 +181,84 @@ function scoreColumns(strategyScores) {
   );
 }
 
-function historyQuality(config, cleanRows, hasCurrent) {
-  if (!hasCurrent || cleanRows < config.indicator.maPeriod) {
-    return { dataStatus: "insufficient_history", historyQuality: "insufficient", periodWeight: 0 };
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function aggregationDropRatio(metadata) {
+  const aggregation = metadata?.aggregation;
+  const totalBuckets = Number(aggregation?.totalBuckets ?? 0);
+  if (!Number.isFinite(totalBuckets) || totalBuckets <= 0) return 0;
+
+  const droppedBuckets = Number(aggregation?.droppedBuckets ?? 0);
+  if (!Number.isFinite(droppedBuckets) || droppedBuckets <= 0) return 0;
+
+  return clamp(droppedBuckets / totalBuckets, 0, 1);
+}
+
+function historyQualityLabel(periodWeight) {
+  if (periodWeight >= 1) return "full_weight";
+  if (periodWeight >= 0.5) return "half_weight";
+  if (periodWeight > 0) return "weak_display_only";
+  return "weak_display_only";
+}
+
+function historyQuality(config, cleanRows, hasCurrent, metadata = {}) {
+  const warmupBars = Number(config.indicator.maPeriod) || 0;
+  const rows = Number(cleanRows) || 0;
+  const effectiveRows = Math.max(0, rows - warmupBars);
+  const aggregationRatio = aggregationDropRatio(metadata);
+  const sampleWeight = clamp(effectiveRows / 500, 0, 1);
+  const truncationFactor = metadata.truncated ? 0.7 : 1;
+  const aggregationFactor = clamp(1 - aggregationRatio, 0, 1);
+
+  if (!hasCurrent || rows < warmupBars) {
+    return {
+      dataStatus: "insufficient_history",
+      historyQuality: "insufficient",
+      periodWeight: 0,
+      effectiveRows,
+      sampleWeight: 0,
+      truncationFactor,
+      aggregationFactor: round(aggregationFactor, 4),
+      aggregationDropRatio: round(aggregationRatio, 4),
+      truncated: Boolean(metadata.truncated)
+    };
   }
 
+  let periodCap = 1;
   if (config.bar === "1W") {
-    if (cleanRows <= 300) return { dataStatus: "ok", historyQuality: "weak_display_only", periodWeight: 0 };
-    if (cleanRows <= 364) return { dataStatus: "ok", historyQuality: "half_weight", periodWeight: 0.5 };
-    return { dataStatus: "ok", historyQuality: "full_weight", periodWeight: 1 };
+    if (rows <= 300) periodCap = 0;
+    else if (rows <= 364) periodCap = 0.5;
   }
 
-  return { dataStatus: "ok", historyQuality: "full_weight", periodWeight: 1 };
+  const rawWeight = sampleWeight * truncationFactor * aggregationFactor;
+  const periodWeight = round(clamp(rawWeight, 0, periodCap), 2);
+
+  return {
+    dataStatus: "ok",
+    historyQuality: historyQualityLabel(periodWeight),
+    periodWeight,
+    effectiveRows,
+    sampleWeight: round(sampleWeight, 4),
+    truncationFactor,
+    aggregationFactor: round(aggregationFactor, 4),
+    aggregationDropRatio: round(aggregationRatio, 4),
+    truncated: Boolean(metadata.truncated)
+  };
+}
+
+function qualitySummary(rows) {
+  const okRows = rows.filter((row) => row.dataStatus === "ok");
+  const weightedWeatherCount = okRows.reduce((sum, row) => sum + (Number(row.periodWeight) || 0), 0);
+
+  return {
+    weatherCount: okRows.length,
+    weightedWeatherCount: round(weightedWeatherCount, 2),
+    averagePeriodWeight: okRows.length ? round(weightedWeatherCount / okRows.length, 4) : 0,
+    lowWeightCount: okRows.filter((row) => (Number(row.periodWeight) || 0) < 1).length,
+    insufficientHistoryCount: rows.length - okRows.length
+  };
 }
 
 async function readJsonIfExists(filePath) {
@@ -301,7 +367,18 @@ function deriveCleanPayload(sourceCleanPayload, config, recipe) {
       instrument: config.instrument,
       bar: config.bar,
       requestedDays: config.days,
+      requestedStartMs: sourceMeta.requestedStartMs,
+      requestedStartDate: sourceMeta.requestedStartDate,
       downloadedAt: sourceMeta.downloadedAt,
+      pageCount: sourceMeta.pageCount,
+      requestLimit: sourceMeta.requestLimit,
+      maxPages: sourceMeta.maxPages,
+      retryCount: sourceMeta.retryCount,
+      oldestReached: sourceMeta.oldestReached,
+      oldestReachedDate: sourceMeta.oldestReachedDate,
+      truncated: Boolean(sourceMeta.truncated),
+      truncationKnown: sourceMeta.truncationKnown,
+      truncationReason: sourceMeta.truncationReason,
       cleanedAt: new Date().toISOString(),
       rawRows: sourceMeta.cleanRows,
       cleanRows: candles.length,
@@ -323,7 +400,7 @@ function buildSummaryRow({ config, cleanPayload, featureResult, weatherResult, d
   const values = featureResult?.current?.values ?? {};
   const finalWeather = deviationRules.finalWeather ?? weatherResult.deviationFinalWeather ?? {};
   const cleanMeta = cleanPayload.metadata ?? {};
-  const quality = historyQuality(config, cleanMeta.cleanRows ?? 0, Boolean(current.gate));
+  const quality = historyQuality(config, cleanMeta.cleanRows ?? 0, Boolean(current.gate), cleanMeta);
 
   return {
     instrument: config.instrument,
@@ -331,6 +408,13 @@ function buildSummaryRow({ config, cleanPayload, featureResult, weatherResult, d
     dataStatus: quality.dataStatus,
     historyQuality: quality.historyQuality,
     periodWeight: quality.periodWeight,
+    effectiveRows: quality.effectiveRows,
+    sampleWeight: quality.sampleWeight,
+    truncationFactor: quality.truncationFactor,
+    aggregationFactor: quality.aggregationFactor,
+    aggregationDropRatio: quality.aggregationDropRatio,
+    truncated: quality.truncated,
+    truncationReason: cleanMeta.truncationReason,
     requiredWarmupBars: config.indicator.maPeriod,
     source: cleanMeta.source,
     firstDate: cleanMeta.firstDate,
@@ -507,6 +591,7 @@ async function writeBarSummary({ config, symbols, rows, errors, skipDownload, su
   const outputStem = `multi_${config.bar}_market_weather_current`;
   const summaryJsonPath = join(root, "reports", `${outputStem}.json`);
   const summaryCsvPath = join(root, "reports", `${outputStem}.csv`);
+  const quality = qualitySummary(rows);
 
   await writeJson(summaryJsonPath, {
     metadata: {
@@ -519,8 +604,11 @@ async function writeBarSummary({ config, symbols, rows, errors, skipDownload, su
       startedAt: startedAt.toISOString(),
       finishedAt: new Date().toISOString(),
       successCount: rows.length,
-      weatherCount: rows.filter((row) => row.dataStatus === "ok").length,
-      insufficientHistoryCount: rows.filter((row) => row.dataStatus !== "ok").length,
+      weatherCount: quality.weatherCount,
+      weightedWeatherCount: quality.weightedWeatherCount,
+      averagePeriodWeight: quality.averagePeriodWeight,
+      lowWeightCount: quality.lowWeightCount,
+      insufficientHistoryCount: quality.insufficientHistoryCount,
       errorCount: errors.length
     },
     rows,
@@ -533,8 +621,11 @@ async function writeBarSummary({ config, symbols, rows, errors, skipDownload, su
     summaryJsonPath,
     summaryCsvPath,
     successCount: rows.length,
-    weatherCount: rows.filter((row) => row.dataStatus === "ok").length,
-    insufficientHistoryCount: rows.filter((row) => row.dataStatus !== "ok").length,
+    weatherCount: quality.weatherCount,
+    weightedWeatherCount: quality.weightedWeatherCount,
+    averagePeriodWeight: quality.averagePeriodWeight,
+    lowWeightCount: quality.lowWeightCount,
+    insufficientHistoryCount: quality.insufficientHistoryCount,
     errorCount: errors.length
   };
 }
@@ -542,6 +633,7 @@ async function writeBarSummary({ config, symbols, rows, errors, skipDownload, su
 async function writeCombinedSummary({ bars, symbols, rows, errors, skipDownload, summaryOnly, fromReports, startedAt }) {
   const summaryJsonPath = join(root, "reports", "multi_period_market_weather_current.json");
   const summaryCsvPath = join(root, "reports", "multi_period_market_weather_current.csv");
+  const quality = qualitySummary(rows);
 
   await writeJson(summaryJsonPath, {
     metadata: {
@@ -553,8 +645,11 @@ async function writeCombinedSummary({ bars, symbols, rows, errors, skipDownload,
       startedAt: startedAt.toISOString(),
       finishedAt: new Date().toISOString(),
       successCount: rows.length,
-      weatherCount: rows.filter((row) => row.dataStatus === "ok").length,
-      insufficientHistoryCount: rows.filter((row) => row.dataStatus !== "ok").length,
+      weatherCount: quality.weatherCount,
+      weightedWeatherCount: quality.weightedWeatherCount,
+      averagePeriodWeight: quality.averagePeriodWeight,
+      lowWeightCount: quality.lowWeightCount,
+      insufficientHistoryCount: quality.insufficientHistoryCount,
       errorCount: errors.length
     },
     rows,
@@ -566,8 +661,11 @@ async function writeCombinedSummary({ bars, symbols, rows, errors, skipDownload,
     summaryJsonPath,
     summaryCsvPath,
     successCount: rows.length,
-    weatherCount: rows.filter((row) => row.dataStatus === "ok").length,
-    insufficientHistoryCount: rows.filter((row) => row.dataStatus !== "ok").length,
+    weatherCount: quality.weatherCount,
+    weightedWeatherCount: quality.weightedWeatherCount,
+    averagePeriodWeight: quality.averagePeriodWeight,
+    lowWeightCount: quality.lowWeightCount,
+    insufficientHistoryCount: quality.insufficientHistoryCount,
     errorCount: errors.length
   };
 }
