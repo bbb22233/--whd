@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "instrument": "W-USDT",
+    "bar": "1W",
+    "fromDate": null,
+    "toDate": null,
+    "firstDate": null,
+    "lastDate": null,
+    "snapshotCount": 0,
+    "stateObservationRows": 0,
+    "metricObservationRows": 0,
+    "horizons": [
+      1,
+      3,
+      5,
+      10
+    ],
+    "bucketScheme": [
+      "极低:0-10%",
+      "偏低:10-30%",
+      "中性:30-70%",
+      "偏高:70-90%",
+      "极高:90-100%"
+    ],
+    "generatedAt": "2026-05-31T04:41:00.240Z",
+    "rulePrinciple": "中值乖离负责短期拉伸/回归，233MA乖离负责大周期天气过滤。规则只识别状态，不直接给交易方向。"
+  },
+  "finalWeather": {
+    "weather": "数据不足",
+    "shortTerm": "未知",
+    "bigCycle": "未知",
+    "actionBias": "等待数据补齐"
+  },
+  "currentRuleRows": [],
+  "ruleLibraryRows": []
+}

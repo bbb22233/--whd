@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Market Weather Terminal</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="terminal-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <p class="eyebrow">MARKET WEATHER TERMINAL</p>
+          <h1>
+            <span id="instrument">--</span>
+            <span class="divider">/</span>
+            <span id="bar">--</span>
+          </h1>
+        </div>
+        <div class="top-meta" id="topMeta"></div>
+        <button class="icon-button" id="reloadButton" type="button" title="刷新数据" aria-label="刷新数据">
+          ↻
+        </button>
+      </header>
+
+      <main class="workspace">
+        <section class="overview">
+          <div class="gate-panel" id="gatePanel">
+            <div class="panel-kicker">总闸门</div>
+            <div class="gate-line">
+              <span class="gate-pill" id="gateText">--</span>
+              <span class="route-score" id="topRoute">--</span>
+            </div>
+            <p class="summary-text" id="weatherSummary">数据加载中...</p>
+            <p class="action-bias" id="actionBias">--</p>
+          </div>
+
+          <div class="price-panel">
+            <div class="panel-kicker">盘口快照</div>
+            <div class="price-main">
+              <span id="lastPrice">--</span>
+              <span id="dailyChange" class="change-chip">--</span>
+            </div>
+            <div class="quote-grid" id="quoteGrid"></div>
+          </div>
+        </section>
+
+        <section class="component-strip" id="componentGrid"></section>
+
+        <section class="content-grid">
+          <section class="panel score-panel">
+            <div class="panel-head">
+              <div>
+                <div class="panel-kicker">策略天气</div>
+                <h2>适配分</h2>
+              </div>
+              <span class="mini-note">越高代表越适合观察该类策略</span>
+            </div>
+            <div class="score-list" id="scoreList"></div>
+          </section>
+
+          <section class="panel metrics-panel">
+            <div class="panel-head">
+              <div>
+                <div class="panel-kicker">指标工厂</div>
+                <h2>基础指标</h2>
+              </div>
+              <span class="mini-note">偏离同时展示百分比和 ATR 尺度</span>
+            </div>
+            <div class="metric-grid" id="metricGrid"></div>
+          </section>
+
+          <section class="panel fib-panel">
+            <div class="panel-head">
+              <div>
+                <div class="panel-kicker">斐波那契波动</div>
+                <h2>3 / 8 / 13 / 21 ATR</h2>
+              </div>
+              <span class="mini-note">长短波动对比</span>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table" id="fibTable"></table>
+            </div>
+          </section>
+
+          <section class="panel probability-panel">
+            <div class="panel-head">
+              <div>
+                <div class="panel-kicker">概率拆解</div>
+                <h2>单指标历史表现</h2>
+              </div>
+              <span class="mini-note">当前状态对应的历史样本</span>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table" id="componentTable"></table>
+            </div>
+          </section>
+
+          <section class="panel deviation-panel">
+            <div class="panel-head">
+              <div>
+                <div class="panel-kicker">乖离规则</div>
+                <h2>中值 / 233MA</h2>
+              </div>
+              <span class="mini-note">只识别天气，不直接给买卖点</span>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table" id="deviationTable"></table>
+            </div>
+          </section>
+
+          <section class="panel notes-panel">
+            <div class="panel-head">
+              <div>
+                <div class="panel-kicker">解释</div>
+                <h2>当前读法</h2>
+              </div>
+            </div>
+            <div class="note-list" id="noteList"></div>
+          </section>
+        </section>
+      </main>
+
+      <footer class="footer-line" id="footerLine">--</footer>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

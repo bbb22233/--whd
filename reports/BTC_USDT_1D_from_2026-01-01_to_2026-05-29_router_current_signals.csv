@@ -1,0 +1,9 @@
+﻿routeKey,routeLabel,light,signalType,currentScore,bestHorizon,calibrationScore,sampleConfidencePct,successRatePct,successLiftPct,directionalWinRatePct,avgRouteReturnPct,reason
+waitDefense,防守等待,红灯,风险过滤信号,65.18,5,42.45,45.28,58.54,-1.88,,1.51,更适合做仓位/入场过滤，不是方向信号
+breakoutDown,向下突破,红灯,波动方向信号,63,1,35.04,36.74,25.93,11.06,55.56,1.98,样本偏少，只能观察
+trendShort,趋势做空,红灯,方向信号,60.87,1,32.59,21.21,77.78,25.75,77.78,1.42,样本偏少，只能观察
+meanReversionLong,低吸均值回归,红灯,位置回归信号,59.64,1,35.25,38.08,62.07,40.45,58.62,0.41,样本偏少，只能观察
+trendLong,趋势追多,红灯,方向信号,26.87,10,38.35,43.59,47.37,0.61,47.37,-1.56,方向胜率不足，不宜当进攻信号
+meanReversionShort,高抛均值回归,红灯,位置回归信号,21.64,1,23.56,68.19,6.45,-17.2,54.84,0.23,当前分桶没有明显优于历史基线
+gridNeutral,震荡网格,红灯,震荡状态信号,18,3,42.21,67.08,90,1.64,,-2.99,当前分桶略好于历史基线
+breakoutUp,向上突破,红灯,波动方向信号,7,1,46.04,60,13.89,3.08,54.17,1.9,当前分桶略好于历史基线

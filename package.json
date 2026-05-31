@@ -1,0 +1,29 @@
+{
+  "name": "quant-monitor-terminal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "serve": "node server.mjs",
+    "download": "node scripts/download-data.mjs",
+    "multi:1d": "node scripts/run-multi-symbol-1d.mjs",
+    "multi:weather": "node scripts/run-multi-symbol-1d.mjs",
+    "multi:periods": "node scripts/run-multi-symbol-1d.mjs --bars \"4H,8H,1D,1W\"",
+    "download:macro": "node scripts/download-macro-data.mjs",
+    "clean": "node scripts/clean-data.mjs",
+    "backtest:indicators": "node scripts/backtest-indicators.mjs",
+    "backtest:volatility": "node scripts/backtest-volatility-state.mjs",
+    "backtest:position": "node scripts/backtest-position-state.mjs",
+    "backtest:deviations": "node scripts/backtest-deviations.mjs",
+    "rules:deviations": "node scripts/build-deviation-rules.mjs",
+    "weather:router": "node scripts/build-market-weather-router.mjs",
+    "backtest:router": "node scripts/backtest-strategy-router.mjs",
+    "calibrate:router": "node scripts/calibrate-router.mjs",
+    "features": "node scripts/build-feature-factory.mjs",
+    "journal:create": "node scripts/create-decision-journal.mjs",
+    "train:trees": "node scripts/train-decision-trees.mjs",
+    "validate:trees": "node scripts/validate-decision-trees.mjs",
+    "compare:macro": "node scripts/compare-macro-impact.mjs",
+    "train:state": "node scripts/train-market-state.mjs"
+  }
+}

@@ -1,0 +1,1291 @@
+{
+  "metadata": {
+    "instrument": "BTC-USDT-SWAP",
+    "bar": "1D",
+    "firstDate": "2023-10-06",
+    "lastDate": "2026-05-29",
+    "snapshotCount": 967,
+    "featureCount": 18,
+    "stateCount": 9,
+    "quantizationError": 2.447705,
+    "generatedAt": "2026-05-30T22:47:04.208Z",
+    "model": {
+      "type": "SOM",
+      "rows": 3,
+      "cols": 3,
+      "epochs": 700,
+      "seed": 20260530
+    }
+  },
+  "features": [
+    {
+      "key": "rangePct",
+      "label": "振幅率"
+    },
+    {
+      "key": "atrPct",
+      "label": "ATR率"
+    },
+    {
+      "key": "volatilityMultiple",
+      "label": "波动倍率"
+    },
+    {
+      "key": "volatilityExcess",
+      "label": "波动超额"
+    },
+    {
+      "key": "volumeMultiple",
+      "label": "量能倍率"
+    },
+    {
+      "key": "d8",
+      "label": "8日涨跌"
+    },
+    {
+      "key": "d13",
+      "label": "13日涨跌"
+    },
+    {
+      "key": "d21",
+      "label": "21日涨跌"
+    },
+    {
+      "key": "d34",
+      "label": "34日涨跌"
+    },
+    {
+      "key": "trendScore",
+      "label": "趋势动能"
+    },
+    {
+      "key": "resonanceCount",
+      "label": "共振数量"
+    },
+    {
+      "key": "middleDeviationRate",
+      "label": "中值乖离率"
+    },
+    {
+      "key": "middleDeviationAtr",
+      "label": "中值乖离ATR"
+    },
+    {
+      "key": "middlePositionPct",
+      "label": "中值位置百分位"
+    },
+    {
+      "key": "maDeviationRate",
+      "label": "233MA乖离率"
+    },
+    {
+      "key": "maDeviationAtr",
+      "label": "233MA乖离ATR"
+    },
+    {
+      "key": "maPositionPct",
+      "label": "MA位置百分位"
+    },
+    {
+      "key": "stretchHeat",
+      "label": "拉伸热度"
+    }
+  ],
+  "featureStats": {
+    "rangePct": {
+      "key": "rangePct",
+      "label": "振幅率",
+      "mean": 3.6956418150254584,
+      "std": 2.1219294391936616,
+      "min": 0.6577999670496265,
+      "max": 18.05532524053349
+    },
+    "atrPct": {
+      "key": "atrPct",
+      "label": "ATR率",
+      "mean": 3.658303212737291,
+      "std": 0.8811211365825657,
+      "min": 1.9465089415468473,
+      "max": 6.160300650817008
+    },
+    "volatilityMultiple": {
+      "key": "volatilityMultiple",
+      "label": "波动倍率",
+      "mean": 1.0037759050752122,
+      "std": 0.49613116898465764,
+      "min": 0.19703133239515072,
+      "max": 4.636186458438101
+    },
+    "volatilityExcess": {
+      "key": "volatilityExcess",
+      "label": "波动超额",
+      "mean": 0.00377590507521235,
+      "std": 0.49613116898465764,
+      "min": -0.8029686676048493,
+      "max": 3.636186458438101
+    },
+    "volumeMultiple": {
+      "key": "volumeMultiple",
+      "label": "量能倍率",
+      "mean": 1.027150536241412,
+      "std": 0.5107920033374205,
+      "min": 0.2110403634254663,
+      "max": 4.99706829492108
+    },
+    "d8": {
+      "key": "d8",
+      "label": "8日涨跌",
+      "mean": 1.0642560848547453,
+      "std": 6.795030707066146,
+      "min": -24.585736038225654,
+      "max": 32.917659898331365
+    },
+    "d13": {
+      "key": "d13",
+      "label": "13日涨跌",
+      "mean": 1.7720021500311682,
+      "std": 8.833044202379313,
+      "min": -24.800788374156678,
+      "max": 32.92855013707318
+    },
+    "d21": {
+      "key": "d21",
+      "label": "21日涨跌",
+      "mean": 2.977610767389938,
+      "std": 11.83861288645342,
+      "min": -30.227862765176205,
+      "max": 42.160971153042475
+    },
+    "d34": {
+      "key": "d34",
+      "label": "34日涨跌",
+      "mean": 5.037640482706167,
+      "std": 16.117054788877017,
+      "min": -30.34832096285963,
+      "max": 66.60072489510847
+    },
+    "trendScore": {
+      "key": "trendScore",
+      "label": "趋势动能",
+      "mean": 2.2140579062861017,
+      "std": 8.654456173211589,
+      "min": -25.882984989128673,
+      "max": 36.37147159198447
+    },
+    "resonanceCount": {
+      "key": "resonanceCount",
+      "label": "共振数量",
+      "mean": 3.4281282316442607,
+      "std": 0.7210492412974786,
+      "min": 2,
+      "max": 4
+    },
+    "middleDeviationRate": {
+      "key": "middleDeviationRate",
+      "label": "中值乖离率",
+      "mean": 1.4336122570635472,
+      "std": 5.65475608082303,
+      "min": -17.584181085012204,
+      "max": 18.640879798582922
+    },
+    "middleDeviationAtr": {
+      "key": "middleDeviationAtr",
+      "label": "中值乖离ATR",
+      "mean": 0.4165428217086541,
+      "std": 1.5037292311989428,
+      "min": -3.9298193896670064,
+      "max": 4.482746123331109
+    },
+    "middlePositionPct": {
+      "key": "middlePositionPct",
+      "label": "中值位置百分位",
+      "mean": 46.2339283502087,
+      "std": 21.784222474010335,
+      "min": 0,
+      "max": 100
+    },
+    "maDeviationRate": {
+      "key": "maDeviationRate",
+      "label": "233MA乖离率",
+      "mean": 14.065214256473997,
+      "std": 24.932220422606264,
+      "min": -36.68132892782064,
+      "max": 91.83289954179403
+    },
+    "maDeviationAtr": {
+      "key": "maDeviationAtr",
+      "label": "233MA乖离ATR",
+      "mean": 2.3817756056024932,
+      "std": 5.452758138242374,
+      "min": -12.076749517335136,
+      "max": 12.59374204955392
+    },
+    "maPositionPct": {
+      "key": "maPositionPct",
+      "label": "MA位置百分位",
+      "mean": 42.729536685670006,
+      "std": 27.402514491560737,
+      "min": 0,
+      "max": 100
+    },
+    "stretchHeat": {
+      "key": "stretchHeat",
+      "label": "拉伸热度",
+      "mean": 42.01094382759283,
+      "std": 21.574584208890897,
+      "min": 2.037470430002003,
+      "max": 100
+    }
+  },
+  "states": [
+    {
+      "id": 3,
+      "grid": "1,0",
+      "name": "低波动压缩态",
+      "occurrences": 177,
+      "sharePct": 18.304033092037226,
+      "avgConfidence": 0.3060179843163389,
+      "avgDistance": 2.22075331821726,
+      "firstSeen": "2023-12-27",
+      "lastSeen": "2026-05-16",
+      "typicalDates": [
+        {
+          "date": "2025-02-14",
+          "close": 97639.9,
+          "distance": 0.7517
+        },
+        {
+          "date": "2025-02-19",
+          "close": 96912.5,
+          "distance": 0.9522
+        },
+        {
+          "date": "2025-02-13",
+          "close": 96940,
+          "distance": 0.9544
+        },
+        {
+          "date": "2024-01-27",
+          "close": 42264.5,
+          "distance": 1.0899
+        },
+        {
+          "date": "2024-06-14",
+          "close": 66327.1,
+          "distance": 1.2001
+        }
+      ],
+      "topFeatures": [
+        {
+          "key": "stretchHeat",
+          "label": "拉伸热度",
+          "z": -0.7996940528481928
+        },
+        {
+          "key": "middlePositionPct",
+          "label": "中值位置百分位",
+          "z": -0.6160960099697905
+        },
+        {
+          "key": "resonanceCount",
+          "label": "共振数量",
+          "z": -0.5859218621046123
+        },
+        {
+          "key": "volumeMultiple",
+          "label": "量能倍率",
+          "z": -0.5772562053713771
+        },
+        {
+          "key": "rangePct",
+          "label": "振幅率",
+          "z": -0.5643942840953046
+        },
+        {
+          "key": "volatilityExcess",
+          "label": "波动超额",
+          "z": -0.5546006419515632
+        }
+      ],
+      "profile": {
+        "rangePct": 2.4980369682910006,
+        "atrPct": 3.469194097288847,
+        "volatilityMultiple": 0.728621240264142,
+        "volatilityExcess": -0.2713787597358583,
+        "volumeMultiple": 0.7322926826608088,
+        "d8": -1.2897073014623266,
+        "d13": -1.7575307249759928,
+        "d21": -2.24042532228001,
+        "d34": 0.8655175733106162,
+        "trendScore": -1.359033059375835,
+        "resonanceCount": 3.005649717514124,
+        "middleDeviationRate": -1.3335282646430464,
+        "middleDeviationAtr": -0.38020021230376616,
+        "middlePositionPct": 32.812755803676694,
+        "maDeviationRate": 23.790176966297672,
+        "maDeviationAtr": 5.162938190501618,
+        "maPositionPct": 51.29358420647896,
+        "stretchHeat": 24.75787714307025
+      },
+      "zProfile": {
+        "rangePct": -0.5643942840953046,
+        "atrPct": -0.214623287987285,
+        "volatilityMultiple": -0.5546006419515623,
+        "volatilityExcess": -0.5546006419515632,
+        "volumeMultiple": -0.5772562053713771,
+        "d8": -0.3464242455695142,
+        "d13": -0.39958283850276993,
+        "d21": -0.44076414523535895,
+        "d34": -0.25886385347991053,
+        "trendScore": -0.4128614085217553,
+        "resonanceCount": -0.5859218621046123,
+        "middleDeviationRate": -0.48934745940515373,
+        "middleDeviationAtr": -0.5298447469676217,
+        "middlePositionPct": -0.6160960099697905,
+        "maDeviationRate": 0.39005602168533554,
+        "maDeviationAtr": 0.5100469366858065,
+        "maPositionPct": 0.31252779825904153,
+        "stretchHeat": -0.7996940528481928
+      }
+    },
+    {
+      "id": 5,
+      "grid": "1,2",
+      "name": "上侧趋势共振态",
+      "occurrences": 175,
+      "sharePct": 18.09720785935884,
+      "avgConfidence": 0.2649858653763012,
+      "avgDistance": 2.3365547658094012,
+      "firstSeen": "2023-10-16",
+      "lastSeen": "2025-10-09",
+      "typicalDates": [
+        {
+          "date": "2024-06-04",
+          "close": 71574.5,
+          "distance": 1.1379
+        },
+        {
+          "date": "2024-06-06",
+          "close": 71117.2,
+          "distance": 1.1815
+        },
+        {
+          "date": "2023-12-24",
+          "close": 43650.3,
+          "distance": 1.201
+        },
+        {
+          "date": "2024-05-23",
+          "close": 68324.5,
+          "distance": 1.4636
+        },
+        {
+          "date": "2024-05-24",
+          "close": 68921.7,
+          "distance": 1.4981
+        }
+      ],
+      "topFeatures": [
+        {
+          "key": "maPositionPct",
+          "label": "MA位置百分位",
+          "z": 0.9412684959666483
+        },
+        {
+          "key": "maDeviationAtr",
+          "label": "233MA乖离ATR",
+          "z": 0.8413870009003068
+        },
+        {
+          "key": "maDeviationRate",
+          "label": "233MA乖离率",
+          "z": 0.732919933663791
+        },
+        {
+          "key": "d34",
+          "label": "34日涨跌",
+          "z": 0.659067130712213
+        },
+        {
+          "key": "stretchHeat",
+          "label": "拉伸热度",
+          "z": -0.6371436914225731
+        },
+        {
+          "key": "middleDeviationAtr",
+          "label": "中值乖离ATR",
+          "z": 0.5929111888845842
+        }
+      ],
+      "profile": {
+        "rangePct": 2.977762956026602,
+        "atrPct": 3.2933530855962916,
+        "volatilityMultiple": 0.9142934328452773,
+        "volatilityExcess": -0.08570656715472266,
+        "volumeMultiple": 0.9534101836957192,
+        "d8": 3.802602997284075,
+        "d13": 5.259980904111921,
+        "d21": 8.171805708110293,
+        "d34": 15.659861537942874,
+        "trendScore": 6.742484575999845,
+        "resonanceCount": 3.7142857142857144,
+        "middleDeviationRate": 4.3543847008518854,
+        "middleDeviationAtr": 1.308120707939321,
+        "middlePositionPct": 58.36781554232337,
+        "maDeviationRate": 32.3385355947016,
+        "maDeviationAtr": 6.969655422172986,
+        "maPositionPct": 68.52266028684566,
+        "stretchHeat": 28.264833603832933
+      },
+      "zProfile": {
+        "rangePct": -0.33831419920902367,
+        "atrPct": -0.41418836978132306,
+        "volatilityMultiple": -0.1803605131543389,
+        "volatilityExcess": -0.18036051315433915,
+        "volumeMultiple": -0.1443647356730077,
+        "d8": 0.4029925736143805,
+        "d13": 0.3948784444145783,
+        "d21": 0.43875029875028015,
+        "d34": 0.659067130712213,
+        "trendScore": 0.5232479752720599,
+        "resonanceCount": 0.3968626083380005,
+        "middleDeviationRate": 0.5165160799231555,
+        "middleDeviationAtr": 0.5929111888845842,
+        "middlePositionPct": 0.55700345544079,
+        "maDeviationRate": 0.732919933663791,
+        "maDeviationAtr": 0.8413870009003068,
+        "maPositionPct": 0.9412684959666483,
+        "stretchHeat": -0.6371436914225731
+      }
+    },
+    {
+      "id": 8,
+      "grid": "2,2",
+      "name": "过渡混合态",
+      "occurrences": 152,
+      "sharePct": 15.718717683557394,
+      "avgConfidence": 0.26858373584996215,
+      "avgDistance": 2.3778089745235986,
+      "firstSeen": "2023-10-09",
+      "lastSeen": "2026-05-25",
+      "typicalDates": [
+        {
+          "date": "2025-12-21",
+          "close": 89677.7,
+          "distance": 1.3148
+        },
+        {
+          "date": "2025-12-07",
+          "close": 89910.3,
+          "distance": 1.4564
+        },
+        {
+          "date": "2025-12-29",
+          "close": 88967.7,
+          "distance": 1.5307
+        },
+        {
+          "date": "2025-03-30",
+          "close": 83427.3,
+          "distance": 1.534
+        },
+        {
+          "date": "2024-09-12",
+          "close": 59659.9,
+          "distance": 1.575
+        }
+      ],
+      "topFeatures": [
+        {
+          "key": "resonanceCount",
+          "label": "共振数量",
+          "z": -1.1320809726007781
+        },
+        {
+          "key": "maDeviationAtr",
+          "label": "233MA乖离ATR",
+          "z": -1.1036829054947126
+        },
+        {
+          "key": "maPositionPct",
+          "label": "MA位置百分位",
+          "z": -1.0728393992029652
+        },
+        {
+          "key": "maDeviationRate",
+          "label": "233MA乖离率",
+          "z": -0.9854059044118142
+        },
+        {
+          "key": "d34",
+          "label": "34日涨跌",
+          "z": -0.5124288293194017
+        },
+        {
+          "key": "d21",
+          "label": "21日涨跌",
+          "z": -0.4223013466204052
+        }
+      ],
+      "profile": {
+        "rangePct": 3.255852930630664,
+        "atrPct": 3.85673602005811,
+        "volatilityMultiple": 0.8442938269129234,
+        "volatilityExcess": -0.15570617308707657,
+        "volumeMultiple": 0.8733641897082248,
+        "d8": 0.38560904529053047,
+        "d13": -0.49914693218725203,
+        "d21": -2.021851396677023,
+        "d34": -3.2212030348347396,
+        "trendScore": -0.8783446156019514,
+        "resonanceCount": 2.611842105263158,
+        "middleDeviationRate": -0.027570327324685177,
+        "middleDeviationAtr": -0.07225508678928041,
+        "middlePositionPct": 40.335872695101244,
+        "maDeviationRate": -10.503142958059032,
+        "maDeviationAtr": -3.63634033937279,
+        "maPositionPct": 13.331039501893436,
+        "stretchHeat": 47.580925663653964
+      },
+      "zProfile": {
+        "rangePct": -0.20725895794250124,
+        "atrPct": 0.2252049112003396,
+        "volatilityMultiple": -0.3214514389182039,
+        "volatilityExcess": -0.3214514389182042,
+        "volumeMultiple": -0.3010743032944439,
+        "d8": -0.09987402100456888,
+        "d13": -0.2571196328448863,
+        "d21": -0.4223013466204052,
+        "d34": -0.5124288293194017,
+        "trendScore": -0.3573191035919812,
+        "resonanceCount": -1.1320809726007781,
+        "middleDeviationRate": -0.25839887052662447,
+        "middleDeviationAtr": -0.3250571302043584,
+        "middlePositionPct": -0.27074896348236116,
+        "maDeviationRate": -0.9854059044118142,
+        "maDeviationAtr": -1.1036829054947126,
+        "maPositionPct": -1.0728393992029652,
+        "stretchHeat": 0.2581733108796479
+      }
+    },
+    {
+      "id": 2,
+      "grid": "0,2",
+      "name": "下侧趋势共振态",
+      "occurrences": 131,
+      "sharePct": 13.547052740434331,
+      "avgConfidence": 0.32952722697706166,
+      "avgDistance": 2.4551622136296913,
+      "firstSeen": "2024-01-18",
+      "lastSeen": "2026-05-29",
+      "typicalDates": [
+        {
+          "date": "2024-07-06",
+          "close": 56832,
+          "distance": 1.0949
+        },
+        {
+          "date": "2024-07-09",
+          "close": 57700,
+          "distance": 1.1334
+        },
+        {
+          "date": "2025-11-07",
+          "close": 101685.1,
+          "distance": 1.1402
+        },
+        {
+          "date": "2025-11-06",
+          "close": 100753.1,
+          "distance": 1.158
+        },
+        {
+          "date": "2025-11-05",
+          "close": 101960.2,
+          "distance": 1.1971
+        }
+      ],
+      "topFeatures": [
+        {
+          "key": "middleDeviationRate",
+          "label": "中值乖离率",
+          "z": -1.3000530494757603
+        },
+        {
+          "key": "middleDeviationAtr",
+          "label": "中值乖离ATR",
+          "z": -1.2697701276749283
+        },
+        {
+          "key": "trendScore",
+          "label": "趋势动能",
+          "z": -1.2667554304901394
+        },
+        {
+          "key": "middlePositionPct",
+          "label": "中值位置百分位",
+          "z": -1.1989324540444493
+        },
+        {
+          "key": "d13",
+          "label": "13日涨跌",
+          "z": -1.1707337071787394
+        },
+        {
+          "key": "d21",
+          "label": "21日涨跌",
+          "z": -1.1264740932518102
+        }
+      ],
+      "profile": {
+        "rangePct": 3.9647601480093555,
+        "atrPct": 4.299552099290157,
+        "volatilityMultiple": 0.9310121113761083,
+        "volatilityExcess": -0.06898788862389091,
+        "volumeMultiple": 0.9747650954716446,
+        "d8": -6.301836979411032,
+        "d13": -8.569140434694035,
+        "d21": -10.358279949236875,
+        "d34": -13.029344515649237,
+        "trendScore": -8.749021449068588,
+        "resonanceCount": 3.9083969465648853,
+        "middleDeviationRate": -5.917870629852032,
+        "middleDeviationAtr": -1.492847636179349,
+        "middlePositionPct": 20.116117039993245,
+        "maDeviationRate": -7.402782768864456,
+        "maDeviationAtr": -2.528174582556218,
+        "maPositionPct": 14.592338432391914,
+        "stretchHeat": 65.29154452761485
+      },
+      "zProfile": {
+        "rangePct": 0.12682718285211345,
+        "atrPct": 0.7277647305567472,
+        "volatilityMultiple": -0.14666241157155369,
+        "volatilityExcess": -0.14666241157155235,
+        "volumeMultiple": -0.1025572844278896,
+        "d8": -1.084041173883995,
+        "d13": -1.1707337071787394,
+        "d21": -1.1264740932518102,
+        "d34": -1.1209855172065375,
+        "trendScore": -1.2667554304901394,
+        "resonanceCount": 0.6660692327425711,
+        "middleDeviationRate": -1.3000530494757603,
+        "middleDeviationAtr": -1.2697701276749283,
+        "middlePositionPct": -1.1989324540444493,
+        "maDeviationRate": -0.8610543570308415,
+        "maDeviationAtr": -0.9004525899880405,
+        "maPositionPct": -1.0268108155528435,
+        "stretchHeat": 1.0790752894523021
+      }
+    },
+    {
+      "id": 6,
+      "grid": "2,0",
+      "name": "上侧趋势共振态",
+      "occurrences": 130,
+      "sharePct": 13.443640124095142,
+      "avgConfidence": 0.2956465908453003,
+      "avgDistance": 2.259715725303445,
+      "firstSeen": "2023-10-06",
+      "lastSeen": "2026-05-13",
+      "typicalDates": [
+        {
+          "date": "2024-09-24",
+          "close": 63500,
+          "distance": 0.9946
+        },
+        {
+          "date": "2026-04-22",
+          "close": 78331.3,
+          "distance": 1.2256
+        },
+        {
+          "date": "2024-09-22",
+          "close": 63626.4,
+          "distance": 1.2274
+        },
+        {
+          "date": "2026-04-17",
+          "close": 76121.9,
+          "distance": 1.252
+        },
+        {
+          "date": "2024-10-24",
+          "close": 67685.8,
+          "distance": 1.2601
+        }
+      ],
+      "topFeatures": [
+        {
+          "key": "middleDeviationAtr",
+          "label": "中值乖离ATR",
+          "z": 0.8840326447066533
+        },
+        {
+          "key": "middlePositionPct",
+          "label": "中值位置百分位",
+          "z": 0.8506388417148079
+        },
+        {
+          "key": "middleDeviationRate",
+          "label": "中值乖离率",
+          "z": 0.8373590288944156
+        },
+        {
+          "key": "d13",
+          "label": "13日涨跌",
+          "z": 0.7133488221075801
+        },
+        {
+          "key": "d8",
+          "label": "8日涨跌",
+          "z": 0.6068030049770298
+        },
+        {
+          "key": "maDeviationRate",
+          "label": "233MA乖离率",
+          "z": -0.5986899863368095
+        }
+      ],
+      "profile": {
+        "rangePct": 3.0702249724091404,
+        "atrPct": 3.283029204332434,
+        "volatilityMultiple": 0.9229186115059325,
+        "volatilityExcess": -0.07708138849406734,
+        "volumeMultiple": 1.0025170068637397,
+        "d8": 5.187501136813674,
+        "d13": 8.07304382742264,
+        "d21": 9.786824075623207,
+        "d34": 7.670849037975881,
+        "trendScore": 7.387850217685549,
+        "resonanceCount": 3.8230769230769233,
+        "middleDeviationRate": 6.168673317536311,
+        "middleDeviationAtr": 1.7458885508881579,
+        "middlePositionPct": 64.76443412315854,
+        "maDeviationRate": -0.86145644768247,
+        "maDeviationAtr": -0.7748141936721289,
+        "maPositionPct": 28.083978422668558,
+        "stretchHeat": 37.1757877509705
+      },
+      "zProfile": {
+        "rangePct": -0.2947396982502764,
+        "atrPct": -0.4259051256679186,
+        "volatilityMultiple": -0.16297563754108776,
+        "volatilityExcess": -0.16297563754108768,
+        "volumeMultiple": -0.04822614531300675,
+        "d8": 0.6068030049770298,
+        "d13": 0.7133488221075801,
+        "d21": 0.5751698593020853,
+        "d34": 0.16338025711043616,
+        "trendScore": 0.5978183039870315,
+        "resonanceCount": 0.5477416365101216,
+        "middleDeviationRate": 0.8373590288944156,
+        "middleDeviationAtr": 0.8840326447066533,
+        "middlePositionPct": 0.8506388417148079,
+        "maDeviationRate": -0.5986899863368095,
+        "maDeviationAtr": -0.5788978200107933,
+        "maPositionPct": -0.5344603783536689,
+        "stretchHeat": -0.2241135231069604
+      }
+    },
+    {
+      "id": 0,
+      "grid": "0,0",
+      "name": "放量波动扩张态",
+      "occurrences": 74,
+      "sharePct": 7.652533609100311,
+      "avgConfidence": 0.2576938272458575,
+      "avgDistance": 2.7645300658940664,
+      "firstSeen": "2023-11-21",
+      "lastSeen": "2026-05-14",
+      "typicalDates": [
+        {
+          "date": "2025-01-13",
+          "close": 96466,
+          "distance": 1.071
+        },
+        {
+          "date": "2024-01-04",
+          "close": 43502,
+          "distance": 1.5223
+        },
+        {
+          "date": "2025-10-20",
+          "close": 113384.5,
+          "distance": 1.6002
+        },
+        {
+          "date": "2024-04-12",
+          "close": 67671.9,
+          "distance": 1.6107
+        },
+        {
+          "date": "2024-01-12",
+          "close": 43157.3,
+          "distance": 1.6778
+        }
+      ],
+      "topFeatures": [
+        {
+          "key": "rangePct",
+          "label": "振幅率",
+          "z": 1.1971623488022074
+        },
+        {
+          "key": "volatilityMultiple",
+          "label": "波动倍率",
+          "z": 1.105090123982799
+        },
+        {
+          "key": "volatilityExcess",
+          "label": "波动超额",
+          "z": 1.1050901239827984
+        },
+        {
+          "key": "volumeMultiple",
+          "label": "量能倍率",
+          "z": 0.8084983414653144
+        },
+        {
+          "key": "stretchHeat",
+          "label": "拉伸热度",
+          "z": -0.7341248491767393
+        },
+        {
+          "key": "resonanceCount",
+          "label": "共振数量",
+          "z": -0.5750158163743109
+        }
+      ],
+      "profile": {
+        "rangePct": 6.235935846443093,
+        "atrPct": 4.089952829745317,
+        "volatilityMultiple": 1.5520455601201986,
+        "volatilityExcess": 0.5520455601201983,
+        "volumeMultiple": 1.4401250237734617,
+        "d8": -2.1626239456397593,
+        "d13": -1.7162431278328498,
+        "d21": -0.024180110392395638,
+        "d34": 3.7489352724830995,
+        "trendScore": -0.789749358187295,
+        "resonanceCount": 3.0135135135135136,
+        "middleDeviationRate": -0.6181889169174103,
+        "middleDeviationAtr": -0.16805024799214374,
+        "middlePositionPct": 36.386652184775684,
+        "maDeviationRate": 28.283567624937664,
+        "maDeviationAtr": 4.872545473616012,
+        "maPositionPct": 49.55781468619046,
+        "stretchHeat": 26.17250544918994
+      },
+      "zProfile": {
+        "rangePct": 1.1971623488022074,
+        "atrPct": 0.48988680339933977,
+        "volatilityMultiple": 1.105090123982799,
+        "volatilityExcess": 1.1050901239827984,
+        "volumeMultiple": 0.8084983414653144,
+        "d8": -0.4748882189949304,
+        "d13": -0.3949086179059771,
+        "d21": -0.2535593406569781,
+        "d34": -0.079959100909209,
+        "trendScore": -0.3470821510161639,
+        "resonanceCount": -0.5750158163743109,
+        "middleDeviationRate": -0.36284521288888644,
+        "middleDeviationAtr": -0.3887621904075737,
+        "middlePositionPct": -0.4520370730321593,
+        "maDeviationRate": 0.5702802689636003,
+        "maDeviationAtr": 0.45679082124416137,
+        "maPositionPct": 0.24918435870632924,
+        "stretchHeat": -0.7341248491767393
+      }
+    },
+    {
+      "id": 1,
+      "grid": "0,1",
+      "name": "上侧趋势拉伸共振态",
+      "occurrences": 69,
+      "sharePct": 7.135470527404343,
+      "avgConfidence": 0.41217180419898186,
+      "avgDistance": 2.630221352551299,
+      "firstSeen": "2023-10-22",
+      "lastSeen": "2025-07-12",
+      "typicalDates": [
+        {
+          "date": "2024-02-17",
+          "close": 51784,
+          "distance": 1.2095
+        },
+        {
+          "date": "2024-02-16",
+          "close": 50980,
+          "distance": 1.4827
+        },
+        {
+          "date": "2024-02-15",
+          "close": 51895.2,
+          "distance": 1.5267
+        },
+        {
+          "date": "2024-11-18",
+          "close": 92398,
+          "distance": 1.5707
+        },
+        {
+          "date": "2023-12-06",
+          "close": 43682.9,
+          "distance": 1.8132
+        }
+      ],
+      "topFeatures": [
+        {
+          "key": "d21",
+          "label": "21日涨跌",
+          "z": 2.0077865699586903
+        },
+        {
+          "key": "trendScore",
+          "label": "趋势动能",
+          "z": 1.9010920938135372
+        },
+        {
+          "key": "middlePositionPct",
+          "label": "中值位置百分位",
+          "z": 1.7962781254239608
+        },
+        {
+          "key": "d13",
+          "label": "13日涨跌",
+          "z": 1.7503183414956718
+        },
+        {
+          "key": "d34",
+          "label": "34日涨跌",
+          "z": 1.7038246260461454
+        },
+        {
+          "key": "middleDeviationRate",
+          "label": "中值乖离率",
+          "z": 1.7024122806714517
+        }
+      ],
+      "profile": {
+        "rangePct": 3.3180006359113454,
+        "atrPct": 3.470562377005558,
+        "volatilityMultiple": 0.9469691634629871,
+        "volatilityExcess": -0.053030836537012876,
+        "volumeMultiple": 0.9444054743140377,
+        "d8": 9.680182204705764,
+        "d13": 17.232641428697686,
+        "d21": 26.747018727750998,
+        "d34": 32.498275331329786,
+        "trendScore": 18.666976113434412,
+        "resonanceCount": 3.9420289855072466,
+        "middleDeviationRate": 11.060338453258241,
+        "middleDeviationAtr": 2.8788774459808635,
+        "middlePositionPct": 85.3644506596425,
+        "maDeviationRate": 43.94688396637043,
+        "maDeviationAtr": 8.433857950473993,
+        "maPositionPct": 87.08850665911217,
+        "stretchHeat": 72.45295731875461
+      },
+      "zProfile": {
+        "rangePct": -0.17797065827863606,
+        "atrPct": -0.21307040307747813,
+        "volatilityMultiple": -0.11449944120318267,
+        "volatilityExcess": -0.11449944120318295,
+        "volumeMultiple": -0.1619936517931631,
+        "d8": 1.267974567192364,
+        "d13": 1.7503183414956718,
+        "d21": 2.0077865699586903,
+        "d34": 1.7038246260461454,
+        "trendScore": 1.9010920938135372,
+        "resonanceCount": 0.7127124257675616,
+        "middleDeviationRate": 1.7024122806714517,
+        "middleDeviationAtr": 1.6374853751489276,
+        "middlePositionPct": 1.7962781254239608,
+        "maDeviationRate": 1.1985161852172002,
+        "maDeviationAtr": 1.1099121199647246,
+        "maPositionPct": 1.6187919538224704,
+        "stretchHeat": 1.4110127544713753
+      }
+    },
+    {
+      "id": 4,
+      "grid": "1,1",
+      "name": "放量波动扩张态",
+      "occurrences": 34,
+      "sharePct": 3.5160289555325748,
+      "avgConfidence": 0.335325132877149,
+      "avgDistance": 3.688614983543989,
+      "firstSeen": "2023-10-15",
+      "lastSeen": "2025-07-13",
+      "typicalDates": [
+        {
+          "date": "2024-02-08",
+          "close": 47159.3,
+          "distance": 2.0603
+        },
+        {
+          "date": "2023-12-03",
+          "close": 41269.3,
+          "distance": 2.2309
+        },
+        {
+          "date": "2024-05-20",
+          "close": 69837.9,
+          "distance": 2.2559
+        },
+        {
+          "date": "2024-11-10",
+          "close": 84097.3,
+          "distance": 2.3546
+        },
+        {
+          "date": "2024-02-13",
+          "close": 51613,
+          "distance": 2.6589
+        }
+      ],
+      "topFeatures": [
+        {
+          "key": "volatilityMultiple",
+          "label": "波动倍率",
+          "z": 2.6754438664106774
+        },
+        {
+          "key": "volatilityExcess",
+          "label": "波动超额",
+          "z": 2.6754438664106774
+        },
+        {
+          "key": "volumeMultiple",
+          "label": "量能倍率",
+          "z": 2.4795006080634963
+        },
+        {
+          "key": "rangePct",
+          "label": "振幅率",
+          "z": 2.2202288545890236
+        },
+        {
+          "key": "trendScore",
+          "label": "趋势动能",
+          "z": 1.776773754246448
+        },
+        {
+          "key": "d8",
+          "label": "8日涨跌",
+          "z": 1.7637309575478184
+        }
+      ],
+      "profile": {
+        "rangePct": 8.406810783325131,
+        "atrPct": 3.603405560997872,
+        "volatilityMultiple": 2.331146998070374,
+        "volatilityExcess": 1.331146998070374,
+        "volumeMultiple": 2.2936596191105174,
+        "d8": 13.048862100395349,
+        "d13": 14.481232814599968,
+        "d21": 21.818663067366003,
+        "d34": 29.842238752197808,
+        "trendScore": 17.591068492124602,
+        "resonanceCount": 3.9705882352941178,
+        "middleDeviationRate": 9.35433423009014,
+        "middleDeviationAtr": 2.4550313881768178,
+        "middlePositionPct": 76.3272509034906,
+        "maDeviationRate": 42.823686447390344,
+        "maDeviationAtr": 7.9351537206562135,
+        "maPositionPct": 77.9192202353657,
+        "stretchHeat": 55.845479714048004
+      },
+      "zProfile": {
+        "rangePct": 2.2202288545890236,
+        "atrPct": -0.06230431828288646,
+        "volatilityMultiple": 2.6754438664106774,
+        "volatilityExcess": 2.6754438664106774,
+        "volumeMultiple": 2.4795006080634963,
+        "d8": 1.7637309575478184,
+        "d13": 1.4388279253878724,
+        "d21": 1.5914915438729593,
+        "d34": 1.5390279796411825,
+        "trendScore": 1.776773754246448,
+        "resonanceCount": 0.7523203306805198,
+        "middleDeviationRate": 1.4007185915389226,
+        "middleDeviationAtr": 1.35562209217869,
+        "middlePositionPct": 1.381427433968999,
+        "maDeviationRate": 1.1534661455519937,
+        "maDeviationAtr": 1.0184530423430405,
+        "maPositionPct": 1.284177171424659,
+        "stretchHeat": 0.6412422947531917
+      }
+    },
+    {
+      "id": 7,
+      "grid": "2,1",
+      "name": "下侧放量扩张拉伸态",
+      "occurrences": 25,
+      "sharePct": 2.5853154084798344,
+      "avgConfidence": 0.3754118362261306,
+      "avgDistance": 3.066839532841838,
+      "firstSeen": "2024-04-30",
+      "lastSeen": "2026-02-05",
+      "typicalDates": [
+        {
+          "date": "2024-07-04",
+          "close": 56678.3,
+          "distance": 1.4677
+        },
+        {
+          "date": "2025-11-13",
+          "close": 96751.9,
+          "distance": 1.8527
+        },
+        {
+          "date": "2024-07-03",
+          "close": 58140.1,
+          "distance": 1.9467
+        },
+        {
+          "date": "2025-03-03",
+          "close": 82977.9,
+          "distance": 1.9667
+        },
+        {
+          "date": "2024-07-07",
+          "close": 55760.2,
+          "distance": 1.978
+        }
+      ],
+      "topFeatures": [
+        {
+          "key": "rangePct",
+          "label": "振幅率",
+          "z": 2.4204046050581076
+        },
+        {
+          "key": "volumeMultiple",
+          "label": "量能倍率",
+          "z": 2.3980615350457923
+        },
+        {
+          "key": "volatilityMultiple",
+          "label": "波动倍率",
+          "z": 2.1658532699818966
+        },
+        {
+          "key": "volatilityExcess",
+          "label": "波动超额",
+          "z": 2.1658532699818966
+        },
+        {
+          "key": "d8",
+          "label": "8日涨跌",
+          "z": -1.7286449631801017
+        },
+        {
+          "key": "trendScore",
+          "label": "趋势动能",
+          "z": -1.6740969473880745
+        }
+      ],
+      "profile": {
+        "rangePct": 8.831569601258165,
+        "atrPct": 4.251798496398466,
+        "volatilityMultiple": 2.078323219760574,
+        "volatilityExcess": 1.078323219760574,
+        "volumeMultiple": 2.252061191853862,
+        "d8": -10.681939521569273,
+        "d13": -12.05471162252676,
+        "d21": -13.911266293279082,
+        "d34": -14.298229621250956,
+        "trendScore": -12.274340754591297,
+        "resonanceCount": 3.88,
+        "middleDeviationRate": -7.905611739542321,
+        "middleDeviationAtr": -1.957054736904571,
+        "middlePositionPct": 12.898276467278286,
+        "maDeviationRate": -6.885423707535315,
+        "maDeviationAtr": -2.320483641485707,
+        "maPositionPct": 13.382470086433985,
+        "stretchHeat": 73.71925344628772
+      },
+      "zProfile": {
+        "rangePct": 2.4204046050581076,
+        "atrPct": 0.6735683199736313,
+        "volatilityMultiple": 2.1658532699818966,
+        "volatilityExcess": 2.1658532699818966,
+        "volumeMultiple": 2.3980615350457923,
+        "d8": -1.7286449631801017,
+        "d13": -1.565339588002231,
+        "d21": -1.4265925596734792,
+        "d34": -1.1997148584058628,
+        "trendScore": -1.6740969473880745,
+        "resonanceCount": 0.6266864209476554,
+        "middleDeviationRate": -1.651569734064741,
+        "middleDeviationAtr": -1.5784740426444495,
+        "middlePositionPct": -1.5302658574434553,
+        "maDeviationRate": -0.8403037358442885,
+        "maDeviationAtr": -0.8623634366082322,
+        "maPositionPct": -1.0709625428087688,
+        "stretchHeat": 1.4697066377588812
+      }
+    }
+  ],
+  "currentState": {
+    "id": 2,
+    "name": "下侧趋势共振态",
+    "date": "2026-05-29",
+    "confidence": 0.1404,
+    "distance": 2.8926,
+    "topFeatures": [
+      {
+        "key": "middleDeviationRate",
+        "label": "中值乖离率",
+        "z": -1.3000530494757603
+      },
+      {
+        "key": "middleDeviationAtr",
+        "label": "中值乖离ATR",
+        "z": -1.2697701276749283
+      },
+      {
+        "key": "trendScore",
+        "label": "趋势动能",
+        "z": -1.2667554304901394
+      },
+      {
+        "key": "middlePositionPct",
+        "label": "中值位置百分位",
+        "z": -1.1989324540444493
+      },
+      {
+        "key": "d13",
+        "label": "13日涨跌",
+        "z": -1.1707337071787394
+      },
+      {
+        "key": "d21",
+        "label": "21日涨跌",
+        "z": -1.1264740932518102
+      }
+    ],
+    "profile": {
+      "rangePct": 3.9647601480093555,
+      "atrPct": 4.299552099290157,
+      "volatilityMultiple": 0.9310121113761083,
+      "volatilityExcess": -0.06898788862389091,
+      "volumeMultiple": 0.9747650954716446,
+      "d8": -6.301836979411032,
+      "d13": -8.569140434694035,
+      "d21": -10.358279949236875,
+      "d34": -13.029344515649237,
+      "trendScore": -8.749021449068588,
+      "resonanceCount": 3.9083969465648853,
+      "middleDeviationRate": -5.917870629852032,
+      "middleDeviationAtr": -1.492847636179349,
+      "middlePositionPct": 20.116117039993245,
+      "maDeviationRate": -7.402782768864456,
+      "maDeviationAtr": -2.528174582556218,
+      "maPositionPct": 14.592338432391914,
+      "stretchHeat": 65.29154452761485
+    }
+  }
+}
