@@ -3,6 +3,7 @@ import { runDeviationStudyFromSnapshots } from "./deviation-study.mjs";
 import { buildDeviationRules } from "./deviation-rules.mjs";
 import { buildWeatherLabels } from "./feature-factory.mjs";
 import { routeStrategies } from "./strategy-router.mjs";
+import { runRouterCalibration } from "./router-calibrator.mjs";
 
 function finite(value) {
   return Number.isFinite(value);
@@ -408,6 +409,128 @@ function gateFromScores(strategyScores, deviationFinal, snapshot, currentCompone
   return "黄";
 }
 
+const LIGHT_GREEN = "\u7eff\u706f";
+const LIGHT_YELLOW = "\u9ec4\u706f";
+const LIGHT_RED = "\u7ea2\u706f";
+const GATE_GREEN = "\u7eff";
+const GATE_YELLOW_GREEN = "\u9ec4\u504f\u7eff";
+const GATE_YELLOW = "\u9ec4";
+const GATE_YELLOW_RED = "\u9ec4\u504f\u7ea2";
+const GATE_RED = "\u7ea2";
+
+function routeFamilyFromKey(routeKey = "") {
+  if (routeKey.startsWith("trend")) return "trend";
+  if (routeKey.startsWith("breakout")) return "breakout";
+  if (routeKey.startsWith("meanReversion")) return "meanReversion";
+  if (routeKey === "gridNeutral") return "grid";
+  if (routeKey === "waitDefense") return "wait";
+  return "";
+}
+
+function routeDirectionFromKey(routeKey = "") {
+  if (routeKey.endsWith("Long") || routeKey.endsWith("Up")) return "long";
+  if (routeKey.endsWith("Short") || routeKey.endsWith("Down")) return "short";
+  return "neutral";
+}
+
+function isWaitSignal(signal) {
+  return routeFamilyFromKey(signal?.routeKey || "") === "wait";
+}
+
+function lightRank(light) {
+  if (light === LIGHT_GREEN) return 3;
+  if (light === LIGHT_YELLOW) return 2;
+  if (light === LIGHT_RED) return 1;
+  return 0;
+}
+
+function numeric(value) {
+  const next = Number(value);
+  return Number.isFinite(next) ? next : 0;
+}
+
+function compareCalibratedSignals(left, right) {
+  return lightRank(right.light) - lightRank(left.light) ||
+    numeric(right.calibrationScore) - numeric(left.calibrationScore) ||
+    numeric(right.currentScore) - numeric(left.currentScore);
+}
+
+function bestCalibratedSignal(signals) {
+  if (!signals?.length) return null;
+  return [...signals].sort(compareCalibratedSignals)[0] || null;
+}
+
+function routeFromSignal(signal, strategyScores) {
+  const rawRoute = strategyScores.routeResult?.routes?.find((route) => route.key === signal.routeKey);
+  return {
+    ...(rawRoute || {}),
+    key: signal.routeKey,
+    label: signal.routeLabel || rawRoute?.label || signal.routeKey,
+    family: rawRoute?.family || routeFamilyFromKey(signal.routeKey),
+    direction: rawRoute?.direction || routeDirectionFromKey(signal.routeKey),
+    score: round(numeric(signal.currentScore || rawRoute?.score), 2),
+    light: signal.light,
+    calibrationScore: signal.calibrationScore,
+    bestHorizon: signal.bestHorizon,
+    sampleConfidencePct: signal.sampleConfidencePct
+  };
+}
+
+function applyCalibrationToStrategyScores(strategyScores, signals) {
+  const topSignal = bestCalibratedSignal(signals);
+  if (!topSignal) return { ...strategyScores, calibratedTopSignal: null };
+
+  return {
+    ...strategyScores,
+    topRoute: routeFromSignal(topSignal, strategyScores),
+    calibratedTopSignal: topSignal
+  };
+}
+
+function gateFromCalibration(signals, strategyScores, deviationFinal, snapshot, currentComponentRows) {
+  if (!signals?.length) {
+    return gateFromScores(strategyScores, deviationFinal, snapshot, currentComponentRows);
+  }
+
+  const waitSignal = signals.find(isWaitSignal);
+  const activeSignals = signals.filter((signal) => !isWaitSignal(signal));
+  const bestActive = bestCalibratedSignal(activeSignals);
+  const greenActive = activeSignals.filter((signal) => signal.light === LIGHT_GREEN);
+  const yellowActive = activeSignals.filter((signal) => signal.light === LIGHT_YELLOW);
+  const redActive = activeSignals.filter((signal) => signal.light === LIGHT_RED);
+  const activeCount = activeSignals.length;
+  const allActiveRed = activeCount > 0 && redActive.length >= Math.max(1, activeCount - 1);
+  const waitGreen = waitSignal?.light === LIGHT_GREEN;
+  const waitYellowStrong = waitSignal?.light === LIGHT_YELLOW &&
+    numeric(waitSignal.currentScore) >= 65 &&
+    numeric(waitSignal.calibrationScore) >= 55;
+  const defensiveDeviation = deviationFinal?.gate === GATE_RED || deviationFinal?.gate === GATE_YELLOW_RED;
+
+  if (!bestActive && waitSignal) {
+    if (waitGreen) return GATE_RED;
+    if (waitSignal.light === LIGHT_YELLOW) return GATE_YELLOW_RED;
+    return GATE_YELLOW;
+  }
+
+  if (waitGreen && !greenActive.length) return allActiveRed ? GATE_RED : GATE_YELLOW_RED;
+  if (allActiveRed) return waitYellowStrong ? GATE_RED : GATE_YELLOW_RED;
+
+  if (greenActive.length) {
+    if (defensiveDeviation || waitGreen || waitYellowStrong || redActive.length >= 3) return GATE_YELLOW_GREEN;
+    return GATE_GREEN;
+  }
+
+  if (yellowActive.length) {
+    if (defensiveDeviation) return GATE_YELLOW_RED;
+    if (waitYellowStrong && numeric(waitSignal.currentScore) >= numeric(bestActive?.currentScore)) return GATE_YELLOW;
+    if (numeric(bestActive?.calibrationScore) >= 58 && redActive.length <= 3) return GATE_YELLOW_GREEN;
+    return GATE_YELLOW;
+  }
+
+  if (waitYellowStrong) return GATE_YELLOW_RED;
+  return GATE_YELLOW;
+}
+
 function actionBias(gate, strategyScores, deviationFinal, currentComponentRows) {
   const top = strategyScores.topRoute;
   const topKey = top?.key || "";
@@ -441,6 +564,10 @@ function currentSnapshotRow(snapshot, deviationRules, currentComponentRows, stra
     gate,
     topWeatherRoute: strategyScores.topRoute.label,
     topWeatherScore: strategyScores.topRoute.score,
+    topWeatherLight: strategyScores.calibratedTopSignal?.light || "",
+    topWeatherCalibrationScore: strategyScores.calibratedTopSignal?.calibrationScore ?? "",
+    topWeatherBestHorizon: strategyScores.calibratedTopSignal?.bestHorizon ?? "",
+    topWeatherSampleConfidencePct: strategyScores.calibratedTopSignal?.sampleConfidencePct ?? "",
     actionBias: actionBias(gate, strategyScores, deviationRules.finalWeather, currentComponentRows),
     volatilityState: volatility5?.state || "",
     atrPct: round(snapshot.volatility.atrPct),
@@ -488,8 +615,11 @@ export function buildMarketWeatherRouter(cleanPayload, config) {
   const deviationStudy = runDeviationStudyFromSnapshots(cleanPayload, config, snapshots);
   const deviationRules = buildDeviationRules(deviationStudy);
   const componentRows = latest ? currentComponentRows(latest, summaryRows, config) : [];
-  const strategyScores = latest ? scoreRouteStrategies(latest, config) : { scores: [], topActiveScore: 0, waitScore: 0, topRoute: null };
-  const gate = latest ? gateFromScores(strategyScores, deviationRules.finalWeather, latest, componentRows) : "数据不足";
+  const calibration = latest ? runRouterCalibration(cleanPayload, config) : null;
+  const calibrationSignals = calibration?.metadata?.currentSignals || [];
+  const rawStrategyScores = latest ? scoreRouteStrategies(latest, config) : { scores: [], topActiveScore: 0, waitScore: 0, topRoute: null };
+  const strategyScores = latest ? applyCalibrationToStrategyScores(rawStrategyScores, calibrationSignals) : rawStrategyScores;
+  const gate = latest ? gateFromCalibration(calibrationSignals, strategyScores, deviationRules.finalWeather, latest, componentRows) : "数据不足";
   const current = latest ? currentSnapshotRow(latest, deviationRules, componentRows, strategyScores, gate) : null;
 
   return {
@@ -502,6 +632,10 @@ export function buildMarketWeatherRouter(cleanPayload, config) {
       lastDate: latest?.date || null,
       snapshotCount: selected.length,
       observationRows: volatilityObservationRows.length,
+      routerCalibrationRows: calibration?.calibrationRows?.length || 0,
+      routerCalibrationObservationRows: calibration?.metadata?.observationRows || 0,
+      gateSource: calibrationSignals.length ? "router_calibration" : "score_fallback",
+      currentCalibrationSignals: calibrationSignals,
       horizons: config.horizons,
       generatedAt: new Date().toISOString(),
       routerPrinciple: "ATR/振幅/波动超额负责波动天气，中值乖离负责短期拉伸，233MA乖离负责大周期过滤。输出是策略适配天气，不是买卖信号。"
