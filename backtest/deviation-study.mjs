@@ -73,6 +73,48 @@ function bucketOrder(name) {
   return bucketDefs.findIndex((bucket) => bucket.name === name);
 }
 
+function prefixMetricRanks(snapshots, metricDef) {
+  const uniqueValues = [...new Set(snapshots.map(metricDef.pick).filter(finite))]
+    .sort((left, right) => left - right);
+  const ranks = new Map(uniqueValues.map((value, index) => [value, index + 1]));
+  const tree = Array(uniqueValues.length + 2).fill(0);
+  const rows = [];
+  let total = 0;
+
+  function add(index, value) {
+    for (let cursor = index; cursor < tree.length; cursor += cursor & -cursor) {
+      tree[cursor] += value;
+    }
+  }
+
+  function sum(index) {
+    let totalAtIndex = 0;
+    for (let cursor = index; cursor > 0; cursor -= cursor & -cursor) {
+      totalAtIndex += tree[cursor];
+    }
+    return totalAtIndex;
+  }
+
+  for (const snapshot of snapshots) {
+    const value = metricDef.pick(snapshot);
+    if (!finite(value)) continue;
+
+    const rank = ranks.get(value);
+    add(rank, 1);
+    total += 1;
+
+    const less = sum(rank - 1);
+    const equal = sum(rank) - less;
+    rows.push({
+      snapshot,
+      value,
+      rankPct: ((less + (equal * 0.5)) / total) * 100
+    });
+  }
+
+  return rows;
+}
+
 function classifyDeviation(deviationAtr, positionPct, prefix) {
   const absDeviation = Math.abs(deviationAtr);
 
@@ -219,24 +261,15 @@ function metricDefsFor(def) {
 }
 
 function rankRowsByMetric(snapshots, def, metricDef) {
-  const values = snapshots
-    .map((snapshot) => ({
-      snapshot,
-      value: metricDef.pick(snapshot)
-    }))
-    .filter((row) => finite(row.value))
-    .sort((left, right) => left.value - right.value);
-
-  return values.map((row, index) => {
-    const rankPct = values.length <= 1 ? 50 : (index / (values.length - 1)) * 100;
-    const bucket = bucketForRank(rankPct);
+  return prefixMetricRanks(snapshots, metricDef).map((row) => {
+    const bucket = bucketForRank(row.rankPct);
     const deviationAtr = def.pickAtr(row.snapshot);
     const positionPct = def.pickPosition(row.snapshot);
     const stateInfo = classifyDeviation(deviationAtr, positionPct, def.prefix);
 
     return {
       ...row,
-      rankPct,
+      rankPct: row.rankPct,
       bucket: bucket.name,
       bucketRange: `${bucket.min}-${Math.min(bucket.max, 100)}%`,
       stateInfo
@@ -491,6 +524,7 @@ export function runDeviationStudyFromSnapshots(cleanPayload, config, snapshots) 
       metricObservationRows: metricRows.length,
       horizons: config.horizons,
       bucketScheme: bucketDefs.map((bucket) => `${bucket.name}:${bucket.min}-${Math.min(bucket.max, 100)}%`),
+      metricBucketMode: "causal_prefix_percentile",
       generatedAt: new Date().toISOString()
     },
     currentRows: currentRows(selected, stateSummaryRows, config.horizons),
