@@ -226,6 +226,16 @@ function aggregateCandles(sourceCandles, targetBar, groupSize) {
   const targetMs = barToMs(targetBar);
   const sourceMs = targetMs / groupSize;
   const buckets = new Map();
+  const candles = [];
+  const aggregation = {
+    sourceRows: sourceCandles.length,
+    totalBuckets: 0,
+    aggregatedRows: 0,
+    droppedBuckets: 0,
+    partialBuckets: 0,
+    oversizedBuckets: 0,
+    nonContinuousBuckets: 0
+  };
 
   for (const candle of sourceCandles) {
     const bucketOpen = Math.floor(candle.openTime / targetMs) * targetMs;
@@ -234,32 +244,54 @@ function aggregateCandles(sourceCandles, targetBar, groupSize) {
     buckets.set(bucketOpen, bucket);
   }
 
-  return Array.from(buckets.entries())
-    .sort(([left], [right]) => left - right)
-    .flatMap(([openTime, bucket]) => {
-      const sorted = bucket.sort((left, right) => left.openTime - right.openTime);
-      if (sorted.length !== groupSize) return [];
+  const entries = Array.from(buckets.entries()).sort(([left], [right]) => left - right);
+  aggregation.totalBuckets = entries.length;
 
-      for (let index = 1; index < sorted.length; index += 1) {
-        if (sorted[index].openTime - sorted[index - 1].openTime !== sourceMs) return [];
+  for (const [openTime, bucket] of entries) {
+    const sorted = bucket.sort((left, right) => left.openTime - right.openTime);
+    if (sorted.length !== groupSize) {
+      aggregation.droppedBuckets += 1;
+      if (sorted.length < groupSize) {
+        aggregation.partialBuckets += 1;
+      } else {
+        aggregation.oversizedBuckets += 1;
       }
+      continue;
+    }
 
-      return [{
-        openTime,
-        closeTime: openTime + targetMs - 1,
-        date: formatCandleDate(openTime, targetBar),
-        open: sorted[0].open,
-        high: Math.max(...sorted.map((candle) => candle.high)),
-        low: Math.min(...sorted.map((candle) => candle.low)),
-        close: sorted.at(-1).close,
-        volume: sorted.reduce((sum, candle) => sum + candle.volume, 0),
-        confirm: "1"
-      }];
+    let continuous = true;
+    for (let index = 1; index < sorted.length; index += 1) {
+      if (sorted[index].openTime - sorted[index - 1].openTime !== sourceMs) {
+        continuous = false;
+        break;
+      }
+    }
+
+    if (!continuous) {
+      aggregation.droppedBuckets += 1;
+      aggregation.nonContinuousBuckets += 1;
+      continue;
+    }
+
+    candles.push({
+      openTime,
+      closeTime: openTime + targetMs - 1,
+      date: formatCandleDate(openTime, targetBar),
+      open: sorted[0].open,
+      high: Math.max(...sorted.map((candle) => candle.high)),
+      low: Math.min(...sorted.map((candle) => candle.low)),
+      close: sorted.at(-1).close,
+      volume: sorted.reduce((sum, candle) => sum + candle.volume, 0),
+      confirm: "1"
     });
+  }
+
+  aggregation.aggregatedRows = candles.length;
+  return { candles, aggregation };
 }
 
 function deriveCleanPayload(sourceCleanPayload, config, recipe) {
-  const candles = aggregateCandles(sourceCleanPayload.candles, config.bar, recipe.groupSize);
+  const { candles, aggregation } = aggregateCandles(sourceCleanPayload.candles, config.bar, recipe.groupSize);
   const sourceMeta = sourceCleanPayload.metadata ?? {};
 
   return {
@@ -279,7 +311,8 @@ function deriveCleanPayload(sourceCleanPayload, config, recipe) {
       missingBars: missingBars(candles, config.bar),
       firstDate: candles[0]?.date || null,
       lastDate: candles.at(-1)?.date || null,
-      derivedFrom: recipe.sourceBar
+      derivedFrom: recipe.sourceBar,
+      aggregation
     },
     candles
   };
