@@ -206,69 +206,6 @@ function weatherName(labels) {
   return `${volatility} / ${trend} / ${middle} / ${ma}`;
 }
 
-export function scoreStrategyFit(snapshot, labels) {
-  const { thresholds } = snapshot.config || {};
-  const strongTrendPct = thresholds?.strongTrendPct || 3;
-  const absTrend = Math.abs(snapshot.momentum.trendScore);
-  const resonance = snapshot.momentum.resonanceCount;
-  const volumeMultiple = snapshot.volume.multiple;
-  const atrPercentile = snapshot.volatility.atrPercentile;
-  const multiplePercentile = snapshot.volatility.multiplePercentile;
-  const volatilityMultiple = snapshot.volatility.multiple;
-  const shortHeating = snapshot.volatility.fibAtrComparisons.atr3To21 >= 1.08 && snapshot.volatility.fibAtrComparisons.atr8To21 >= 1;
-  const shortCooling = snapshot.volatility.fibAtrComparisons.atr3To21 <= 0.88 && snapshot.volatility.fibAtrComparisons.atr8To21 <= 0.96;
-  const volatilityLabel = labelByDimension(labels, "波动")?.label || "";
-  const middleLabel = labelByDimension(labels, "中值位置")?.label || "";
-  const maLabel = labelByDimension(labels, "MA位置")?.label || "";
-  const middleExtreme = middleLabel.includes("极端");
-  const maExtreme = maLabel.includes("极端");
-  const strongTrend = resonance >= 3 && absTrend >= strongTrendPct;
-  const lowTrend = absTrend < 1.2;
-  const compressed = volatilityLabel === "波动压缩";
-  const highExpansion = volatilityLabel === "高波动扩张";
-  const highCooling = volatilityLabel === "高波动冷却";
-
-  const trendFollowing = clamp(
-    18 + (resonance * 11) + Math.min(absTrend * 5, 30) + (volumeMultiple >= 1.15 ? 8 : 0) +
-      (shortHeating ? 10 : 0) - (compressed ? 14 : 0) - (middleExtreme ? 8 : 0),
-    0,
-    100
-  );
-
-  const breakout = clamp(
-    22 + (compressed ? 18 : 0) + (multiplePercentile >= 70 ? 22 : 0) + (shortHeating ? 18 : 0) +
-      (volumeMultiple >= 1.2 ? 10 : 0) - (highCooling ? 18 : 0) - (shortCooling ? 8 : 0),
-    0,
-    100
-  );
-
-  const meanReversion = clamp(
-    18 + clamp((Math.abs(snapshot.position.middleDeviationAtr) - 0.8) * 18, 0, 35) +
-      (middleExtreme ? 24 : 0) + (maExtreme ? 8 : 0) - (strongTrend ? 16 : 0) - (highExpansion ? 8 : 0),
-    0,
-    100
-  );
-
-  const grid = clamp(
-    42 + (atrPercentile <= 40 ? 16 : 0) + (volatilityMultiple <= 1 ? 14 : 0) + (lowTrend ? 18 : 0) +
-      (volumeMultiple <= 1.15 ? 8 : 0) - (highExpansion ? 30 : 0) -
-      (Math.abs(snapshot.position.middleDeviationAtr) >= 1.7 ? 12 : 0) - (volumeMultiple >= 1.5 ? 10 : 0),
-    0,
-    100
-  );
-
-  const maxActiveScore = Math.max(trendFollowing, breakout, meanReversion, grid);
-  const cautionBoost = (maExtreme && compressed ? 16 : 0) + (highCooling ? 12 : 0) + (shortCooling ? 8 : 0);
-  const wait = clamp(35 + cautionBoost + (maxActiveScore < 45 ? 18 : 0) - (maxActiveScore * 0.22), 0, 100);
-
-  return {
-    trendFollowing: round(trendFollowing, 2),
-    breakout: round(breakout, 2),
-    meanReversion: round(meanReversion, 2),
-    grid: round(grid, 2),
-    wait: round(wait, 2)
-  };
-}
 
 function attachConfig(snapshot, config) {
   return {

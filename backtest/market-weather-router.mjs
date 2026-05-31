@@ -1,6 +1,8 @@
 import { buildIndicatorSnapshots } from "./indicators.mjs";
 import { runDeviationStudyFromSnapshots } from "./deviation-study.mjs";
 import { buildDeviationRules } from "./deviation-rules.mjs";
+import { buildWeatherLabels } from "./feature-factory.mjs";
+import { routeStrategies } from "./strategy-router.mjs";
 
 function finite(value) {
   return Number.isFinite(value);
@@ -361,78 +363,29 @@ function findComponent(componentRows, component, horizon) {
   return componentRows.find((row) => row.component === component && row.horizon === horizon);
 }
 
-function scoreStrategies(snapshot, deviationRules, currentComponentRows) {
-  const middle10 = findCurrentRule(deviationRules.currentRuleRows, "middle", 10);
-  const ma10 = findCurrentRule(deviationRules.currentRuleRows, "ma233", 10);
-  const vol5 = findComponent(currentComponentRows, "波动状态", 5);
-  const shortAtr5 = findComponent(currentComponentRows, "短ATR状态", 5);
-  const energy5 = findComponent(currentComponentRows, "波动超额状态", 5);
-  const trend = classifyTrend(snapshot, { thresholds: { strongTrendPct: 3, weakTrendPct: 1.2 } });
-  const absTrend = Math.abs(snapshot.momentum.trendScore);
-  const strongTrend = trend.strength === "strong";
-  const bigWeak = ma10?.state.includes("下侧") || false;
-  const bigExtreme = ma10?.state.includes("极端") || false;
-  const middleExtreme = middle10?.state.includes("极端") || false;
-  const middleDeviation = middle10?.state.includes("偏离") || false;
-  const compressed = vol5?.state === "波动压缩";
-  const lowStart = vol5?.state === "低波动启动";
-  const highExpansion = vol5?.state === "高波动扩张";
-  const shortHeating = shortAtr5?.state === "短ATR升温";
-  const shortCooling = shortAtr5?.state === "短ATR降温";
-  const energyLow = energy5?.state === "振幅未满ATR";
-  const energyPositive = energy5?.state === "振幅已超ATR";
-  const volumeMultiple = snapshot.volume.multiple;
-  const atrPercentile = snapshot.volatility.atrPercentile;
-  const volatilityMultiple = snapshot.volatility.multiple;
-  const middleCloserEdge = (Number(middle10?.returnCloserProbabilityPct) || 0) - (Number(middle10?.continueAwayProbabilityPct) || 0);
-
-  const trendScore = clamp(
-    18 + (strongTrend ? 32 : 0) + Math.min(absTrend * 6, 30) + (volumeMultiple >= 1.15 ? 8 : 0) -
-      (compressed ? 18 : 0) - (energyLow ? 10 : 0) - (bigWeak ? 10 : 0),
-    0,
-    100
-  );
-  const breakoutScore = clamp(
-    16 + (compressed ? 22 : 0) + (lowStart ? 18 : 0) + (shortHeating ? 28 : 0) +
-      (volumeMultiple >= 1.2 ? 12 : 0) + (energyPositive ? 10 : 0) -
-      (shortCooling ? 18 : 0) - (energyLow ? 12 : 0),
-    0,
-    100
-  );
-  const meanReversionScore = clamp(
-    18 + (middleExtreme ? 42 : 0) + (middleDeviation ? 18 : 0) +
-      clamp(middleCloserEdge * 1.8, -18, 24) + (shortCooling ? 8 : 0) -
-      (highExpansion ? 12 : 0) - (bigWeak && !middleExtreme ? 14 : 0),
-    0,
-    100
-  );
-  const gridScore = clamp(
-    34 + (atrPercentile <= 40 ? 16 : 0) + (volatilityMultiple <= 1 ? 16 : 0) +
-      (absTrend < 1.2 ? 18 : 0) + (volumeMultiple >= 0.75 && volumeMultiple <= 1.2 ? 8 : 0) -
-      (highExpansion ? 30 : 0) - (middleExtreme ? 20 : 0) - (bigExtreme ? 10 : 0),
-    0,
-    100
-  );
-  const topActive = Math.max(trendScore, breakoutScore, meanReversionScore, gridScore);
-  const waitScore = clamp(
-    25 + (bigWeak ? 20 : 0) + (energyLow ? 16 : 0) + (shortCooling ? 10 : 0) +
-      (compressed && !shortHeating ? 12 : 0) + (topActive < 55 ? 18 : 0) - (topActive * 0.12),
-    0,
-    100
-  );
+function scoreRouteStrategies(snapshot, config) {
+  const labels = buildWeatherLabels(snapshot, config);
+  const routeResult = routeStrategies(snapshot, labels);
+  const aggregate = routeResult.scores;
   const scores = [
-    { key: "trend", label: "趋势策略天气", score: round(trendScore, 2) },
-    { key: "breakout", label: "突破策略天气", score: round(breakoutScore, 2) },
-    { key: "meanReversion", label: "均值回归天气", score: round(meanReversionScore, 2) },
-    { key: "grid", label: "网格震荡天气", score: round(gridScore, 2) },
-    { key: "wait", label: "防守等待", score: round(waitScore, 2) }
+    { key: "trendFollowing", label: "趋势策略天气", score: round(aggregate.trendFollowing, 2) },
+    { key: "breakout", label: "突破策略天气", score: round(aggregate.breakout, 2) },
+    { key: "meanReversion", label: "均值回归天气", score: round(aggregate.meanReversion, 2) },
+    { key: "grid", label: "网格震荡天气", score: round(aggregate.grid, 2) },
+    { key: "wait", label: "防守等待", score: round(aggregate.wait, 2) }
   ].sort((left, right) => right.score - left.score);
 
   return {
     scores,
-    topRoute: scores[0],
-    topActiveScore: round(topActive, 2),
-    waitScore: round(waitScore, 2)
+    topRoute: routeResult.topRoutes[0] ?? scores[0],
+    topActiveScore: round(Math.max(
+      aggregate.trendFollowing,
+      aggregate.breakout,
+      aggregate.meanReversion,
+      aggregate.grid
+    ), 2),
+    waitScore: round(aggregate.wait, 2),
+    routeResult
   };
 }
 
@@ -457,16 +410,18 @@ function gateFromScores(strategyScores, deviationFinal, snapshot, currentCompone
 
 function actionBias(gate, strategyScores, deviationFinal, currentComponentRows) {
   const top = strategyScores.topRoute;
+  const topKey = top?.key || "";
+  const topFamily = top?.family || topKey;
   const energy5 = findComponent(currentComponentRows, "波动超额状态", 5);
   const vol5 = findComponent(currentComponentRows, "波动状态", 5);
 
   if (gate === "红") return "防守等待，策略环境不友好";
   if (gate === "黄偏红") return "谨慎观察，不把单一短期偏离当入场理由";
-  if (top.key === "wait") return "等待更清楚的波动或位置共振";
-  if (top.key === "breakout" && vol5?.state === "波动压缩") return "突破预备天气，等待放量和方向确认";
-  if (top.key === "meanReversion") return "均值回归可观察，但要服从大周期过滤";
-  if (top.key === "grid") return "震荡/网格天气较友好，仍需控制突破风险";
-  if (top.key === "trend") return "趋势天气较友好，等方向和量能确认";
+  if (topFamily === "wait" || topKey === "waitDefense") return "等待更清楚的波动或位置共振";
+  if (topFamily === "breakout" && vol5?.state === "波动压缩") return "突破预备天气，等待放量和方向确认";
+  if (topFamily === "meanReversion") return "均值回归可观察，但要服从大周期过滤";
+  if (topFamily === "grid") return "震荡/网格天气较友好，仍需控制突破风险";
+  if (topFamily === "trend") return "趋势天气较友好，等方向和量能确认";
   if (energy5?.state === "振幅未满ATR") return "当根振幅未满ATR，避免追单";
   return deviationFinal.actionBias || "观察";
 }
@@ -533,7 +488,7 @@ export function buildMarketWeatherRouter(cleanPayload, config) {
   const deviationStudy = runDeviationStudyFromSnapshots(cleanPayload, config, snapshots);
   const deviationRules = buildDeviationRules(deviationStudy);
   const componentRows = latest ? currentComponentRows(latest, summaryRows, config) : [];
-  const strategyScores = latest ? scoreStrategies(latest, deviationRules, componentRows) : { scores: [], topActiveScore: 0, waitScore: 0, topRoute: null };
+  const strategyScores = latest ? scoreRouteStrategies(latest, config) : { scores: [], topActiveScore: 0, waitScore: 0, topRoute: null };
   const gate = latest ? gateFromScores(strategyScores, deviationRules.finalWeather, latest, componentRows) : "数据不足";
   const current = latest ? currentSnapshotRow(latest, deviationRules, componentRows, strategyScores, gate) : null;
 
