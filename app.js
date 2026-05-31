@@ -151,7 +151,7 @@ function renderComponentGrid(weather, deviations) {
       sub: `升波 ${formatPct(current.fiveDayAtrUpProbabilityPct)}`,
     },
     {
-      title: "余动能",
+      title: "波动超额",
       state: current.remainingMomentumState,
       main: `${formatNumber(current.remainingMomentumAtr, 2)} ATR`,
       sub: `转正 ${formatPct(current.fiveDayFutureMomentumPositivePct)}`,
@@ -216,7 +216,7 @@ function renderMetrics(values) {
   const metrics = [
     ["ATR", formatPct(values.atrPct), `百分位 ${formatPct(values.atrPercentile)}`],
     ["振幅/ATR", formatNumber(values.volatilityMultiple, 2), `百分位 ${formatPct(values.volatilityMultiplePercentile)}`],
-    ["剩余动能", `${formatNumber(values.remainingMomentumAtr, 2)} ATR`, formatPct(values.remainingMomentumPct)],
+    ["波动超额", `${formatNumber(values.remainingMomentumAtr, 2)} ATR`, formatPct(values.remainingMomentumPct)],
     ["量能倍率", `${formatNumber(values.volumeMultiple, 2)}x`, "当前 / 20日均量"],
     ["8日涨跌", formatSignedPct(values.d8), "短端动量"],
     ["13日涨跌", formatSignedPct(values.d13), "中短动量"],
@@ -264,7 +264,7 @@ function renderFibTable(values) {
         <th>ATR百分位</th>
         <th>振幅/ATR</th>
         <th>振幅倍率百分位</th>
-        <th>剩余动能ATR</th>
+        <th>波动超额ATR</th>
       </tr>
     </thead>
     <tbody>
@@ -297,7 +297,7 @@ function renderComponentTable(rows) {
         <th>样本</th>
         <th>ATR升</th>
         <th>ATR降</th>
-        <th>余动能转正</th>
+        <th>振幅超ATR</th>
         <th>中位ATR变化</th>
       </tr>
     </thead>
@@ -367,7 +367,7 @@ function renderNotes(weather, features, deviations) {
   const notes = [
     ["主结论", `${current.gate}，当前更像“${current.topWeatherRoute}”天气，分数 ${formatNumber(current.topWeatherScore, 2)}。`],
     ["波动", `ATR 处在 ${formatPct(values.atrPercentile)} 分位，振幅/ATR 为 ${formatNumber(values.volatilityMultiple, 2)}，历史上 5 日后 ATR 降低概率 ${formatPct(current.fiveDayAtrDownProbabilityPct)}。`],
-    ["余动能", `剩余动能 ${formatNumber(values.remainingMomentumAtr, 2)} ATR，属于 ${current.remainingMomentumState}，5 日后余动能转正概率 ${formatPct(current.fiveDayFutureMomentumPositivePct)}。`],
+    ["波动超额", `波动超额 ${formatNumber(values.remainingMomentumAtr, 2)} ATR，属于 ${current.remainingMomentumState}，5 日后振幅超ATR概率 ${formatPct(current.fiveDayFutureMomentumPositivePct)}。`],
     ["乖离", `中值乖离率 ${formatSignedPct(values.middleDeviationRate)}，等于 ${formatNumber(values.middleDeviationAtr, 2)} 个 ATR；233MA 乖离率 ${formatSignedPct(values.maDeviationRate)}，等于 ${formatNumber(values.maDeviationAtr, 2)} 个 ATR。`],
     ["规则", deviationWeather?.riskNote ?? "当前规则只做天气识别，不单独触发交易。"],
   ];

@@ -125,20 +125,20 @@ function classifyEnergy(snapshot) {
 
   if (remaining >= 0.2) {
     return {
-      label: "剩余动能为正",
+      label: "振幅已超ATR",
       confidence: clamp(remaining / 1.2, 0.25, 1)
     };
   }
 
   if (remaining <= -0.2) {
     return {
-      label: "剩余动能不足",
+      label: "振幅未满ATR",
       confidence: clamp(Math.abs(remaining) / 1.2, 0.25, 1)
     };
   }
 
   return {
-    label: "接近正常动能",
+    label: "接近一倍ATR",
     confidence: clamp(1 - Math.abs(remaining) / 0.2, 0, 1)
   };
 }

@@ -148,7 +148,7 @@ function prefixPercentile(values) {
 
 function buildAtrBundle(candles, period) {
   const atrValues = wilderAtr(candles, period);
-  const atrPctValues = candles.map((candle, index) => atrValues[index] ? safeDivide(atrValues[index], candle.open) * 100 : null);
+  const atrPctValues = candles.map((candle, index) => atrValues[index] ? safeDivide(atrValues[index], candle.close) * 100 : null);
   const multipleValues = candles.map((candle, index) => atrValues[index] ? safeDivide(candle.high - candle.low, atrValues[index]) : null);
 
   return {
@@ -165,7 +165,7 @@ export function buildIndicatorSnapshots(candles, config) {
   const { indicator } = config;
   const closes = candles.map((candle) => candle.close);
   const atrValues = wilderAtr(candles, indicator.atrPeriod);
-  const atrPctValues = candles.map((candle, index) => atrValues[index] ? safeDivide(atrValues[index], candle.open) * 100 : null);
+  const atrPctValues = candles.map((candle, index) => atrValues[index] ? safeDivide(atrValues[index], candle.close) * 100 : null);
   const volatilityMultipleValues = candles.map((candle, index) => atrValues[index] ? safeDivide(candle.high - candle.low, atrValues[index]) : null);
   const atrPercentileValues = prefixPercentile(atrPctValues);
   const volatilityMultiplePercentileValues = prefixPercentile(volatilityMultipleValues);
@@ -214,8 +214,9 @@ export function buildIndicatorSnapshots(candles, config) {
     const middlePositionPct = positionPct(middleDeviationAtr, middleValleyAtr, middlePeakAtr);
     const maPositionPct = positionPct(maDeviationAtr, maValleyAtr, maPeakAtr);
     const rangeAbs = latest.high - latest.low;
+    const rangePctClose = safeDivide(rangeAbs, latest.close) * 100;
     const remainingMomentumAbs = rangeAbs - atrAbs;
-    const remainingMomentumPct = (safeDivide(rangeAbs, latest.open) * 100) - atrPct;
+    const remainingMomentumPct = rangePctClose - atrPct;
     const remainingMomentumAtr = volatilityMultiple - 1;
     const fibAtr = Object.fromEntries(Object.entries(fibAtrBundles).flatMap(([period, bundle]) => {
       const fibAtrAbs = bundle.atrValues[index];
@@ -232,7 +233,7 @@ export function buildIndicatorSnapshots(candles, config) {
         multiple: fibMultiple,
         multiplePercentile: fibMultiplePercentile,
         remainingMomentumAbs: rangeAbs - fibAtrAbs,
-        remainingMomentumPct: (safeDivide(rangeAbs, latest.open) * 100) - fibAtrPct,
+        remainingMomentumPct: rangePctClose - fibAtrPct,
         remainingMomentumAtr: fibMultiple - 1
       }]];
     }));

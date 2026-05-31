@@ -114,20 +114,20 @@ function classifyEnergy(snapshot) {
 
   if (remaining >= 0.2) {
     return {
-      state: "动能已超ATR",
+      state: "振幅已超ATR",
       confidencePct: round(clamp(remaining / 1.2, 0, 1) * 100, 2)
     };
   }
 
   if (remaining <= -0.2) {
     return {
-      state: "余动能不足",
+      state: "振幅未满ATR",
       confidencePct: round(clamp(Math.abs(remaining) / 1.2, 0, 1) * 100, 2)
     };
   }
 
   return {
-    state: "接近正常动能",
+    state: "接近一倍ATR",
     confidencePct: round(clamp(1 - Math.abs(remaining) / 0.2, 0, 1) * 100, 2)
   };
 }
@@ -296,7 +296,7 @@ function componentSummaryRows(rows) {
   return [
     ...summarizeComponent(rows, "volatilityState", "波动状态"),
     ...summarizeComponent(rows, "shortAtrState", "短ATR状态"),
-    ...summarizeComponent(rows, "energyState", "余动能状态"),
+    ...summarizeComponent(rows, "energyState", "波动超额状态"),
     ...summarizeComponent(rows, "trendState", "趋势状态"),
     ...summarizeComponent(rows, "volumeState", "量能状态")
   ].sort((left, right) =>
@@ -320,7 +320,7 @@ function currentComponentRows(snapshot, summaryRows, config) {
   const components = [
     { component: "波动状态", state: volatility.state, confidencePct: volatility.confidencePct },
     { component: "短ATR状态", state: shortAtr.state, confidencePct: shortAtr.confidencePct },
-    { component: "余动能状态", state: energy.state, confidencePct: energy.confidencePct },
+    { component: "波动超额状态", state: energy.state, confidencePct: energy.confidencePct },
     { component: "趋势状态", state: trend.state, confidencePct: trend.confidencePct },
     { component: "量能状态", state: volume.state, confidencePct: volume.confidencePct }
   ];
@@ -366,7 +366,7 @@ function scoreStrategies(snapshot, deviationRules, currentComponentRows) {
   const ma10 = findCurrentRule(deviationRules.currentRuleRows, "ma233", 10);
   const vol5 = findComponent(currentComponentRows, "波动状态", 5);
   const shortAtr5 = findComponent(currentComponentRows, "短ATR状态", 5);
-  const energy5 = findComponent(currentComponentRows, "余动能状态", 5);
+  const energy5 = findComponent(currentComponentRows, "波动超额状态", 5);
   const trend = classifyTrend(snapshot, { thresholds: { strongTrendPct: 3, weakTrendPct: 1.2 } });
   const absTrend = Math.abs(snapshot.momentum.trendScore);
   const strongTrend = trend.strength === "strong";
@@ -379,8 +379,8 @@ function scoreStrategies(snapshot, deviationRules, currentComponentRows) {
   const highExpansion = vol5?.state === "高波动扩张";
   const shortHeating = shortAtr5?.state === "短ATR升温";
   const shortCooling = shortAtr5?.state === "短ATR降温";
-  const energyLow = energy5?.state === "余动能不足";
-  const energyPositive = energy5?.state === "动能已超ATR";
+  const energyLow = energy5?.state === "振幅未满ATR";
+  const energyPositive = energy5?.state === "振幅已超ATR";
   const volumeMultiple = snapshot.volume.multiple;
   const atrPercentile = snapshot.volatility.atrPercentile;
   const volatilityMultiple = snapshot.volatility.multiple;
@@ -439,10 +439,10 @@ function scoreStrategies(snapshot, deviationRules, currentComponentRows) {
 function gateFromScores(strategyScores, deviationFinal, snapshot, currentComponentRows) {
   const topActive = strategyScores.topActiveScore;
   const wait = strategyScores.waitScore;
-  const energy5 = findComponent(currentComponentRows, "余动能状态", 5);
+  const energy5 = findComponent(currentComponentRows, "波动超额状态", 5);
   const vol5 = findComponent(currentComponentRows, "波动状态", 5);
   const bigWeak = deviationFinal.weather?.includes("大周期弱势") || false;
-  const energyLow = energy5?.state === "余动能不足";
+  const energyLow = energy5?.state === "振幅未满ATR";
   const compressed = vol5?.state === "波动压缩";
 
   if (bigWeak && energyLow && topActive < 65) return "黄偏红";
@@ -457,7 +457,7 @@ function gateFromScores(strategyScores, deviationFinal, snapshot, currentCompone
 
 function actionBias(gate, strategyScores, deviationFinal, currentComponentRows) {
   const top = strategyScores.topRoute;
-  const energy5 = findComponent(currentComponentRows, "余动能状态", 5);
+  const energy5 = findComponent(currentComponentRows, "波动超额状态", 5);
   const vol5 = findComponent(currentComponentRows, "波动状态", 5);
 
   if (gate === "红") return "防守等待，策略环境不友好";
@@ -467,7 +467,7 @@ function actionBias(gate, strategyScores, deviationFinal, currentComponentRows) 
   if (top.key === "meanReversion") return "均值回归可观察，但要服从大周期过滤";
   if (top.key === "grid") return "震荡/网格天气较友好，仍需控制突破风险";
   if (top.key === "trend") return "趋势天气较友好，等方向和量能确认";
-  if (energy5?.state === "余动能不足") return "余动能不足，避免追单";
+  if (energy5?.state === "振幅未满ATR") return "当根振幅未满ATR，避免追单";
   return deviationFinal.actionBias || "观察";
 }
 
@@ -476,7 +476,7 @@ function currentSnapshotRow(snapshot, deviationRules, currentComponentRows, stra
   const ma10 = findCurrentRule(deviationRules.currentRuleRows, "ma233", 10);
   const volatility5 = findComponent(currentComponentRows, "波动状态", 5);
   const shortAtr5 = findComponent(currentComponentRows, "短ATR状态", 5);
-  const energy5 = findComponent(currentComponentRows, "余动能状态", 5);
+  const energy5 = findComponent(currentComponentRows, "波动超额状态", 5);
   const trend = classifyTrend(snapshot, { thresholds: { strongTrendPct: 3, weakTrendPct: 1.2 } });
   const volume = classifyVolume(snapshot, { thresholds: { volumeExpansion: 1.5 } });
 
@@ -549,7 +549,7 @@ export function buildMarketWeatherRouter(cleanPayload, config) {
       observationRows: volatilityObservationRows.length,
       horizons: config.horizons,
       generatedAt: new Date().toISOString(),
-      routerPrinciple: "ATR/振幅/余动能负责波动天气，中值乖离负责短期拉伸，233MA乖离负责大周期过滤。输出是策略适配天气，不是买卖信号。"
+      routerPrinciple: "ATR/振幅/波动超额负责波动天气，中值乖离负责短期拉伸，233MA乖离负责大周期过滤。输出是策略适配天气，不是买卖信号。"
     },
     current,
     strategyScores: strategyScores.scores,

@@ -136,7 +136,7 @@ export function routeStrategies(snapshot, labels) {
     (compressed ? 10 : 0) +
     (shortCooling ? 10 : 0) +
     ((maLowerExtreme || maUpperExtreme) ? 14 : 0) +
-    ((energyLabel === "剩余动能不足") ? 6 : 0) +
+    ((energyLabel === "振幅未满ATR") ? 6 : 0) +
     ((volumeLabel === "缩量") ? 6 : 0) +
     (maxDirectional < 45 ? 18 : 0) -
     (maxDirectional * 0.14);
@@ -189,7 +189,7 @@ export function routeStrategies(snapshot, labels) {
       scoreReason("波动压缩，等待确认", compressed),
       scoreReason("短波动降温", shortCooling),
       scoreReason("MA位置极端，等待结构修复", maLowerExtreme || maUpperExtreme),
-      scoreReason("剩余动能不足", energyLabel === "剩余动能不足")
+      scoreReason("振幅未满ATR", energyLabel === "振幅未满ATR")
     ])
   ].sort((left, right) => right.score - left.score);
 
