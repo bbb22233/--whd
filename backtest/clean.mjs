@@ -45,10 +45,7 @@ function normalizeRow(row, bar) {
   };
 }
 
-function isValidCandle(candle) {
-  const highLowRatio = candle.low > 0 ? candle.high / candle.low : Infinity;
-  const openCloseRatio = Math.max(candle.open, candle.close) / Math.min(candle.open, candle.close);
-
+function isStructurallyValidCandle(candle) {
   return finite(candle.openTime) &&
     finite(candle.open) &&
     finite(candle.high) &&
@@ -60,15 +57,21 @@ function isValidCandle(candle) {
     candle.low > 0 &&
     candle.close > 0 &&
     candle.high >= Math.max(candle.open, candle.close) &&
-    candle.low <= Math.min(candle.open, candle.close) &&
-    highLowRatio <= 5 &&
-    openCloseRatio <= 5;
+    candle.low <= Math.min(candle.open, candle.close);
+}
+
+function isExtremeCandle(candle) {
+  const highLowRatio = candle.high / candle.low;
+  const openCloseRatio = Math.max(candle.open, candle.close) / Math.min(candle.open, candle.close);
+
+  return highLowRatio > 5 || openCloseRatio > 5;
 }
 
 export function cleanOkxRaw(rawPayload) {
   const seen = new Map();
   const invalidRows = [];
   let duplicateRows = 0;
+  let extremeRows = 0;
   let unconfirmedRows = 0;
   const barMs = barToMs(rawPayload.bar);
 
@@ -80,9 +83,14 @@ export function cleanOkxRaw(rawPayload) {
       continue;
     }
 
-    if (!isValidCandle(candle)) {
+    if (!isStructurallyValidCandle(candle)) {
       invalidRows.push(row);
       continue;
+    }
+
+    if (isExtremeCandle(candle)) {
+      candle.extremeFlag = true;
+      extremeRows += 1;
     }
 
     if (seen.has(candle.openTime)) duplicateRows += 1;
@@ -115,6 +123,7 @@ export function cleanOkxRaw(rawPayload) {
       cleanRows: candles.length,
       duplicateRows,
       invalidRows: invalidRows.length,
+      extremeRows,
       unconfirmedRows,
       missingBars,
       firstDate: candles[0]?.date || null,
