@@ -57,15 +57,59 @@ function average(values) {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
-function stddev(values, mean) {
-  if (values.length < 2) return 1;
-  const variance = average(values.map((value) => (value - mean) ** 2));
-  return Math.sqrt(variance) || 1;
-}
-
 function clamp(value, min, max) {
   if (!finite(value)) return 0;
   return Math.min(max, Math.max(min, value));
+}
+
+function makeRunningStats() {
+  return Object.fromEntries(stateFeatureDefs.map((feature) => [
+    feature.key,
+    {
+      key: feature.key,
+      label: feature.label,
+      count: 0,
+      mean: 0,
+      m2: 0,
+      min: Infinity,
+      max: -Infinity
+    }
+  ]));
+}
+
+function updateRunningStats(stats, values) {
+  for (const feature of stateFeatureDefs) {
+    const item = stats[feature.key];
+    const value = values[feature.key];
+    item.count += 1;
+
+    const delta = value - item.mean;
+    item.mean += delta / item.count;
+    const deltaAfterMean = value - item.mean;
+    item.m2 += delta * deltaAfterMean;
+    item.min = Math.min(item.min, value);
+    item.max = Math.max(item.max, value);
+  }
+}
+
+function finalizeRunningStats(item) {
+  const std = item.count < 2 ? 1 : Math.sqrt(item.m2 / item.count) || 1;
+  return {
+    key: item.key,
+    label: item.label,
+    mean: item.mean,
+    std,
+    min: item.count ? item.min : 0,
+    max: item.count ? item.max : 0,
+    count: item.count
+  };
+}
+
+function snapshotRunningStats(stats) {
+  return Object.fromEntries(stateFeatureDefs.map((feature) => [
+    feature.key,
+    finalizeRunningStats(stats[feature.key])
+  ]));
 }
 
 export function buildFeatureDataset(snapshots) {
@@ -84,33 +128,29 @@ export function buildFeatureDataset(snapshots) {
     };
   }).filter((row) => Object.values(row.values).every(finite));
 
-  const stats = Object.fromEntries(stateFeatureDefs.map((feature) => {
-    const values = rawRows.map((row) => row.values[feature.key]);
-    const mean = average(values);
-    return [
-      feature.key,
-      {
-        key: feature.key,
-        label: feature.label,
-        mean,
-        std: stddev(values, mean),
-        min: Math.min(...values),
-        max: Math.max(...values)
-      }
-    ];
-  }));
+  const runningStats = makeRunningStats();
+  const rows = rawRows.map((row) => {
+    updateRunningStats(runningStats, row.values);
+    const rowStats = snapshotRunningStats(runningStats);
 
-  const rows = rawRows.map((row) => ({
-    ...row,
-    vector: stateFeatureDefs.map((feature) => {
-      const featureStats = stats[feature.key];
-      return clamp((row.values[feature.key] - featureStats.mean) / featureStats.std, -5, 5);
-    })
-  }));
+    return {
+      ...row,
+      vector: stateFeatureDefs.map((feature) => {
+        const featureStats = rowStats[feature.key];
+        return clamp((row.values[feature.key] - featureStats.mean) / featureStats.std, -5, 5);
+      })
+    };
+  });
+
+  const stats = snapshotRunningStats(runningStats);
 
   return {
     features: stateFeatureDefs.map(({ key, label }) => ({ key, label })),
     stats,
+    normalization: {
+      mode: "expanding_causal_zscore",
+      description: "Each row vector uses running mean/std from rows up to and including that row."
+    },
     rows
   };
 }
