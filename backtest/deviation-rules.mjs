@@ -19,6 +19,14 @@ function confidenceLabel(samples, edgePct) {
   return "弱";
 }
 
+const LOW_CONFIDENCE_LABEL = "\u6837\u672c\u504f\u5c11";
+const DEVIATION_GATE_YELLOW = "\u9ec4\u706f";
+const DEVIATION_GATE_YELLOW_GREEN = "\u9ec4\u504f\u7eff";
+
+function isLowConfidence(label) {
+  return label === LOW_CONFIDENCE_LABEL;
+}
+
 function roleForKind(kindKey) {
   if (kindKey === "middle") return "短期拉伸/回归";
   return "大周期天气过滤";
@@ -207,6 +215,9 @@ function finalWeather(currentRows) {
   const maRule = ruleForState(ma10);
   const middleEdge = probabilityEdge(middle10.returnCloserProbabilityPct, middle10.continueAwayProbabilityPct);
   const maEdge = probabilityEdge(ma10.returnCloserProbabilityPct, ma10.continueAwayProbabilityPct);
+  const middleConfidence = confidenceLabel(middle10.similarOccurrences, middleEdge);
+  const maConfidence = confidenceLabel(ma10.similarOccurrences, maEdge);
+  const confidenceLimited = isLowConfidence(middleConfidence) || isLowConfidence(maConfidence);
   const shortBias = middle10.returnCloserProbabilityPct > middle10.continueAwayProbabilityPct
     ? "短期略偏回归"
     : "短期仍可能继续拉伸";
@@ -232,6 +243,11 @@ function finalWeather(currentRows) {
     gate = "黄偏绿";
   }
 
+  if (confidenceLimited && gate === DEVIATION_GATE_YELLOW_GREEN) {
+    actionBias = "样本偏少，偏离规则只做观察，不升级主灯号";
+    gate = DEVIATION_GATE_YELLOW;
+  }
+
   return {
     date: middle10.date,
     close: middle10.close,
@@ -240,7 +256,8 @@ function finalWeather(currentRows) {
     bigCycle: `${bigBias}，10日继续远离概率 ${ma10.continueAwayProbabilityPct}%`,
     gate,
     actionBias,
-    ruleConfidence: `中值${confidenceLabel(middle10.similarOccurrences, middleEdge)} / 233MA${confidenceLabel(ma10.similarOccurrences, maEdge)}`,
+    ruleConfidence: `中值${middleConfidence} / 233MA${maConfidence}`,
+    confidenceLimited,
     riskNote: `${middleRule.riskNote}；${maRule.riskNote}`
   };
 }

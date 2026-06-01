@@ -417,6 +417,10 @@ const GATE_YELLOW_GREEN = "\u9ec4\u504f\u7eff";
 const GATE_YELLOW = "\u9ec4";
 const GATE_YELLOW_RED = "\u9ec4\u504f\u7ea2";
 const GATE_RED = "\u7ea2";
+const MIN_CALIBRATION_OCCURRENCES = 30;
+const MIN_CALIBRATION_CONFIDENCE_PCT = 40;
+const CONFIDENCE_GATE_PASS = "\u6837\u672c\u901a\u8fc7";
+const CONFIDENCE_GATE_WEAK = "\u6837\u672c\u4e0d\u8db3";
 
 function routeFamilyFromKey(routeKey = "") {
   if (routeKey.startsWith("trend")) return "trend";
@@ -449,6 +453,61 @@ function numeric(value) {
   return Number.isFinite(next) ? next : 0;
 }
 
+function calibrationRowKey(routeKey, horizon) {
+  return `${routeKey}::${horizon}`;
+}
+
+function calibrationRowsBySignalKey(rows = []) {
+  const lookup = new Map();
+  for (const row of rows) {
+    lookup.set(calibrationRowKey(row.routeKey, row.horizon), row);
+  }
+  return lookup;
+}
+
+function signalOccurrences(signal, rowLookup) {
+  const direct = Number(signal?.occurrences);
+  if (Number.isFinite(direct)) return direct;
+  const row = rowLookup.get(calibrationRowKey(signal?.routeKey, signal?.bestHorizon));
+  return numeric(row?.occurrences);
+}
+
+function confidenceGateReason(occurrences, confidencePct) {
+  if (occurrences < MIN_CALIBRATION_OCCURRENCES && confidencePct < MIN_CALIBRATION_CONFIDENCE_PCT) {
+    return `occurrences ${occurrences} < ${MIN_CALIBRATION_OCCURRENCES}, sampleConfidencePct ${round(confidencePct, 2)} < ${MIN_CALIBRATION_CONFIDENCE_PCT}`;
+  }
+  if (occurrences < MIN_CALIBRATION_OCCURRENCES) {
+    return `occurrences ${occurrences} < ${MIN_CALIBRATION_OCCURRENCES}`;
+  }
+  if (confidencePct < MIN_CALIBRATION_CONFIDENCE_PCT) {
+    return `sampleConfidencePct ${round(confidencePct, 2)} < ${MIN_CALIBRATION_CONFIDENCE_PCT}`;
+  }
+  return "";
+}
+
+function applyConfidenceGateToSignal(signal, rowLookup) {
+  const occurrences = signalOccurrences(signal, rowLookup);
+  const sampleConfidencePct = numeric(signal?.sampleConfidencePct);
+  const weakSample = occurrences < MIN_CALIBRATION_OCCURRENCES ||
+    sampleConfidencePct < MIN_CALIBRATION_CONFIDENCE_PCT;
+  const rawLight = signal.light;
+  const light = weakSample && rawLight === LIGHT_GREEN ? LIGHT_YELLOW : rawLight;
+
+  return {
+    ...signal,
+    occurrences,
+    rawLight,
+    light,
+    confidenceGate: weakSample ? CONFIDENCE_GATE_WEAK : CONFIDENCE_GATE_PASS,
+    confidenceGateReason: weakSample ? confidenceGateReason(occurrences, sampleConfidencePct) : ""
+  };
+}
+
+function applyConfidenceGateToSignals(signals, calibrationRows) {
+  const rowLookup = calibrationRowsBySignalKey(calibrationRows);
+  return (signals || []).map((signal) => applyConfidenceGateToSignal(signal, rowLookup));
+}
+
 function compareCalibratedSignals(left, right) {
   return lightRank(right.light) - lightRank(left.light) ||
     numeric(right.calibrationScore) - numeric(left.calibrationScore) ||
@@ -470,9 +529,13 @@ function routeFromSignal(signal, strategyScores) {
     direction: rawRoute?.direction || routeDirectionFromKey(signal.routeKey),
     score: round(numeric(signal.currentScore || rawRoute?.score), 2),
     light: signal.light,
+    rawLight: signal.rawLight || signal.light,
     calibrationScore: signal.calibrationScore,
     bestHorizon: signal.bestHorizon,
-    sampleConfidencePct: signal.sampleConfidencePct
+    sampleConfidencePct: signal.sampleConfidencePct,
+    occurrences: signal.occurrences,
+    confidenceGate: signal.confidenceGate,
+    confidenceGateReason: signal.confidenceGateReason
   };
 }
 
@@ -565,9 +628,12 @@ function currentSnapshotRow(snapshot, deviationRules, currentComponentRows, stra
     topWeatherRoute: strategyScores.topRoute.label,
     topWeatherScore: strategyScores.topRoute.score,
     topWeatherLight: strategyScores.calibratedTopSignal?.light || "",
+    topWeatherRawLight: strategyScores.calibratedTopSignal?.rawLight || strategyScores.calibratedTopSignal?.light || "",
     topWeatherCalibrationScore: strategyScores.calibratedTopSignal?.calibrationScore ?? "",
     topWeatherBestHorizon: strategyScores.calibratedTopSignal?.bestHorizon ?? "",
+    topWeatherOccurrences: strategyScores.calibratedTopSignal?.occurrences ?? "",
     topWeatherSampleConfidencePct: strategyScores.calibratedTopSignal?.sampleConfidencePct ?? "",
+    topWeatherConfidenceGate: strategyScores.calibratedTopSignal?.confidenceGate || "",
     actionBias: actionBias(gate, strategyScores, deviationRules.finalWeather, currentComponentRows),
     volatilityState: volatility5?.state || "",
     atrPct: round(snapshot.volatility.atrPct),
@@ -616,7 +682,10 @@ export function buildMarketWeatherRouter(cleanPayload, config) {
   const deviationRules = buildDeviationRules(deviationStudy);
   const componentRows = latest ? currentComponentRows(latest, summaryRows, config) : [];
   const calibration = latest ? runRouterCalibration(cleanPayload, config) : null;
-  const calibrationSignals = calibration?.metadata?.currentSignals || [];
+  const calibrationSignals = applyConfidenceGateToSignals(
+    calibration?.metadata?.currentSignals || [],
+    calibration?.calibrationRows || []
+  );
   const rawStrategyScores = latest ? scoreRouteStrategies(latest, config) : { scores: [], topActiveScore: 0, waitScore: 0, topRoute: null };
   const strategyScores = latest ? applyCalibrationToStrategyScores(rawStrategyScores, calibrationSignals) : rawStrategyScores;
   const gate = latest ? gateFromCalibration(calibrationSignals, strategyScores, deviationRules.finalWeather, latest, componentRows) : "数据不足";
@@ -635,6 +704,11 @@ export function buildMarketWeatherRouter(cleanPayload, config) {
       routerCalibrationRows: calibration?.calibrationRows?.length || 0,
       routerCalibrationObservationRows: calibration?.metadata?.observationRows || 0,
       gateSource: calibrationSignals.length ? "router_calibration" : "score_fallback",
+      calibrationConfidenceGate: {
+        minOccurrences: MIN_CALIBRATION_OCCURRENCES,
+        minSampleConfidencePct: MIN_CALIBRATION_CONFIDENCE_PCT,
+        effect: "green_signals_below_threshold_are_downgraded_to_yellow"
+      },
       currentCalibrationSignals: calibrationSignals,
       horizons: config.horizons,
       generatedAt: new Date().toISOString(),
