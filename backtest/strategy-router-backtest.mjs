@@ -234,10 +234,10 @@ function summarize(rows) {
   );
 }
 
-export function runStrategyRouterBacktest(cleanPayload, config) {
-  const snapshots = buildIndicatorSnapshots(cleanPayload.candles, config);
-  const selected = snapshots.filter((snapshot) => inWindow(snapshot.date, config));
-  const byIndex = new Map(snapshots.map((snapshot) => [snapshot.index, snapshot]));
+export function runStrategyRouterBacktest(cleanPayload, config, snapshots = null) {
+  const builtSnapshots = snapshots ?? buildIndicatorSnapshots(cleanPayload.candles, config);
+  const selected = builtSnapshots.filter((snapshot) => inWindow(snapshot.date, config));
+  const byIndex = new Map(builtSnapshots.map((snapshot) => [snapshot.index, snapshot]));
   const observationRows = [];
   let current = null;
 

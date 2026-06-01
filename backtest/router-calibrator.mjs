@@ -244,8 +244,8 @@ function currentSignals(calibrationRows, backtestResult) {
   }));
 }
 
-export function runRouterCalibration(cleanPayload, config) {
-  const backtestResult = runStrategyRouterBacktest(cleanPayload, config);
+export function runRouterCalibration(cleanPayload, config, snapshots = null) {
+  const backtestResult = runStrategyRouterBacktest(cleanPayload, config, snapshots);
   const calibrationRows = buildCalibrationRows(backtestResult);
   const signals = currentSignals(calibrationRows, backtestResult);
 

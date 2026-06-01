@@ -681,7 +681,7 @@ export function buildMarketWeatherRouter(cleanPayload, config) {
   const deviationStudy = runDeviationStudyFromSnapshots(cleanPayload, config, snapshots);
   const deviationRules = buildDeviationRules(deviationStudy);
   const componentRows = latest ? currentComponentRows(latest, summaryRows, config) : [];
-  const calibration = latest ? runRouterCalibration(cleanPayload, config) : null;
+  const calibration = latest ? runRouterCalibration(cleanPayload, config, snapshots) : null;
   const calibrationSignals = applyConfidenceGateToSignals(
     calibration?.metadata?.currentSignals || [],
     calibration?.calibrationRows || []
