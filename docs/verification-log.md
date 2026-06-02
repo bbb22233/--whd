@@ -857,3 +857,51 @@ download_okx_history BTC-USDT 1D days=2 = rowCount 2, pageCount 1, truncated fal
 ### 备注
 - 新增 `backend_py.research.okx`, `backend_py.research.clean`, `backend_py.download_data`, `backend_py.clean_data`, `backend_py.compare_clean_data`, `backend_py.run_data_pipeline`。
 - `python_data` 会真实写入 `data/raw` 与 `data/clean`;它和只写 `_py` artifacts 的 parity 模式分开。
+
+---
+
+## 20. Python Full Orchestrator
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols BTC-USDT --bars 1D --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols BTC-USDT --bars 4H,8H --days 3650
+uv run python - <<'PY'
+import time
+from backend_py.scanner_service import ScannerService
+scanner = ScannerService()
+job = scanner.start("python_full")
+last = None
+for _ in range(240):
+    snapshot = scanner.snapshot()
+    last = snapshot["lastJob"]
+    if last and last["status"] != "running":
+        break
+    time.sleep(0.25)
+print({"startedMode": job["mode"], "status": last["status"], "returnCode": last["returnCode"]})
+assert last["status"] == "succeeded", last
+PY
+```
+
+### 期望
+- Python full orchestrator 串联 `download/clean -> feature -> deviation -> router -> summary`。
+- 默认写 `_py_full` reports,不覆盖正式 Node reports。
+- 支持 `--official` 作为后续切生产时的显式开关。
+- 支持派生周期 `8H`:从 `4H` clean 聚合,不直接下载 8H。
+- scanner/status 的 `supportedModes` 包含 `python_full`。
+
+### 实际
+```
+py_compile backend_py/*.py backend_py/research/*.py = 通过
+run_full_pipeline BTC-USDT 1D --skip-download = successCount 1, errorCount 0, suffix _py_full
+run_full_pipeline BTC-USDT 4H,8H --skip-download = successCount 2, errorCount 0, suffix _py_full
+ScannerService().start("python_full") = succeeded, returnCode 0
+```
+
+### 备注
+- 新增 `backend_py.run_full_pipeline`,作为 Python 版完整扫描编排入口。
+- 新增 `python_full` scanner mode。
+- 本轮验证生成的 `reports/*_py_full.*` 是临时对照产物,已加入 `.gitignore`;正式切换前不提交。

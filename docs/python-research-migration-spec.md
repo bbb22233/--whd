@@ -80,6 +80,13 @@ Python implementation:
     the existing Node clean JSON, ignoring only `metadata.cleanedAt`.
 - `backend_py/run_data_pipeline.py`
   - Batch Python download + clean entry point used by scanner mode `python_data`.
+- `backend_py/run_full_pipeline.py`
+  - Python full orchestrator for download, clean, feature, deviation, router,
+    and summary generation.
+  - Writes `_py_full` report artifacts by default so it can be validated without
+    replacing Node production reports.
+  - Supports `--official` for the later cutover step when Python becomes the
+    production report writer.
 
 ## Feature Factory Parity Contract
 
@@ -222,8 +229,9 @@ node --check server.mjs
 The next Python research migration should choose one of:
 
 - Add a scanner mode for Python deviation parity across selected symbols/bars.
-- Add Python multi-symbol/full orchestrator parity for the Node `full` scanner
-  path, using `python_data` for ingestion and `python_research` for research
-  outputs.
-- Start replacing selected Node scanner/orchestrator paths behind explicit
-  Python modes after the parity modes have enough coverage.
+- Expand `python_full` validation from BTC sample scopes to the full default
+  symbol set and bars.
+- Add an explicit cutover checklist for running `python_full --official` as the
+  default production report writer.
+- Start replacing selected Node scanner/orchestrator paths only after full-scope
+  Python output has been reviewed.

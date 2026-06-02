@@ -12,7 +12,7 @@ from typing import Literal
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-ScannerMode = Literal["summary", "full", "python_summary", "python_router", "python_research", "python_data"]
+ScannerMode = Literal["summary", "full", "python_summary", "python_router", "python_research", "python_data", "python_full"]
 ScannerStatus = Literal["idle", "running", "succeeded", "failed", "cancelled"]
 
 
@@ -99,6 +99,14 @@ def command_for_mode(mode: ScannerMode, *, symbols: str | None = None, bars: str
             "backend_py.run_data_pipeline",
             *scope,
         ]
+    if mode == "python_full":
+        scope = scanner_scope_args(symbols or "BTC-USDT", bars or "1D")
+        return [
+            sys.executable,
+            "-m",
+            "backend_py.run_full_pipeline",
+            *scope,
+        ]
     raise ValueError(f"Unsupported scanner mode: {mode}")
 
 
@@ -122,7 +130,7 @@ class ScannerJob:
 class ScannerSnapshot:
     active: bool
     lastJob: dict | None
-    supportedModes: list[str] = field(default_factory=lambda: ["summary", "full", "python_summary", "python_router", "python_research", "python_data"])
+    supportedModes: list[str] = field(default_factory=lambda: ["summary", "full", "python_summary", "python_router", "python_research", "python_data", "python_full"])
     modeNotes: dict[str, str] = field(
         default_factory=lambda: {
             "summary": "Rebuild combined summaries from existing reports; no download.",
@@ -131,6 +139,7 @@ class ScannerSnapshot:
             "python_router": "Run Python full router parity against existing Node reports; defaults to BTC-USDT 1D and writes _py artifacts only.",
             "python_research": "Run Python feature/deviation/router/summary parity chain; defaults to BTC-USDT 1D and writes _py artifacts only.",
             "python_data": "Run Python OKX download and clean pipeline; defaults to BTC-USDT 1D and writes data/raw + data/clean.",
+            "python_full": "Run Python download/clean/research/summary orchestration; defaults to BTC-USDT 1D and writes _py_full report artifacts unless --official is used from CLI.",
         }
     )
 
@@ -162,7 +171,7 @@ class ScannerService:
             startedAt=utc_now_iso(),
             note=(
                 "Python backend is running a Python parity path."
-                if mode in {"python_summary", "python_router", "python_research", "python_data"}
+                if mode in {"python_summary", "python_router", "python_research", "python_data", "python_full"}
                 else "Python backend is orchestrating the existing Node scanner."
             ),
         )

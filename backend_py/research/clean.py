@@ -183,3 +183,113 @@ def candles_to_csv_rows(candles: list[dict[str, Any]]) -> list[dict[str, Any]]:
         }
         for candle in candles
     ]
+
+
+def missing_bars(candles: list[dict[str, Any]], bar: str) -> list[dict[str, Any]]:
+    bar_ms = bar_to_ms(bar)
+    rows = []
+    for index in range(1, len(candles)):
+        gap = candles[index]["openTime"] - candles[index - 1]["openTime"]
+        if gap > bar_ms * 1.5:
+            rows.append(
+                {
+                    "previousDate": candles[index - 1]["date"],
+                    "nextDate": candles[index]["date"],
+                    "missingBars": round(gap / bar_ms) - 1,
+                }
+            )
+    return rows
+
+
+def aggregate_candles(source_candles: list[dict[str, Any]], target_bar: str, group_size: int) -> dict[str, Any]:
+    target_ms = bar_to_ms(target_bar)
+    source_ms = target_ms / group_size
+    buckets: dict[int, list[dict[str, Any]]] = {}
+    candles: list[dict[str, Any]] = []
+    aggregation = {
+        "sourceRows": len(source_candles),
+        "totalBuckets": 0,
+        "aggregatedRows": 0,
+        "droppedBuckets": 0,
+        "partialBuckets": 0,
+        "oversizedBuckets": 0,
+        "nonContinuousBuckets": 0,
+    }
+
+    for candle in source_candles:
+        bucket_open = int(candle["openTime"] // target_ms * target_ms)
+        buckets.setdefault(bucket_open, []).append(candle)
+
+    entries = sorted(buckets.items(), key=lambda item: item[0])
+    aggregation["totalBuckets"] = len(entries)
+    for open_time, bucket in entries:
+        sorted_bucket = sorted(bucket, key=lambda candle: candle["openTime"])
+        if len(sorted_bucket) != group_size:
+            aggregation["droppedBuckets"] += 1
+            if len(sorted_bucket) < group_size:
+                aggregation["partialBuckets"] += 1
+            else:
+                aggregation["oversizedBuckets"] += 1
+            continue
+
+        continuous = all(sorted_bucket[index]["openTime"] - sorted_bucket[index - 1]["openTime"] == source_ms for index in range(1, len(sorted_bucket)))
+        if not continuous:
+            aggregation["droppedBuckets"] += 1
+            aggregation["nonContinuousBuckets"] += 1
+            continue
+
+        candles.append(
+            {
+                "openTime": open_time,
+                "closeTime": open_time + target_ms - 1,
+                "date": format_candle_date(open_time, target_bar),
+                "open": sorted_bucket[0]["open"],
+                "high": max(candle["high"] for candle in sorted_bucket),
+                "low": min(candle["low"] for candle in sorted_bucket),
+                "close": sorted_bucket[-1]["close"],
+                "volume": sum(candle["volume"] for candle in sorted_bucket),
+                "confirm": "1",
+            }
+        )
+
+    aggregation["aggregatedRows"] = len(candles)
+    return {"candles": candles, "aggregation": aggregation}
+
+
+def derive_clean_payload(source_clean_payload: dict[str, Any], *, instrument: str, target_bar: str, requested_days: int, source_bar: str, group_size: int) -> dict[str, Any]:
+    result = aggregate_candles(source_clean_payload.get("candles") or [], target_bar, group_size)
+    candles = result["candles"]
+    source_meta = source_clean_payload.get("metadata") or {}
+    return {
+        "metadata": {
+            "source": source_meta.get("source"),
+            "sourceBar": source_bar,
+            "instrument": instrument,
+            "bar": target_bar,
+            "requestedDays": requested_days,
+            "requestedStartMs": source_meta.get("requestedStartMs"),
+            "requestedStartDate": source_meta.get("requestedStartDate"),
+            "downloadedAt": source_meta.get("downloadedAt"),
+            "pageCount": source_meta.get("pageCount"),
+            "requestLimit": source_meta.get("requestLimit"),
+            "maxPages": source_meta.get("maxPages"),
+            "retryCount": source_meta.get("retryCount"),
+            "oldestReached": source_meta.get("oldestReached"),
+            "oldestReachedDate": source_meta.get("oldestReachedDate"),
+            "truncated": bool(source_meta.get("truncated")),
+            "truncationKnown": source_meta.get("truncationKnown"),
+            "truncationReason": source_meta.get("truncationReason"),
+            "cleanedAt": utc_now_iso(),
+            "rawRows": source_meta.get("cleanRows"),
+            "cleanRows": len(candles),
+            "duplicateRows": 0,
+            "invalidRows": 0,
+            "unconfirmedRows": 0,
+            "missingBars": missing_bars(candles, target_bar),
+            "firstDate": candles[0]["date"] if candles else None,
+            "lastDate": candles[-1]["date"] if candles else None,
+            "derivedFrom": source_bar,
+            "aggregation": result["aggregation"],
+        },
+        "candles": candles,
+    }
