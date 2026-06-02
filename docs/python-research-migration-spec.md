@@ -243,8 +243,9 @@ The next Python research migration should choose one of:
   `--skip-download --official --bars 1D,4H,8H --days 3650`.
 - `npm run multi:summary` and `npm run multi:periods` now route to Python
   official pipeline.
+- `npm run download` and `npm run clean` now route to Python data pipeline.
 - Legacy Node scanner remains available as `/api/scanner/run?mode=node_summary`
   and `/api/scanner/run?mode=node_full`; package-level legacy commands are
-  available under `legacy:multi:*`.
+  available under `legacy:multi:*`, `legacy:download`, and `legacy:clean`.
 - Next, monitor the Python official scanner entries in normal use, then decide
   when to remove the legacy Node production scripts entirely.

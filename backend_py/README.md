@@ -80,12 +80,16 @@ POST /api/scanner/cancel
 常用 npm 入口：
 
 ```bash
+npm run download -- --instrument BTC-USDT --bar 1D
+npm run clean -- --instrument BTC-USDT --bar 1D
 npm run multi:summary
 npm run multi:periods
 npm run multi:periods -- --symbols BTC-USDT,ETH-USDT --bars 1D,4H
 ```
 
+- `download` / `clean`: 调用 Python data pipeline。
 - `multi:summary` / `multi:periods`: 调用 Python official pipeline。
+- `legacy:download` / `legacy:clean`: 调用旧 Node 数据脚本,只作为回退或对照入口使用。
 - `legacy:multi:periods`: 调用旧 Node 多周期扫描,只作为回退或对照入口使用。
 
 全量跑 `python_full` 前可先检查本地输入覆盖:
@@ -117,7 +121,7 @@ curl -fsS http://127.0.0.1:8000/api/market/overview
 curl -fsS "http://127.0.0.1:8000/api/dashboard/current?instrument=BTC-USDT&bar=1D"
 ```
 
-`data/clean/` 不进 Git。干净 clone 中 smoke test 会把 clean candles 标记为 `missing_untracked_data`;跑过 `npm run download` + `npm run clean` 后会变为 `ok`。
+`data/clean/` 不进 Git。干净 clone 中 smoke test 会把 clean candles 标记为 `missing_untracked_data`;跑过 Python `npm run download` + `npm run clean` 后会变为 `ok`。
 Dashboard API 会把 `data/clean/` 作为可选源:缺少 clean candles 时仍返回 200,`candles` 为 `null`,前端继续渲染 reports 中的研究结果。
 
 ## 迁移边界

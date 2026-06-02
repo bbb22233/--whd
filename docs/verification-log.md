@@ -1873,3 +1873,53 @@ node checks = pass
 ### 备注
 - 本轮只改 package scripts、API legacy 回退命令、测试和文档,未重新生成 official reports。
 - `legacy:multi:periods` 暂时保留旧 `4H,8H,1D,1W` Node 范围;当前 Python official 主路径仍是 `1D,4H,8H`。
+
+---
+
+## 39. Python Data Package Script Cutover
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+git status --short --branch
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.smoke_test
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check app.js
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check server.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check scripts/download-data.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check scripts/clean-data.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" npm --silent run download -- --max-symbols 0
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" npm --silent run clean -- --max-symbols 0
+```
+
+### 期望
+- `npm run download` 指向 Python `backend_py.run_data_pipeline --download-only`。
+- `npm run clean` 指向 Python `backend_py.run_data_pipeline --clean-only`。
+- 旧 Node 数据脚本移动到 `legacy:download` / `legacy:clean`。
+- no-write CLI 检查使用 `--max-symbols 0`,不下载、不清洗、不写 data。
+
+### 实际
+```
+download no-write:
+step = python-data-pipeline
+stepCount = 0
+successCount = 0
+skippedCount = 0
+errorCount = 0
+
+clean no-write:
+step = python-data-pipeline
+stepCount = 0
+successCount = 0
+skippedCount = 0
+errorCount = 0
+
+smoke_test = pass
+py_compile = pass
+node checks = pass
+```
+
+### 备注
+- 本轮只改 package scripts、测试和文档,未下载数据,未重写 `data/raw` 或 `data/clean`。
+- `download:macro` 暂时仍是 Node 宏观数据入口,尚未迁移。

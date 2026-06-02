@@ -90,11 +90,17 @@ def main() -> None:
     assert "backend_py.run_full_pipeline" in command_for_mode("python_full")
 
     package_scripts = json.loads((PROJECT_ROOT / "package.json").read_text(encoding="utf-8"))["scripts"]
+    assert "backend_py.run_data_pipeline" in package_scripts["download"]
+    assert "--download-only" in package_scripts["download"]
+    assert "backend_py.run_data_pipeline" in package_scripts["clean"]
+    assert "--clean-only" in package_scripts["clean"]
     assert "backend_py.run_full_pipeline" in package_scripts["multi:periods"]
     assert "--official" in package_scripts["multi:periods"]
     assert "--bars \"1D,4H,8H\"" in package_scripts["multi:periods"]
     assert "backend_py.run_full_pipeline" in package_scripts["multi:summary"]
     assert "--summary-only" in package_scripts["multi:summary"]
+    assert "scripts/download-data.mjs" in package_scripts["legacy:download"]
+    assert "scripts/clean-data.mjs" in package_scripts["legacy:clean"]
     assert "scripts/run-multi-symbol-1d.mjs" in package_scripts["legacy:multi:periods"]
     assert "scripts/run-multi-symbol-1d.mjs" in package_scripts["legacy:multi:1d"]
 

@@ -17,9 +17,13 @@ npm run clean -- --instrument BTC-USDT --days 3650
 npm run weather:router -- --instrument BTC-USDT --days 3650
 ```
 
+`download` / `clean` 现在调用 Python data pipeline。旧 Node 数据入口保留为
+`legacy:download` / `legacy:clean`,只作为回退或对照使用。
+
 ## Python API
 
-Python API 是前端数据源迁移的桥接层,读取现有 `reports/` 和 `data/clean/` 产物,不替代当前 Node 研究流水线。
+Python API 是当前前端数据源与扫描入口。`summary` / `full` / `download` /
+`clean` 主路径已切到 Python,旧 Node 入口以 `legacy:*` 名称保留。
 
 ```bash
 uv sync

@@ -93,3 +93,12 @@ After scanner entries are cut over:
 - `npm run multi:periods` should call the Python official full pipeline.
 - Legacy Node package scripts should move under `legacy:multi:*`.
 - Use `npm run multi:summary -- --plan-outputs` and `npm run multi:periods -- --plan-outputs` for no-write CLI checks.
+
+## Data Script Cutover
+
+After report package scripts are cut over:
+
+- `npm run download` should call `backend_py.run_data_pipeline --download-only`.
+- `npm run clean` should call `backend_py.run_data_pipeline --clean-only`.
+- Legacy Node data scripts should move under `legacy:download` and `legacy:clean`.
+- Use `npm run download -- --max-symbols 0` and `npm run clean -- --max-symbols 0` for no-write CLI checks.
