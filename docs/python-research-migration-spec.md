@@ -4,14 +4,17 @@
 
 ## Phase 1 Scope
 
-This phase implements a Python parity layer for Feature Factory JSON output.
+This phase implements Python parity layers for the research outputs that can be
+matched safely against current Node golden reports.
 
 - Keep Node scripts as the production generator.
 - Add Python modules under `backend_py/research/`.
 - Generate Python comparison artifacts with `_py` suffix.
-- Compare Python output against the Node report for the full JSON schema, ignoring only runtime timestamps.
+- Compare Python output against the Node report, ignoring only runtime timestamps
+  and explicitly documented out-of-scope sections.
 - Do not change FastAPI routes in this phase.
-- Do not migrate OKX download, clean aggregation, market weather router, or deviation rules yet.
+- Do not migrate OKX download, clean aggregation, deviation rules, or router
+  calibration/gate selection yet.
 
 ## Files
 
@@ -39,8 +42,19 @@ Python implementation:
 - `backend_py/compare_summary.py`
   - Compares Node and Python summary JSON.
   - Ignores `startedAt` and `finishedAt`.
+- `backend_py/research/market_weather_router.py`
+  - Ports market weather router component classification and summaries.
+  - Reuses Python feature snapshots, weather labels, and strategy routing.
+  - Produces `strategyScores`, `currentComponentRows`, and `componentSummaryRows`.
+- `backend_py/build_market_weather_router.py`
+  - CLI that reads `data/clean/*_clean.json`.
+  - Writes `_market_weather_router_py.json` and `_py` component/score CSV files.
+- `backend_py/compare_market_weather_router.py`
+  - Compares Python router component output against Node router reports.
+  - Ignores `generatedAt`.
+  - Does not compare `current`, `deviationFinalWeather`, or calibration metadata.
 
-## Current Parity Contract
+## Feature Factory Parity Contract
 
 The Python report must match Node for:
 
@@ -70,6 +84,33 @@ The Python report may differ for now:
 
 `generatedAt` is intentionally ignored because Node and Python are run at different times.
 
+## Market Weather Router Component Parity Contract
+
+The Python market weather router component report must match Node for:
+
+- `metadata.instrument`
+- `metadata.bar`
+- `metadata.fromDate`
+- `metadata.toDate`
+- `metadata.firstDate`
+- `metadata.lastDate`
+- `metadata.snapshotCount`
+- `metadata.observationRows`
+- `metadata.horizons`
+- `strategyScores`
+- `currentComponentRows`
+- `componentSummaryRows`
+
+The Python router component report may differ for now:
+
+- `metadata.generatedAt`
+- `current`
+- `deviationFinalWeather`
+- router calibration metadata and gate selection
+
+Those fields remain Node-owned until deviation rules and router calibration are
+ported with their own golden comparisons.
+
 ## Commands
 
 Refresh the Node golden report from current clean candles:
@@ -90,6 +131,13 @@ Compare full JSON schema:
 uv run python -m backend_py.compare_feature_factory --instrument BTC-USDT --bar 1D --days 3650
 ```
 
+Generate and compare router component parity output:
+
+```bash
+uv run python -m backend_py.build_market_weather_router --instrument BTC-USDT --bar 1D --days 3650
+uv run python -m backend_py.compare_market_weather_router --instrument BTC-USDT --bar 1D --days 3650
+```
+
 Full validation:
 
 ```bash
@@ -103,6 +151,6 @@ node --check server.mjs
 
 The next Python research migration should choose one of:
 
-- Add broader sample coverage after generating additional clean data, such as `ETH-USDT 4H`.
-- Add a scanner mode that can call Python summary parity without replacing Node `summary`.
-- Port the next algorithmic layer after summary, likely market weather router only after broader parity coverage exists.
+- Port deviation rules into Python and compare against `*_deviation_rules.json`.
+- Port router calibration/gate selection after deviation parity exists.
+- Add a scanner mode for Python router component parity across selected symbols/bars.

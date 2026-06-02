@@ -588,3 +588,62 @@ ScannerService().start("python_summary", symbols="BTC-USDT,ETH-USDT", bars="1D,4
 
 ### 备注
 - 参数化 `python_summary` 仍只写 `_py` summary artifacts,不覆盖正式 Node summary。
+
+---
+
+## 15. Python Market Weather Router Component Parity
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+
+for instrument in BTC-USDT ETH-USDT; do
+  for bar in 1D 4H; do
+    uv run python -m backend_py.build_market_weather_router --instrument "$instrument" --bar "$bar" --days 3650
+    uv run python -m backend_py.compare_market_weather_router --instrument "$instrument" --bar "$bar" --days 3650
+  done
+done
+```
+
+### 期望
+- Python 版 market weather router component 层与 Node golden reports 对齐。
+- 对齐范围包括 `strategyScores`、`currentComponentRows`、`componentSummaryRows`。
+- 对比 metadata 包括 `instrument/bar/fromDate/toDate/firstDate/lastDate/snapshotCount/observationRows/horizons`。
+- `_py` router JSON/CSV 只作为本地验证产物,不替换 Node 正式报告。
+- 暂不比较 `current`、`deviationFinalWeather`、router calibration/gate selection;这些仍等待 deviation rules 与 calibration Python 迁移。
+
+### 实际
+```
+py_compile backend_py/*.py backend_py/research/*.py = 通过
+
+compare_market_weather_router BTC-USDT 1D = status ok
+snapshotCount = 2924
+strategyScoreCount = 5
+currentComponentRowCount = 20
+componentSummaryRowCount = 80
+
+compare_market_weather_router BTC-USDT 4H = status ok
+snapshotCount = 18150
+strategyScoreCount = 5
+currentComponentRowCount = 20
+componentSummaryRowCount = 80
+
+compare_market_weather_router ETH-USDT 1D = status ok
+snapshotCount = 2924
+strategyScoreCount = 5
+currentComponentRowCount = 20
+componentSummaryRowCount = 80
+
+compare_market_weather_router ETH-USDT 4H = status ok
+snapshotCount = 18150
+strategyScoreCount = 5
+currentComponentRowCount = 20
+componentSummaryRowCount = 80
+```
+
+### 备注
+- Python 复用已对齐的 feature snapshots、weather labels、strategy routing,并补齐 router component 观察、汇总、当前 component 表格。
+- Node 的中文 `localeCompare("zh-CN")` 排序在 Python 中用显式状态顺序表固定,避免不同运行环境排序差异。
+- 下一步应先迁移 deviation rules,再迁移 router calibration/gate,否则无法安全替换完整 `market_weather_router.json`。
