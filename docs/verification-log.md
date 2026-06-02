@@ -980,3 +980,65 @@ cleanMissingCount = 0
 ### 备注
 - 本地目前只有 BTC/ETH 的 1D/4H raw;BTC/ETH 的 8H 由 4H 派生,因此已覆盖 6 组。
 - 默认 58 symbols 若要离线全量跑,还缺 56 个 symbols 的 1D raw 和 56 个 symbols 的 4H raw;8H 会复用 4H raw。
+
+---
+
+## 23. Python Data Pipeline Small Batch Fill
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+uv run python -m backend_py.run_data_pipeline --missing-only --symbols BTC-USDT --bars 1D,4H --days 3650
+uv run python -m backend_py.run_data_pipeline --missing-only --symbols SOL-USDT BNB-USDT XRP-USDT DOGE-USDT ADA-USDT --bars 1D,4H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols SOL-USDT BNB-USDT XRP-USDT DOGE-USDT ADA-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+```
+
+### 期望
+- `run_data_pipeline` 支持 `--missing-only`,已有 raw 时跳过,缺失 raw 时下载并 clean。
+- 第一批补齐 `SOL/BNB/XRP/DOGE/ADA × 1D/4H`。
+- `python_full --skip-download` 可使用新 raw/clean 完整生成 1D/4H/8H 的 `_py_full` 对照 reports。
+- 本地覆盖度从 6 组提升到 21 组。
+
+### 实际
+```
+BTC-USDT 1D,4H --missing-only:
+stepCount = 2
+skippedCount = 2
+errorCount = 0
+
+SOL/BNB/XRP/DOGE/ADA × 1D/4H:
+stepCount = 10
+successCount = 10
+errorCount = 0
+
+rawRows / cleanRows:
+SOL 1D = 2072 / 2071
+BNB 1D = 1260 / 1259
+XRP 1D = 3065 / 3064
+DOGE 1D = 2515 / 2514
+ADA 1D = 2872 / 2871
+SOL 4H = 12428 / 12427
+BNB 4H = 7558 / 7557
+XRP 4H = 18386 / 18385
+DOGE 4H = 15068 / 15067
+ADA 4H = 17228 / 17227
+
+python_full SOL/BNB/XRP/DOGE/ADA × 1D,4H,8H:
+successCount = 15
+weatherCount = 15
+errorCount = 0
+
+default symbols × 1D,4H,8H after fill:
+requiredCount = 174
+rawReadyCount = 21
+rawMissingCount = 153
+cleanReadyCount = 21
+cleanMissingCount = 153
+```
+
+### 备注
+- 新增 `run_data_pipeline --missing-only` 与 `--max-symbols`,用于可控分批补资料。
+- `data/raw`、`data/clean` 和 `_py_full` reports 均不进入 Git。

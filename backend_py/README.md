@@ -79,6 +79,12 @@ POST /api/scanner/cancel
 uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
 ```
 
+分批补齐缺失 raw/clean 可用:
+
+```bash
+uv run python -m backend_py.run_data_pipeline --missing-only --symbols SOL-USDT BNB-USDT XRP-USDT DOGE-USDT ADA-USDT --bars 1D,4H --days 3650
+```
+
 ## 验证
 
 ```bash

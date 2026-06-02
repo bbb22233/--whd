@@ -39,9 +39,12 @@ def parse_batch_args(argv: list[str]) -> dict[str, Any]:
     bars = [config.bar]
     download = True
     clean = True
+    missing_only = False
+    max_symbols: int | None = None
     index = 0
     while index < len(argv):
         arg = argv[index]
+        value = argv[index + 1] if index + 1 < len(argv) else None
         if arg == "--symbols":
             values = collect_option_values(argv, index + 1)
             symbols = split_csv_values(values)
@@ -56,14 +59,27 @@ def parse_batch_args(argv: list[str]) -> dict[str, Any]:
         elif arg == "--clean-only":
             download = False
             index += 1
+        elif arg == "--missing-only":
+            missing_only = True
+            index += 1
+        elif arg == "--max-symbols" and value:
+            max_symbols = int(value)
+            index += 2
         else:
             index += 1
-    return {"config": config, "symbols": list(dict.fromkeys(symbols)), "bars": list(dict.fromkeys(bars)), "download": download, "clean": clean}
+    unique_symbols = list(dict.fromkeys(symbols))
+    if max_symbols is not None:
+        unique_symbols = unique_symbols[: max(0, max_symbols)]
+    return {"config": config, "symbols": unique_symbols, "bars": list(dict.fromkeys(bars)), "download": download, "clean": clean, "missingOnly": missing_only, "maxSymbols": max_symbols}
+
+
+def raw_path_for(config: ResearchConfig) -> Any:
+    return DATA_RAW_DIR / f"{file_stem(config)}_raw.json"
 
 
 def run_one(config: ResearchConfig, *, download: bool, clean: bool) -> dict[str, Any]:
     stem = file_stem(config)
-    raw_path = DATA_RAW_DIR / f"{stem}_raw.json"
+    raw_path = raw_path_for(config)
     clean_json_path = DATA_CLEAN_DIR / f"{stem}_clean.json"
     clean_csv_path = DATA_CLEAN_DIR / f"{stem}_clean.csv"
     result: dict[str, Any] = {"instrument": config.instrument, "bar": config.bar, "rawPath": str(raw_path)}
@@ -93,10 +109,22 @@ def main(argv: list[str] | None = None) -> None:
     config: ResearchConfig = parsed["config"]
     steps = []
     errors = []
+    skipped = []
     for bar in parsed["bars"]:
         for symbol in parsed["symbols"]:
             try:
                 scoped_config = replace(config, instrument=symbol, bar=bar)
+                if parsed["missingOnly"] and raw_path_for(scoped_config).exists():
+                    result = {
+                        "instrument": symbol,
+                        "bar": bar,
+                        "status": "skipped",
+                        "reason": "raw_exists",
+                        "rawPath": str(raw_path_for(scoped_config)),
+                    }
+                    steps.append(result)
+                    skipped.append(result)
+                    continue
                 steps.append(run_one(scoped_config, download=parsed["download"], clean=parsed["clean"]))
             except Exception as error:  # noqa: BLE001 - batch runner reports per-scope failures.
                 failure = {"instrument": symbol, "bar": bar, "status": "failed", "message": str(error)}
@@ -110,8 +138,11 @@ def main(argv: list[str] | None = None) -> None:
                 "symbols": parsed["symbols"],
                 "bars": parsed["bars"],
                 "stepCount": len(steps),
-                "successCount": len(steps) - len(errors),
+                "successCount": len(steps) - len(errors) - len(skipped),
+                "skippedCount": len(skipped),
                 "errorCount": len(errors),
+                "missingOnly": parsed["missingOnly"],
+                "maxSymbols": parsed["maxSymbols"],
                 "steps": steps,
                 "errors": errors,
             },
