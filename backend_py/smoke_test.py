@@ -105,6 +105,10 @@ def main() -> None:
     assert "--official" in package_scripts["rules:deviations"]
     assert "backend_py.build_market_weather_router" in package_scripts["weather:router"]
     assert "--official" in package_scripts["weather:router"]
+    assert "backend_py.backtest_strategy_router" in package_scripts["backtest:router"]
+    assert "--official" in package_scripts["backtest:router"]
+    assert "backend_py.calibrate_router" in package_scripts["calibrate:router"]
+    assert "--official" in package_scripts["calibrate:router"]
     assert "scripts/download-data.mjs" in package_scripts["legacy:download"]
     assert "scripts/clean-data.mjs" in package_scripts["legacy:clean"]
     assert "scripts/run-multi-symbol-1d.mjs" in package_scripts["legacy:multi:periods"]
@@ -112,6 +116,8 @@ def main() -> None:
     assert "scripts/build-feature-factory.mjs" in package_scripts["legacy:features"]
     assert "scripts/build-deviation-rules.mjs" in package_scripts["legacy:rules:deviations"]
     assert "scripts/build-market-weather-router.mjs" in package_scripts["legacy:weather:router"]
+    assert "scripts/backtest-strategy-router.mjs" in package_scripts["legacy:backtest:router"]
+    assert "scripts/calibrate-router.mjs" in package_scripts["legacy:calibrate:router"]
 
     node_scripts = {name for name, command in package_scripts.items() if command.startswith("node ")}
     assert node_scripts == {
@@ -126,8 +132,8 @@ def main() -> None:
         "backtest:volatility",
         "backtest:position",
         "backtest:deviations",
-        "backtest:router",
-        "calibrate:router",
+        "legacy:backtest:router",
+        "legacy:calibrate:router",
         "legacy:rules:deviations",
         "legacy:weather:router",
         "legacy:features",

@@ -336,6 +336,50 @@ def score_bucket(score: float) -> str:
     return "不适配"
 
 
+def bucket_order(bucket: str) -> int:
+    try:
+        return ["不适配", "低适配", "中适配", "高适配"].index(bucket)
+    except ValueError:
+        return -1
+
+
+def summarize_strategy_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    groups: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        key = f"{row['routeKey']}::{row['scoreBucket']}::{row['horizon']}"
+        groups.setdefault(key, []).append(row)
+
+    summary_rows = []
+    for group_rows in groups.values():
+        first = group_rows[0]
+        route_returns = [row["routeReturnPct"] for row in group_rows]
+        directional_rows = [row for row in group_rows if row["directionalWin"] != ""]
+        summary_rows.append(
+            {
+                "routeKey": first["routeKey"],
+                "routeLabel": first["routeLabel"],
+                "family": first["family"],
+                "direction": first["direction"],
+                "scoreBucket": first["scoreBucket"],
+                "horizon": first["horizon"],
+                "occurrences": len(group_rows),
+                "avgScore": js_round(average([row["score"] for row in group_rows]), 2),
+                "medianScore": js_round(median([row["score"] for row in group_rows]), 2),
+                "successRatePct": js_round(safe_divide(len([row for row in group_rows if row["success"] == 1]), len(group_rows)) * 100, 2),
+                "directionalWinRatePct": js_round(safe_divide(len([row for row in directional_rows if row["directionalWin"] == 1]), len(directional_rows)) * 100, 2) if directional_rows else "",
+                "avgRouteReturnPct": js_round(average(route_returns)),
+                "medianRouteReturnPct": js_round(median(route_returns)),
+                "avgFutureReturnPct": js_round(average([row["futureReturnPct"] for row in group_rows])),
+                "avgAbsReturnPct": js_round(average([row["absReturnPct"] for row in group_rows])),
+                "avgMaxUpPct": js_round(average([row["maxUpPct"] for row in group_rows])),
+                "avgMaxDownPct": js_round(average([row["maxDownPct"] for row in group_rows])),
+                "lastSeen": group_rows[-1].get("date", ""),
+            }
+        )
+
+    return sorted(summary_rows, key=lambda row: (row["routeKey"], row["horizon"], bucket_order(row["scoreBucket"])))
+
+
 def future_price_stats(candles: list[dict[str, Any]], index: int, horizon: int) -> dict[str, Any] | None:
     entry = candles[index] if 0 <= index < len(candles) else None
     future = candles[index + 1 : index + 1 + horizon]
@@ -463,6 +507,7 @@ def run_strategy_router_backtest(clean_payload: dict[str, Any], config: Research
             "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             "current": current,
         },
+        "summaryRows": summarize_strategy_rows(rows),
         "observationRows": rows,
     }
 
@@ -617,8 +662,19 @@ def run_router_calibration(clean_payload: dict[str, Any], config: ResearchConfig
     calibration_rows.sort(key=lambda row: (-row["currentScore"], -row["calibrationScore"], row["horizon"]))
     signals = current_signals(calibration_rows, backtest)
     return {
-        "metadata": {**backtest["metadata"], "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"), "currentSignals": signals},
+        "metadata": {
+            **backtest["metadata"],
+            "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "calibration": {
+                "scoreBuckets": "不适配:<30, 低适配:30-49, 中适配:50-69, 高适配:>=70",
+                "sampleConfidence": "sqrt(当前分桶样本数 / 200)，最高100%",
+                "lights": "绿灯=历史校准较强，黄灯=可观察/需确认，红灯=不适合单独开工",
+            },
+            "currentSignals": signals,
+        },
         "calibrationRows": calibration_rows,
+        "observationRows": backtest["observationRows"],
+        "summaryRows": backtest["summaryRows"],
     }
 
 

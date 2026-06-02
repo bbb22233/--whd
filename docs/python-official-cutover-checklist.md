@@ -110,5 +110,8 @@ After data package scripts are cut over:
 - `npm run features` should call `backend_py.build_feature_factory --official`.
 - `npm run rules:deviations` should call `backend_py.build_deviation_rules --official`.
 - `npm run weather:router` should call `backend_py.build_market_weather_router --official`.
+- `npm run backtest:router` should call `backend_py.backtest_strategy_router --official`.
+- `npm run calibrate:router` should call `backend_py.calibrate_router --official`.
 - Legacy Node research scripts should move under `legacy:features`, `legacy:rules:deviations`, and `legacy:weather:router`.
+- Legacy Node router research scripts should move under `legacy:backtest:router` and `legacy:calibrate:router`.
 - Use `--plan-outputs` for no-write CLI checks.

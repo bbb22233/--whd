@@ -2045,3 +2045,74 @@ node checks = pass
 ### 备注
 - 本轮只新增剩余 Node 命令盘点和测试白名单,未修改 reports/data。
 - 推荐迁移顺序: `calibrate:router`/`backtest:router` -> macro commands -> training commands -> historical backtests/journal -> optional `serve` cleanup。
+
+---
+
+## 42. Python Router Backtest And Calibration Script Cutover
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+git status --short --branch
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.smoke_test
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check app.js
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check server.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check scripts/backtest-strategy-router.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check scripts/calibrate-router.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" npm --silent run backtest:router -- --instrument BTC-USDT --bar 1D --plan-outputs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" npm --silent run calibrate:router -- --instrument BTC-USDT --bar 1D --plan-outputs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.backtest_strategy_router --instrument BTC-USDT --bar 1D --days 3650
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.calibrate_router --instrument BTC-USDT --bar 1D --days 3650
+```
+
+### 期望
+- `npm run backtest:router` 指向 Python `backend_py.backtest_strategy_router --official`。
+- `npm run calibrate:router` 指向 Python `backend_py.calibrate_router --official`。
+- 旧 Node router research scripts 移动到 `legacy:backtest:router` / `legacy:calibrate:router`。
+- Python router backtest 输出 `summaryRows` 与 `observationRows`。
+- Python calibration metadata 包含 `calibration` 说明和 `currentSignals`。
+- 非 official 实跑只写 `_py` 对照产物,不覆盖 official reports。
+
+### 实际
+```
+backtest:router plan:
+step = backtest-strategy-router-output-plan
+official = true
+suffix = ""
+pathCount = 3
+existingCount = 2
+missingCount = 1
+
+calibrate:router plan:
+step = calibrate-router-output-plan
+official = true
+suffix = ""
+pathCount = 3
+existingCount = 3
+missingCount = 0
+
+non-official backtest run:
+summaryRows = 128
+observationRows = 93416
+routeCount = 8
+
+non-official calibration run:
+calibrationRows = 32
+currentSignals = 8
+observationRows = 93416
+
+remaining node scripts no longer include:
+backtest:router
+calibrate:router
+
+smoke_test = pass
+py_compile = pass
+node checks = pass
+```
+
+### 备注
+- 本轮新增 `backend_py.backtest_strategy_router` 与 `backend_py.calibrate_router`。
+- 新增 `_py` router research 对照产物已加入 `.gitignore`。
+- `backtest:router` 的 missing official path 是 standalone strategy router observations CSV;旧 Node standalone router backtest 也会生成该类输出。

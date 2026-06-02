@@ -8,6 +8,7 @@
 
 - `download` / `clean`
 - `features` / `rules:deviations` / `weather:router`
+- `backtest:router` / `calibrate:router`
 - `multi:1d` / `multi:weather` / `multi:summary` / `multi:periods`
 - `/api/scanner/run?mode=summary`
 - `/api/scanner/run?mode=full`
@@ -25,6 +26,8 @@
 | `legacy:features` | `scripts/build-feature-factory.mjs` | Keep as parity rollback. |
 | `legacy:rules:deviations` | `scripts/build-deviation-rules.mjs` | Keep as parity rollback. |
 | `legacy:weather:router` | `scripts/build-market-weather-router.mjs` | Keep as parity rollback. |
+| `legacy:backtest:router` | `scripts/backtest-strategy-router.mjs` | Keep as router research rollback. |
+| `legacy:calibrate:router` | `scripts/calibrate-router.mjs` | Keep as router research rollback. |
 | `legacy:multi:1d` | `scripts/run-multi-symbol-1d.mjs` | Keep as historical scanner rollback. |
 | `legacy:multi:weather` | `scripts/run-multi-symbol-1d.mjs` | Keep as historical scanner rollback. |
 | `legacy:multi:periods` | `scripts/run-multi-symbol-1d.mjs` | Keep as historical scanner rollback. |
@@ -47,8 +50,6 @@ These are not part of the official report writer path, but they still matter for
 | `backtest:volatility` | `scripts/backtest-volatility-state.mjs` | Historical research | Keep temporarily; likely replace with Python notebooks/CLI if reused. |
 | `backtest:position` | `scripts/backtest-position-state.mjs` | Historical research | Keep temporarily; Python deviation rules already cover the production-facing output. |
 | `backtest:deviations` | `scripts/backtest-deviations.mjs` | Historical research | Keep temporarily; production deviation rules are already Python. |
-| `backtest:router` | `scripts/backtest-strategy-router.mjs` | Router research | Migrate if router backtests are needed for calibration decisions. |
-| `calibrate:router` | `scripts/calibrate-router.mjs` | Router research | Higher priority if calibration is used to tune official gate behavior. |
 | `download:macro` | `scripts/download-macro-data.mjs` | Macro research | Migrate before macro data becomes part of official Python reports. |
 | `compare:macro` | `scripts/compare-macro-impact.mjs` | Macro research | Migrate together with macro download/feature support. |
 | `train:state` | `scripts/train-market-state.mjs` | Model training | Keep until ML training direction is decided. |
@@ -58,11 +59,10 @@ These are not part of the official report writer path, but they still matter for
 
 ## Suggested Migration Order
 
-1. `calibrate:router` and `backtest:router`: closest to the official weather gate behavior.
-2. `download:macro` and `compare:macro`: needed before macro becomes an official report dependency.
-3. `train:state`, `train:trees`, and `validate:trees`: migrate as a separate Python ML/training milestone.
-4. Historical `backtest:*` utilities and `journal:create`: migrate only if actively used.
-5. `serve`: optional final cleanup.
+1. `download:macro` and `compare:macro`: needed before macro becomes an official report dependency.
+2. `train:state`, `train:trees`, and `validate:trees`: migrate as a separate Python ML/training milestone.
+3. Historical `backtest:*` utilities and `journal:create`: migrate only if actively used.
+4. `serve`: optional final cleanup.
 
 ## Verification
 

@@ -247,10 +247,13 @@ The next Python research migration should choose one of:
 - `npm run features`, `npm run rules:deviations`, and
   `npm run weather:router` now route to Python official single-symbol research
   entrypoints.
+- `npm run backtest:router` and `npm run calibrate:router` now route to Python
+  official router research entrypoints.
 - Legacy Node scanner remains available as `/api/scanner/run?mode=node_summary`
   and `/api/scanner/run?mode=node_full`; package-level legacy commands are
   available under `legacy:multi:*`, `legacy:download`, `legacy:clean`,
-  `legacy:features`, `legacy:rules:deviations`, and `legacy:weather:router`.
+  `legacy:features`, `legacy:rules:deviations`, `legacy:weather:router`,
+  `legacy:backtest:router`, and `legacy:calibrate:router`.
 - Remaining Node research/training commands are tracked in
   `docs/remaining-node-command-inventory.md`.
 - Next, monitor the Python official scanner entries in normal use, then decide
