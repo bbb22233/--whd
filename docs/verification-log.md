@@ -1540,3 +1540,73 @@ cleanMissingCount = 18
 - 当前本地已覆盖 52 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX, WLD, AR, XLM, ICP, HBAR, ALGO, LDO, CRV, ENS, PENDLE, JUP, PYTH, TIA, ONDO, FET, PEPE, SHIB, BONK, FLOKI, WIF, ORDI, SATS, NOT, ENA, W。
 - `ENA` 日线历史较短,但 `python_full` 未出现 insufficient-history 或 error。
 - 继续分批补齐剩余 6 个 symbols。
+
+---
+
+## 33. Python Data Pipeline Final Batch and Full Default Validation
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m backend_py.run_full_pipeline --check-inputs --symbols STRK-USDT ZK-USDT ZRO-USDT GALA-USDT SAND-USDT MANA-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_data_pipeline --missing-only --symbols STRK-USDT ZK-USDT ZRO-USDT GALA-USDT SAND-USDT MANA-USDT --bars 1D,4H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols STRK-USDT ZK-USDT ZRO-USDT GALA-USDT SAND-USDT MANA-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --bars 1D,4H,8H --days 3650
+```
+
+### 期望
+- 最后一批补齐 `STRK/ZK/ZRO/GALA/SAND/MANA × 1D/4H`。
+- 补齐后 `python_full --skip-download` 可验证该批 1D/4H/8H 全链路。
+- 本地输入覆盖度从 156 组提升到 174 组。
+- 完整 default symbols 的 `python_full` 验证可覆盖 58 个 symbols × 1D/4H/8H。
+
+### 实际
+```
+STRK/ZK/ZRO/GALA/SAND/MANA × 1D/4H:
+stepCount = 12
+successCount = 12
+errorCount = 0
+
+rawRows / cleanRows:
+STRK 1D = 835 / 834
+ZK 1D = 716 / 715
+ZRO 1D = 714 / 713
+GALA 1D = 1716 / 1715
+SAND 1D = 1904 / 1903
+MANA 1D = 3066 / 3065
+STRK 4H = 5000 / 4999
+ZK 4H = 4287 / 4286
+ZRO 4H = 4274 / 4273
+GALA 4H = 10287 / 10286
+SAND 4H = 11415 / 11414
+MANA 4H = 18387 / 18386
+
+python_full STRK/ZK/ZRO/GALA/SAND/MANA × 1D,4H,8H:
+successCount = 18
+weatherCount = 18
+insufficientHistoryCount = 0
+errorCount = 0
+
+default symbols × 1D,4H,8H after fill:
+requiredCount = 174
+rawReadyCount = 174
+rawMissingCount = 0
+cleanReadyCount = 174
+cleanMissingCount = 0
+
+full default python_full × 1D,4H,8H:
+successCount = 174
+weatherCount = 174
+insufficientHistoryCount = 0
+errorCount = 0
+1D successCount = 58
+4H successCount = 58
+8H successCount = 58
+```
+
+### 备注
+- 当前本地已覆盖全部 58 个 default symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX, WLD, AR, XLM, ICP, HBAR, ALGO, LDO, CRV, ENS, PENDLE, JUP, PYTH, TIA, ONDO, FET, PEPE, SHIB, BONK, FLOKI, WIF, ORDI, SATS, NOT, ENA, W, STRK, ZK, ZRO, GALA, SAND, MANA。
+- 本地 default input coverage 已完成:raw/clean 均为 `174/174`。
+- 完整 default `python_full --skip-download` 已通过,下一步可进入 `--official` cutover checklist 和生产报告 writer 切换准备。
