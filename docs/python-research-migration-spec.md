@@ -207,7 +207,7 @@ node --check server.mjs
 The next Python research migration should choose one of:
 
 - Add a scanner mode for Python deviation parity across selected symbols/bars.
-- Start wiring selected Python research generators into scanner/orchestrator
-  paths behind explicit modes.
-- Add a Python full research parity mode that chains feature, deviation,
-  router, and summary checks for selected symbols/bars.
+- Migrate OKX download and clean-candle generation into Python so the research
+  path no longer depends on Node for data ingestion.
+- Start replacing selected Node scanner/orchestrator paths behind explicit
+  Python modes after the parity modes have enough coverage.

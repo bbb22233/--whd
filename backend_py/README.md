@@ -53,6 +53,8 @@ POST /api/scanner/run?mode=python_summary
 POST /api/scanner/run?mode=python_summary&symbols=BTC-USDT,ETH-USDT&bars=1D,4H
 POST /api/scanner/run?mode=python_router
 POST /api/scanner/run?mode=python_router&symbols=BTC-USDT,ETH-USDT&bars=1D,4H
+POST /api/scanner/run?mode=python_research
+POST /api/scanner/run?mode=python_research&symbols=BTC-USDT,ETH-USDT&bars=1D,4H
 POST /api/scanner/run?mode=full
 POST /api/scanner/cancel
 ```
@@ -62,6 +64,7 @@ POST /api/scanner/cancel
 - `summary`: 调用现有 Node 脚本从已有 reports 重建多周期汇总，不下载。
 - `python_summary`: 调用 Python from-reports summary parity 路径,默认跑 `BTC-USDT 1D`,可用 `symbols`/`bars` 参数扩大范围,只写 `_py` 对照产物。
 - `python_router`: 调用 Python 完整 router parity 路径,默认跑 `BTC-USDT 1D`,可用 `symbols`/`bars` 参数扩大范围,只写 `_py` 对照产物并对比现有 Node reports。
+- `python_research`: 调用 Python feature/deviation/router/summary parity 链路,默认跑 `BTC-USDT 1D`,可用 `symbols`/`bars` 参数扩大范围,只写 `_py` 对照产物;如果现有 Node golden 日期或汇总范围不匹配,对应 compare 会标记为 skipped,不会重写 Node 正式报告。
 - `full`: 调用现有 Node 多周期扫描，会尝试下载/刷新数据。
 
 ## 验证

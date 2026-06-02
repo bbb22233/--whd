@@ -765,3 +765,50 @@ ScannerService().start("python_router") = succeeded, returnCode 0
 ### 备注
 - 新增 `backend_py.run_router_parity`,负责按 symbols/bars 批量执行 Python router build + compare。
 - `python_router` 与 `python_summary` 一样是显式 parity 模式,不会改变 Node 默认生产扫描路径。
+
+---
+
+## 18. Scanner Python Research Mode
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+uv run python -m backend_py.run_research_parity
+uv run python -m backend_py.smoke_test
+uv run python - <<'PY'
+import time
+from backend_py.scanner_service import ScannerService
+scanner = ScannerService()
+job = scanner.start("python_research")
+last = None
+for _ in range(180):
+    snapshot = scanner.snapshot()
+    last = snapshot["lastJob"]
+    if last and last["status"] != "running":
+        break
+    time.sleep(0.1)
+print({"startedMode": job["mode"], "status": last["status"], "returnCode": last["returnCode"]})
+assert last["status"] == "succeeded", last
+PY
+```
+
+### 期望
+- `/api/scanner/run?mode=python_research` 可运行。
+- `python_research` 默认跑 `BTC-USDT 1D`,串联 Python feature、deviation、router、summary build/compare。
+- 所有产物只写 `_py` artifacts,不替换 Node 正式 reports。
+- 当现有 Node golden 与当前局部 scope 不一致时,对应 compare 标记为 `skipped`,不刷新 Node 报告。
+
+### 实际
+```
+py_compile backend_py/*.py backend_py/research/*.py = 通过
+backend_py.run_research_parity = stepCount 8, successCount 6, skippedCount 2, errorCount 0
+backend_py.smoke_test = 通过
+ScannerService().start("python_research") = succeeded, returnCode 0
+```
+
+### 备注
+- `deviation_compare` 跳过原因:仓库中 BTC-USDT 1D Node deviation golden 的 `lastDate` 为 `2026-05-29`,当前 router golden 的 `lastDate` 为 `2026-05-31`。
+- `summary_compare` 跳过原因:仓库中 Node summary 是全量 58 symbols/4 bars,本次默认 Python research 只跑 `BTC-USDT 1D`。
+- 新增 `backend_py.run_research_parity`,作为 Python 研究链路的一键 parity/orchestration 入口。

@@ -12,7 +12,7 @@ from typing import Literal
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-ScannerMode = Literal["summary", "full", "python_summary", "python_router"]
+ScannerMode = Literal["summary", "full", "python_summary", "python_router", "python_research"]
 ScannerStatus = Literal["idle", "running", "succeeded", "failed", "cancelled"]
 
 
@@ -83,6 +83,14 @@ def command_for_mode(mode: ScannerMode, *, symbols: str | None = None, bars: str
             "backend_py.run_router_parity",
             *scope,
         ]
+    if mode == "python_research":
+        scope = scanner_scope_args(symbols or "BTC-USDT", bars or "1D")
+        return [
+            sys.executable,
+            "-m",
+            "backend_py.run_research_parity",
+            *scope,
+        ]
     raise ValueError(f"Unsupported scanner mode: {mode}")
 
 
@@ -106,13 +114,14 @@ class ScannerJob:
 class ScannerSnapshot:
     active: bool
     lastJob: dict | None
-    supportedModes: list[str] = field(default_factory=lambda: ["summary", "full", "python_summary", "python_router"])
+    supportedModes: list[str] = field(default_factory=lambda: ["summary", "full", "python_summary", "python_router", "python_research"])
     modeNotes: dict[str, str] = field(
         default_factory=lambda: {
             "summary": "Rebuild combined summaries from existing reports; no download.",
             "full": "Run the existing Node multi-period scanner; may download market data.",
             "python_summary": "Run Python from-reports summary parity; defaults to BTC-USDT 1D and writes _py artifacts only.",
             "python_router": "Run Python full router parity against existing Node reports; defaults to BTC-USDT 1D and writes _py artifacts only.",
+            "python_research": "Run Python feature/deviation/router/summary parity chain; defaults to BTC-USDT 1D and writes _py artifacts only.",
         }
     )
 
@@ -144,7 +153,7 @@ class ScannerService:
             startedAt=utc_now_iso(),
             note=(
                 "Python backend is running a Python parity path."
-                if mode in {"python_summary", "python_router"}
+                if mode in {"python_summary", "python_router", "python_research"}
                 else "Python backend is orchestrating the existing Node scanner."
             ),
         )
