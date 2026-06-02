@@ -1262,3 +1262,58 @@ cleanMissingCount = 93
 ### 备注
 - 当前本地已覆盖 27 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX。
 - 继续分批补齐剩余 31 个 symbols。
+
+---
+
+## 28. Python Data Pipeline Small Batch Fill 6
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m backend_py.run_full_pipeline --check-inputs --symbols WLD-USDT AR-USDT XLM-USDT ICP-USDT HBAR-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_data_pipeline --missing-only --symbols WLD-USDT AR-USDT XLM-USDT ICP-USDT HBAR-USDT --bars 1D,4H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols WLD-USDT AR-USDT XLM-USDT ICP-USDT HBAR-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+```
+
+### 期望
+- 第六批补齐 `WLD/AR/XLM/ICP/HBAR × 1D/4H`。
+- 补齐后 `python_full --skip-download` 可验证该批 1D/4H/8H 全链路。
+- 本地覆盖度从 81 组提升到 96 组。
+
+### 实际
+```
+WLD/AR/XLM/ICP/HBAR × 1D/4H:
+stepCount = 10
+successCount = 10
+errorCount = 0
+
+rawRows / cleanRows:
+WLD 1D = 1046 / 1045
+AR 1D = 1623 / 1622
+XLM 1D = 3066 / 3065
+ICP 1D = 1850 / 1849
+HBAR 1D = 2452 / 2451
+WLD 4H = 6267 / 6266
+AR 4H = 9728 / 9727
+XLM 4H = 18387 / 18386
+ICP 4H = 11095 / 11094
+HBAR 4H = 14703 / 14702
+
+python_full WLD/AR/XLM/ICP/HBAR × 1D,4H,8H:
+successCount = 15
+weatherCount = 15
+errorCount = 0
+
+default symbols × 1D,4H,8H after fill:
+requiredCount = 174
+rawReadyCount = 96
+rawMissingCount = 78
+cleanReadyCount = 96
+cleanMissingCount = 78
+```
+
+### 备注
+- 当前本地已覆盖 32 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX, WLD, AR, XLM, ICP, HBAR。
+- 继续分批补齐剩余 26 个 symbols。
