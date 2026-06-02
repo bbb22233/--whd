@@ -1,0 +1,3000 @@
+{
+  "chunk": 2,
+  "generatedAt": "2026-06-01T23:57:52.803Z",
+  "results": [
+    {
+      "symbol": "AAVE-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2020-11-29 20:00",
+        "trainRows": 6763,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 7,
+        "name": "放量波动扩张态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 288,
+      "avgTrainSuccessPct": 46.14,
+      "avgValidateSuccessPct": 45.84,
+      "avgGapPct": -0.31,
+      "avgAbsGapPct": 2.71,
+      "maxAbsGapPct": 12.75,
+      "largeGapCount": 8,
+      "largeGapSharePct": 2.78,
+      "topAbsGaps": [
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "观察",
+          "trainN": 191,
+          "validateN": 142,
+          "train": 71.2,
+          "validate": 58.45,
+          "gap": -12.75
+        },
+        {
+          "stateId": 5,
+          "stateName": "放量波动扩张态",
+          "route": "高抛均值回归",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 439,
+          "validateN": 575,
+          "train": 70.16,
+          "validate": 57.91,
+          "gap": -12.25
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 191,
+          "validateN": 142,
+          "train": 67.02,
+          "validate": 55.63,
+          "gap": -11.39
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "高抛均值回归",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 191,
+          "validateN": 142,
+          "train": 39.79,
+          "validate": 28.87,
+          "gap": -10.92
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "趋势追多",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 191,
+          "validateN": 142,
+          "train": 47.64,
+          "validate": 57.75,
+          "gap": 10.11
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 191,
+          "validateN": 142,
+          "train": 52.36,
+          "validate": 42.25,
+          "gap": -10.11
+        },
+        {
+          "stateId": 8,
+          "stateName": "放量波动扩张态",
+          "route": "低吸均值回归",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 288,
+          "validateN": 263,
+          "train": 49.31,
+          "validate": 57.79,
+          "gap": 8.48
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 191,
+          "validateN": 142,
+          "train": 73.3,
+          "validate": 81.69,
+          "gap": 8.39
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "震荡网格",
+          "horizon": 1,
+          "light": "绿灯",
+          "trainN": 792,
+          "validateN": 540,
+          "train": 81.06,
+          "validate": 82.04,
+          "gap": 0.98
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 792,
+          "validateN": 539,
+          "train": 81.82,
+          "validate": 82.56,
+          "gap": 0.74
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 792,
+          "validateN": 538,
+          "train": 82.45,
+          "validate": 81.97,
+          "gap": -0.48
+        },
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 792,
+          "validateN": 538,
+          "train": 58.46,
+          "validate": 62.64,
+          "gap": 4.18
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 792,
+          "validateN": 538,
+          "train": 76.77,
+          "validate": 81.6,
+          "gap": 4.83
+        },
+        {
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 792,
+          "validateN": 538,
+          "train": 62.88,
+          "validate": 57.99,
+          "gap": -4.89
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 792,
+          "validateN": 538,
+          "train": 63.38,
+          "validate": 68.4,
+          "gap": 5.02
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 792,
+          "validateN": 538,
+          "train": 47.85,
+          "validate": 52.42,
+          "gap": 4.57
+        }
+      ],
+      "quality": "??"
+    },
+    {
+      "symbol": "NEAR-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2021-01-10 20:00",
+        "trainRows": 6511,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 3,
+        "name": "放量波动扩张态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 288,
+      "avgTrainSuccessPct": 46.2,
+      "avgValidateSuccessPct": 46.01,
+      "avgGapPct": -0.19,
+      "avgAbsGapPct": 2.38,
+      "maxAbsGapPct": 10.29,
+      "largeGapCount": 8,
+      "largeGapSharePct": 2.78,
+      "topAbsGaps": [
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "高抛均值回归",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 183,
+          "validateN": 132,
+          "train": 45.9,
+          "validate": 35.61,
+          "gap": -10.29
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "高抛均值回归",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 183,
+          "validateN": 132,
+          "train": 49.73,
+          "validate": 40.15,
+          "gap": -9.58
+        },
+        {
+          "stateId": 4,
+          "stateName": "放量波动扩张态",
+          "route": "趋势追多",
+          "horizon": 1,
+          "light": "红灯",
+          "trainN": 653,
+          "validateN": 523,
+          "train": 56.51,
+          "validate": 47.61,
+          "gap": -8.9
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "向上突破",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 183,
+          "validateN": 132,
+          "train": 45.9,
+          "validate": 37.12,
+          "gap": -8.78
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 183,
+          "validateN": 132,
+          "train": 47.54,
+          "validate": 56.06,
+          "gap": 8.52
+        },
+        {
+          "stateId": 4,
+          "stateName": "放量波动扩张态",
+          "route": "防守等待",
+          "horizon": 1,
+          "light": "观察",
+          "trainN": 653,
+          "validateN": 523,
+          "train": 44.72,
+          "validate": 53.15,
+          "gap": 8.43
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "向下突破",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 183,
+          "validateN": 132,
+          "train": 46.99,
+          "validate": 38.64,
+          "gap": -8.35
+        },
+        {
+          "stateId": 4,
+          "stateName": "放量波动扩张态",
+          "route": "趋势做空",
+          "horizon": 1,
+          "light": "黄灯",
+          "trainN": 653,
+          "validateN": 523,
+          "train": 43.03,
+          "validate": 51.24,
+          "gap": 8.21
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 183,
+          "validateN": 132,
+          "train": 65.03,
+          "validate": 59.85,
+          "gap": -5.18
+        },
+        {
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 183,
+          "validateN": 132,
+          "train": 64.48,
+          "validate": 57.58,
+          "gap": -6.9
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 183,
+          "validateN": 132,
+          "train": 68.31,
+          "validate": 64.39,
+          "gap": -3.92
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 183,
+          "validateN": 132,
+          "train": 73.77,
+          "validate": 74.24,
+          "gap": 0.47
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 183,
+          "validateN": 132,
+          "train": 47.54,
+          "validate": 56.06,
+          "gap": 8.52
+        },
+        {
+          "route": "趋势追多",
+          "horizon": 1,
+          "light": "黄灯",
+          "trainN": 183,
+          "validateN": 132,
+          "train": 51.37,
+          "validate": 52.27,
+          "gap": 0.9
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 183,
+          "validateN": 132,
+          "train": 73.22,
+          "validate": 77.27,
+          "gap": 4.05
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 183,
+          "validateN": 132,
+          "train": 50.82,
+          "validate": 51.52,
+          "gap": 0.7
+        }
+      ],
+      "quality": "??"
+    },
+    {
+      "symbol": "OP-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2022-07-09 08:00",
+        "trainRows": 3244,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 8,
+        "name": "放量波动扩张态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 288,
+      "avgTrainSuccessPct": 45.88,
+      "avgValidateSuccessPct": 46.41,
+      "avgGapPct": 0.53,
+      "avgAbsGapPct": 4.85,
+      "maxAbsGapPct": 25.17,
+      "largeGapCount": 58,
+      "largeGapSharePct": 20.14,
+      "topAbsGaps": [
+        {
+          "stateId": 8,
+          "stateName": "放量波动扩张态",
+          "route": "低吸均值回归",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 17.58,
+          "validate": 42.75,
+          "gap": 25.17
+        },
+        {
+          "stateId": 8,
+          "stateName": "放量波动扩张态",
+          "route": "向上突破",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 63.74,
+          "validate": 43.48,
+          "gap": -20.26
+        },
+        {
+          "stateId": 8,
+          "stateName": "放量波动扩张态",
+          "route": "向上突破",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 53.85,
+          "validate": 34.06,
+          "gap": -19.79
+        },
+        {
+          "stateId": 8,
+          "stateName": "放量波动扩张态",
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 72.53,
+          "validate": 53.62,
+          "gap": -18.91
+        },
+        {
+          "stateId": 8,
+          "stateName": "放量波动扩张态",
+          "route": "趋势做空",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 37.36,
+          "validate": 55.8,
+          "gap": 18.44
+        },
+        {
+          "stateId": 8,
+          "stateName": "放量波动扩张态",
+          "route": "趋势追多",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 62.64,
+          "validate": 44.2,
+          "gap": -18.44
+        },
+        {
+          "stateId": 5,
+          "stateName": "下侧趋势共振态",
+          "route": "向下突破",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 172,
+          "validateN": 678,
+          "train": 28.49,
+          "validate": 43.95,
+          "gap": 15.46
+        },
+        {
+          "stateId": 8,
+          "stateName": "放量波动扩张态",
+          "route": "低吸均值回归",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 26.37,
+          "validate": 41.3,
+          "gap": 14.93
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 57.14,
+          "validate": 68.12,
+          "gap": 10.98
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 37.36,
+          "validate": 55.8,
+          "gap": 18.44
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 41.76,
+          "validate": 55.07,
+          "gap": 13.31
+        },
+        {
+          "route": "向下突破",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 48.35,
+          "validate": 55.8,
+          "gap": 7.45
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 80.22,
+          "validate": 86.96,
+          "gap": 6.74
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 61.54,
+          "validate": 71.74,
+          "gap": 10.2
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 79.12,
+          "validate": 79.71,
+          "gap": 0.59
+        },
+        {
+          "route": "防守等待",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 91,
+          "validateN": 138,
+          "train": 56.04,
+          "validate": 63.04,
+          "gap": 7
+        }
+      ],
+      "quality": "???"
+    },
+    {
+      "symbol": "ARB-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2023-05-01 04:00",
+        "trainRows": 1469,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 1,
+        "name": "放量波动扩张态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 288,
+      "avgTrainSuccessPct": 45.84,
+      "avgValidateSuccessPct": 46.46,
+      "avgGapPct": 0.62,
+      "avgAbsGapPct": 4.75,
+      "maxAbsGapPct": 29.74,
+      "largeGapCount": 51,
+      "largeGapSharePct": 17.71,
+      "topAbsGaps": [
+        {
+          "stateId": 2,
+          "stateName": "放量波动扩张态",
+          "route": "趋势追多",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 44,
+          "validateN": 107,
+          "train": 72.73,
+          "validate": 42.99,
+          "gap": -29.74
+        },
+        {
+          "stateId": 2,
+          "stateName": "放量波动扩张态",
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 44,
+          "validateN": 107,
+          "train": 27.27,
+          "validate": 57.01,
+          "gap": 29.74
+        },
+        {
+          "stateId": 2,
+          "stateName": "放量波动扩张态",
+          "route": "向上突破",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 44,
+          "validateN": 107,
+          "train": 61.36,
+          "validate": 40.19,
+          "gap": -21.17
+        },
+        {
+          "stateId": 2,
+          "stateName": "放量波动扩张态",
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 44,
+          "validateN": 107,
+          "train": 70.45,
+          "validate": 51.4,
+          "gap": -19.05
+        },
+        {
+          "stateId": 2,
+          "stateName": "放量波动扩张态",
+          "route": "防守等待",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 44,
+          "validateN": 107,
+          "train": 45.45,
+          "validate": 64.49,
+          "gap": 19.04
+        },
+        {
+          "stateId": 1,
+          "stateName": "放量波动扩张态",
+          "route": "低吸均值回归",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 119,
+          "validateN": 537,
+          "train": 34.45,
+          "validate": 18.44,
+          "gap": -16.01
+        },
+        {
+          "stateId": 2,
+          "stateName": "放量波动扩张态",
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 44,
+          "validateN": 107,
+          "train": 54.55,
+          "validate": 70.09,
+          "gap": 15.54
+        },
+        {
+          "stateId": 2,
+          "stateName": "放量波动扩张态",
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 44,
+          "validateN": 107,
+          "train": 50,
+          "validate": 65.42,
+          "gap": 15.42
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 119,
+          "validateN": 537,
+          "train": 57.14,
+          "validate": 66.11,
+          "gap": 8.97
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 119,
+          "validateN": 537,
+          "train": 52.94,
+          "validate": 56.24,
+          "gap": 3.3
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 119,
+          "validateN": 537,
+          "train": 49.58,
+          "validate": 55.31,
+          "gap": 5.73
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 1,
+          "light": "绿灯",
+          "trainN": 119,
+          "validateN": 538,
+          "train": 80.67,
+          "validate": 78.81,
+          "gap": -1.86
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 119,
+          "validateN": 538,
+          "train": 79.83,
+          "validate": 80.48,
+          "gap": 0.65
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 119,
+          "validateN": 537,
+          "train": 82.35,
+          "validate": 80.63,
+          "gap": -1.72
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 119,
+          "validateN": 537,
+          "train": 63.03,
+          "validate": 71.14,
+          "gap": 8.11
+        },
+        {
+          "route": "防守等待",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 119,
+          "validateN": 537,
+          "train": 57.14,
+          "validate": 62.76,
+          "gap": 5.62
+        }
+      ],
+      "quality": "???"
+    },
+    {
+      "symbol": "SUI-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2023-06-11 04:00",
+        "trainRows": 1223,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 8,
+        "name": "中性震荡态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 288,
+      "avgTrainSuccessPct": 46.08,
+      "avgValidateSuccessPct": 46.37,
+      "avgGapPct": 0.29,
+      "avgAbsGapPct": 4.93,
+      "maxAbsGapPct": 18.31,
+      "largeGapCount": 60,
+      "largeGapSharePct": 20.83,
+      "topAbsGaps": [
+        {
+          "stateId": 6,
+          "stateName": "上侧趋势共振态",
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 98,
+          "validateN": 530,
+          "train": 67.35,
+          "validate": 85.66,
+          "gap": 18.31
+        },
+        {
+          "stateId": 1,
+          "stateName": "放量波动扩张态",
+          "route": "趋势做空",
+          "horizon": 1,
+          "light": "红灯",
+          "trainN": 34,
+          "validateN": 83,
+          "train": 52.94,
+          "validate": 34.94,
+          "gap": -18
+        },
+        {
+          "stateId": 1,
+          "stateName": "放量波动扩张态",
+          "route": "趋势追多",
+          "horizon": 1,
+          "light": "绿灯",
+          "trainN": 34,
+          "validateN": 83,
+          "train": 47.06,
+          "validate": 63.86,
+          "gap": 16.8
+        },
+        {
+          "stateId": 1,
+          "stateName": "放量波动扩张态",
+          "route": "向上突破",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 34,
+          "validateN": 83,
+          "train": 35.29,
+          "validate": 51.81,
+          "gap": 16.52
+        },
+        {
+          "stateId": 1,
+          "stateName": "放量波动扩张态",
+          "route": "防守等待",
+          "horizon": 1,
+          "light": "观察",
+          "trainN": 34,
+          "validateN": 83,
+          "train": 52.94,
+          "validate": 37.35,
+          "gap": -15.59
+        },
+        {
+          "stateId": 3,
+          "stateName": "过渡混合态",
+          "route": "高抛均值回归",
+          "horizon": 1,
+          "light": "红灯",
+          "trainN": 221,
+          "validateN": 579,
+          "train": 22.17,
+          "validate": 37.31,
+          "gap": 15.14
+        },
+        {
+          "stateId": 6,
+          "stateName": "上侧趋势共振态",
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 98,
+          "validateN": 530,
+          "train": 70.41,
+          "validate": 85.28,
+          "gap": 14.87
+        },
+        {
+          "stateId": 3,
+          "stateName": "过渡混合态",
+          "route": "高抛均值回归",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 221,
+          "validateN": 579,
+          "train": 21.27,
+          "validate": 35.75,
+          "gap": 14.48
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 223,
+          "validateN": 978,
+          "train": 63.68,
+          "validate": 65.34,
+          "gap": 1.66
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 1,
+          "light": "绿灯",
+          "trainN": 223,
+          "validateN": 983,
+          "train": 89.24,
+          "validate": 84.54,
+          "gap": -4.7
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 223,
+          "validateN": 982,
+          "train": 87.44,
+          "validate": 80.65,
+          "gap": -6.79
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 223,
+          "validateN": 978,
+          "train": 53.36,
+          "validate": 56.13,
+          "gap": 2.77
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 223,
+          "validateN": 980,
+          "train": 86.1,
+          "validate": 80.61,
+          "gap": -5.49
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 223,
+          "validateN": 980,
+          "train": 59.64,
+          "validate": 55.71,
+          "gap": -3.93
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 223,
+          "validateN": 978,
+          "train": 85.2,
+          "validate": 79.04,
+          "gap": -6.16
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 223,
+          "validateN": 978,
+          "train": 72.2,
+          "validate": 70.55,
+          "gap": -1.65
+        }
+      ],
+      "quality": "???"
+    },
+    {
+      "symbol": "APT-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2022-11-26 16:00",
+        "trainRows": 2402,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 8,
+        "name": "放量波动扩张态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 288,
+      "avgTrainSuccessPct": 45.99,
+      "avgValidateSuccessPct": 46.4,
+      "avgGapPct": 0.41,
+      "avgAbsGapPct": 3.73,
+      "maxAbsGapPct": 13.78,
+      "largeGapCount": 25,
+      "largeGapSharePct": 8.68,
+      "topAbsGaps": [
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 167,
+          "validateN": 233,
+          "train": 63.47,
+          "validate": 77.25,
+          "gap": 13.78
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 167,
+          "validateN": 233,
+          "train": 43.71,
+          "validate": 56.22,
+          "gap": 12.51
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "趋势追多",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 167,
+          "validateN": 233,
+          "train": 56.29,
+          "validate": 43.78,
+          "gap": -12.51
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 167,
+          "validateN": 233,
+          "train": 57.49,
+          "validate": 69.53,
+          "gap": 12.04
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 167,
+          "validateN": 233,
+          "train": 46.71,
+          "validate": 58.37,
+          "gap": 11.66
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "趋势追多",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 167,
+          "validateN": 233,
+          "train": 53.29,
+          "validate": 41.63,
+          "gap": -11.66
+        },
+        {
+          "stateId": 7,
+          "stateName": "放量波动扩张态",
+          "route": "低吸均值回归",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 68,
+          "validateN": 99,
+          "train": 19.12,
+          "validate": 30.3,
+          "gap": 11.18
+        },
+        {
+          "stateId": 2,
+          "stateName": "下侧趋势共振态",
+          "route": "防守等待",
+          "horizon": 3,
+          "light": "观察",
+          "trainN": 143,
+          "validateN": 569,
+          "train": 39.16,
+          "validate": 50.26,
+          "gap": 11.1
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 220,
+          "validateN": 548,
+          "train": 63.18,
+          "validate": 65.88,
+          "gap": 2.7
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 220,
+          "validateN": 549,
+          "train": 53.64,
+          "validate": 55.56,
+          "gap": 1.92
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 1,
+          "light": "绿灯",
+          "trainN": 220,
+          "validateN": 550,
+          "train": 80.45,
+          "validate": 81.45,
+          "gap": 1
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 220,
+          "validateN": 550,
+          "train": 82.27,
+          "validate": 78,
+          "gap": -4.27
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 220,
+          "validateN": 549,
+          "train": 82.73,
+          "validate": 77.96,
+          "gap": -4.77
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 220,
+          "validateN": 548,
+          "train": 86.82,
+          "validate": 79.93,
+          "gap": -6.89
+        },
+        {
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 220,
+          "validateN": 548,
+          "train": 58.18,
+          "validate": 59.85,
+          "gap": 1.67
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 220,
+          "validateN": 548,
+          "train": 68.64,
+          "validate": 70.44,
+          "gap": 1.8
+        }
+      ],
+      "quality": "???"
+    },
+    {
+      "symbol": "FIL-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2021-01-10 20:00",
+        "trainRows": 6511,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 6,
+        "name": "放量波动扩张态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 288,
+      "avgTrainSuccessPct": 45.74,
+      "avgValidateSuccessPct": 46.26,
+      "avgGapPct": 0.51,
+      "avgAbsGapPct": 3.04,
+      "maxAbsGapPct": 17.47,
+      "largeGapCount": 18,
+      "largeGapSharePct": 6.25,
+      "topAbsGaps": [
+        {
+          "stateId": 4,
+          "stateName": "放量波动扩张态",
+          "route": "震荡网格",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 179,
+          "validateN": 133,
+          "train": 59.22,
+          "validate": 76.69,
+          "gap": 17.47
+        },
+        {
+          "stateId": 4,
+          "stateName": "放量波动扩张态",
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 179,
+          "validateN": 133,
+          "train": 61.45,
+          "validate": 77.44,
+          "gap": 15.99
+        },
+        {
+          "stateId": 4,
+          "stateName": "放量波动扩张态",
+          "route": "向上突破",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 179,
+          "validateN": 133,
+          "train": 52.51,
+          "validate": 36.84,
+          "gap": -15.67
+        },
+        {
+          "stateId": 4,
+          "stateName": "放量波动扩张态",
+          "route": "向上突破",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 179,
+          "validateN": 133,
+          "train": 58.1,
+          "validate": 42.86,
+          "gap": -15.24
+        },
+        {
+          "stateId": 4,
+          "stateName": "放量波动扩张态",
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 179,
+          "validateN": 133,
+          "train": 65.36,
+          "validate": 79.7,
+          "gap": 14.34
+        },
+        {
+          "stateId": 6,
+          "stateName": "放量波动扩张态",
+          "route": "低吸均值回归",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 203,
+          "validateN": 145,
+          "train": 29.56,
+          "validate": 43.45,
+          "gap": 13.89
+        },
+        {
+          "stateId": 4,
+          "stateName": "放量波动扩张态",
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 179,
+          "validateN": 133,
+          "train": 50.84,
+          "validate": 60.9,
+          "gap": 10.06
+        },
+        {
+          "stateId": 4,
+          "stateName": "放量波动扩张态",
+          "route": "趋势追多",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 179,
+          "validateN": 133,
+          "train": 49.16,
+          "validate": 39.1,
+          "gap": -10.06
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 203,
+          "validateN": 145,
+          "train": 64.53,
+          "validate": 64.14,
+          "gap": -0.39
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 203,
+          "validateN": 145,
+          "train": 51.72,
+          "validate": 57.24,
+          "gap": 5.52
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 203,
+          "validateN": 145,
+          "train": 50.74,
+          "validate": 55.86,
+          "gap": 5.12
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 203,
+          "validateN": 145,
+          "train": 69.95,
+          "validate": 73.79,
+          "gap": 3.84
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 203,
+          "validateN": 145,
+          "train": 75.86,
+          "validate": 77.93,
+          "gap": 2.07
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 203,
+          "validateN": 145,
+          "train": 74.38,
+          "validate": 73.79,
+          "gap": -0.59
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 203,
+          "validateN": 145,
+          "train": 75.37,
+          "validate": 81.38,
+          "gap": 6.01
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 3,
+          "light": "黄灯",
+          "trainN": 203,
+          "validateN": 145,
+          "train": 47.29,
+          "validate": 53.79,
+          "gap": 6.5
+        }
+      ],
+      "quality": "???"
+    },
+    {
+      "symbol": "ETC-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2018-02-19 00:00",
+        "trainRows": 12852,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 8,
+        "name": "放量波动扩张态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 288,
+      "avgTrainSuccessPct": 45.65,
+      "avgValidateSuccessPct": 46.33,
+      "avgGapPct": 0.68,
+      "avgAbsGapPct": 3.86,
+      "maxAbsGapPct": 33.15,
+      "largeGapCount": 31,
+      "largeGapSharePct": 10.76,
+      "topAbsGaps": [
+        {
+          "stateId": 3,
+          "stateName": "下侧趋势共振态",
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 641,
+          "validateN": 44,
+          "train": 48.67,
+          "validate": 81.82,
+          "gap": 33.15
+        },
+        {
+          "stateId": 3,
+          "stateName": "下侧趋势共振态",
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "观察",
+          "trainN": 641,
+          "validateN": 44,
+          "train": 58.03,
+          "validate": 29.55,
+          "gap": -28.48
+        },
+        {
+          "stateId": 3,
+          "stateName": "下侧趋势共振态",
+          "route": "向上突破",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 641,
+          "validateN": 44,
+          "train": 33.39,
+          "validate": 59.09,
+          "gap": 25.7
+        },
+        {
+          "stateId": 3,
+          "stateName": "下侧趋势共振态",
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 641,
+          "validateN": 44,
+          "train": 48.36,
+          "validate": 22.73,
+          "gap": -25.63
+        },
+        {
+          "stateId": 3,
+          "stateName": "下侧趋势共振态",
+          "route": "趋势追多",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 641,
+          "validateN": 44,
+          "train": 51.64,
+          "validate": 77.27,
+          "gap": 25.63
+        },
+        {
+          "stateId": 3,
+          "stateName": "下侧趋势共振态",
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 641,
+          "validateN": 44,
+          "train": 48.83,
+          "validate": 25,
+          "gap": -23.83
+        },
+        {
+          "stateId": 3,
+          "stateName": "下侧趋势共振态",
+          "route": "防守等待",
+          "horizon": 5,
+          "light": "观察",
+          "trainN": 641,
+          "validateN": 44,
+          "train": 50.39,
+          "validate": 27.27,
+          "gap": -23.12
+        },
+        {
+          "stateId": 1,
+          "stateName": "放量波动扩张态",
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 429,
+          "validateN": 74,
+          "train": 64.1,
+          "validate": 86.49,
+          "gap": 22.39
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 1247,
+          "validateN": 697,
+          "train": 60.63,
+          "validate": 63.85,
+          "gap": 3.22
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 1247,
+          "validateN": 699,
+          "train": 81.88,
+          "validate": 83.55,
+          "gap": 1.67
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 1,
+          "light": "绿灯",
+          "trainN": 1247,
+          "validateN": 699,
+          "train": 81.48,
+          "validate": 79.83,
+          "gap": -1.65
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 1247,
+          "validateN": 697,
+          "train": 80.11,
+          "validate": 82.35,
+          "gap": 2.24
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 1247,
+          "validateN": 697,
+          "train": 78.75,
+          "validate": 82.21,
+          "gap": 3.46
+        },
+        {
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 1247,
+          "validateN": 697,
+          "train": 59.18,
+          "validate": 59.4,
+          "gap": 0.22
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 1247,
+          "validateN": 697,
+          "train": 66.08,
+          "validate": 68.58,
+          "gap": 2.5
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 1247,
+          "validateN": 697,
+          "train": 48.92,
+          "validate": 53.23,
+          "gap": 4.31
+        }
+      ],
+      "quality": "???"
+    },
+    {
+      "symbol": "ATOM-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2019-06-01 00:00",
+        "trainRows": 10050,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 3,
+        "name": "下侧趋势共振态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 256,
+      "avgTrainSuccessPct": 45.99,
+      "avgValidateSuccessPct": 46.19,
+      "avgGapPct": 0.21,
+      "avgAbsGapPct": 2.59,
+      "maxAbsGapPct": 13.93,
+      "largeGapCount": 7,
+      "largeGapSharePct": 2.73,
+      "topAbsGaps": [
+        {
+          "stateId": 5,
+          "stateName": "放量波动扩张态",
+          "route": "向上突破",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 352,
+          "validateN": 139,
+          "train": 57.1,
+          "validate": 43.17,
+          "gap": -13.93
+        },
+        {
+          "stateId": 1,
+          "stateName": "下侧趋势共振态",
+          "route": "趋势追多",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 887,
+          "validateN": 140,
+          "train": 57.27,
+          "validate": 70,
+          "gap": 12.73
+        },
+        {
+          "stateId": 1,
+          "stateName": "下侧趋势共振态",
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 887,
+          "validateN": 140,
+          "train": 42.39,
+          "validate": 30,
+          "gap": -12.39
+        },
+        {
+          "stateId": 5,
+          "stateName": "放量波动扩张态",
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 352,
+          "validateN": 139,
+          "train": 65.91,
+          "validate": 53.96,
+          "gap": -11.95
+        },
+        {
+          "stateId": 1,
+          "stateName": "下侧趋势共振态",
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 887,
+          "validateN": 140,
+          "train": 49.83,
+          "validate": 40,
+          "gap": -9.83
+        },
+        {
+          "stateId": 1,
+          "stateName": "下侧趋势共振态",
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 887,
+          "validateN": 140,
+          "train": 60.2,
+          "validate": 70,
+          "gap": 9.8
+        },
+        {
+          "stateId": 1,
+          "stateName": "下侧趋势共振态",
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "观察",
+          "trainN": 887,
+          "validateN": 140,
+          "train": 56.48,
+          "validate": 47.86,
+          "gap": -8.62
+        },
+        {
+          "stateId": 1,
+          "stateName": "下侧趋势共振态",
+          "route": "低吸均值回归",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 887,
+          "validateN": 140,
+          "train": 60.65,
+          "validate": 68.57,
+          "gap": 7.92
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "震荡网格",
+          "horizon": 1,
+          "light": "绿灯",
+          "trainN": 1364,
+          "validateN": 965,
+          "train": 87.32,
+          "validate": 86.94,
+          "gap": -0.38
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 1364,
+          "validateN": 964,
+          "train": 86,
+          "validate": 87.24,
+          "gap": 1.24
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 1364,
+          "validateN": 962,
+          "train": 85.92,
+          "validate": 86.9,
+          "gap": 0.98
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 1364,
+          "validateN": 958,
+          "train": 81.89,
+          "validate": 84.34,
+          "gap": 2.45
+        },
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 1364,
+          "validateN": 958,
+          "train": 63.12,
+          "validate": 64.41,
+          "gap": 1.29
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 1364,
+          "validateN": 958,
+          "train": 68.4,
+          "validate": 68.89,
+          "gap": 0.49
+        },
+        {
+          "route": "防守等待",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 1364,
+          "validateN": 962,
+          "train": 61.73,
+          "validate": 62.99,
+          "gap": 1.26
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 1364,
+          "validateN": 962,
+          "train": 51.39,
+          "validate": 51.98,
+          "gap": 0.59
+        }
+      ],
+      "quality": "??"
+    },
+    {
+      "symbol": "INJ-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "",
+        "trainRows": 0,
+        "validationRows": 5255
+      },
+      "currentState": {
+        "id": 4,
+        "name": "放量波动扩张态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 0,
+      "avgTrainSuccessPct": 0,
+      "avgValidateSuccessPct": 0,
+      "avgGapPct": 0,
+      "avgAbsGapPct": 0,
+      "maxAbsGapPct": 0,
+      "largeGapCount": 0,
+      "largeGapSharePct": 0,
+      "topAbsGaps": [],
+      "currentTopRoutes": [
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 0,
+          "validateN": 369,
+          "train": "",
+          "validate": 67.48,
+          "gap": null
+        },
+        {
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 0,
+          "validateN": 369,
+          "train": "",
+          "validate": 64.23,
+          "gap": null
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 0,
+          "validateN": 369,
+          "train": "",
+          "validate": 55.83,
+          "gap": null
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 1,
+          "light": "绿灯",
+          "trainN": 0,
+          "validateN": 372,
+          "train": "",
+          "validate": 80.65,
+          "gap": null
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 0,
+          "validateN": 370,
+          "train": "",
+          "validate": 84.59,
+          "gap": null
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 0,
+          "validateN": 370,
+          "train": "",
+          "validate": 84.05,
+          "gap": null
+        },
+        {
+          "route": "高抛均值回归",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 0,
+          "validateN": 369,
+          "train": "",
+          "validate": 73.44,
+          "gap": null
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 0,
+          "validateN": 369,
+          "train": "",
+          "validate": 85.64,
+          "gap": null
+        }
+      ],
+      "quality": "????"
+    },
+    {
+      "symbol": "STX-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2021-04-12 00:00",
+        "trainRows": 5964,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 5,
+        "name": "过渡混合态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 288,
+      "avgTrainSuccessPct": 45.73,
+      "avgValidateSuccessPct": 46.28,
+      "avgGapPct": 0.55,
+      "avgAbsGapPct": 3.51,
+      "maxAbsGapPct": 17.23,
+      "largeGapCount": 27,
+      "largeGapSharePct": 9.38,
+      "topAbsGaps": [
+        {
+          "stateId": 0,
+          "stateName": "上侧趋势共振态",
+          "route": "高抛均值回归",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 629,
+          "validateN": 675,
+          "train": 31.96,
+          "validate": 49.19,
+          "gap": 17.23
+        },
+        {
+          "stateId": 8,
+          "stateName": "放量波动扩张态",
+          "route": "高抛均值回归",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 140,
+          "validateN": 77,
+          "train": 35,
+          "validate": 48.05,
+          "gap": 13.05
+        },
+        {
+          "stateId": 8,
+          "stateName": "放量波动扩张态",
+          "route": "趋势追多",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 140,
+          "validateN": 77,
+          "train": 47.14,
+          "validate": 59.74,
+          "gap": 12.6
+        },
+        {
+          "stateId": 8,
+          "stateName": "放量波动扩张态",
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 140,
+          "validateN": 77,
+          "train": 52.86,
+          "validate": 40.26,
+          "gap": -12.6
+        },
+        {
+          "stateId": 3,
+          "stateName": "下侧趋势共振态",
+          "route": "趋势做空",
+          "horizon": 3,
+          "light": "黄灯",
+          "trainN": 656,
+          "validateN": 858,
+          "train": 42.99,
+          "validate": 54.31,
+          "gap": 11.32
+        },
+        {
+          "stateId": 3,
+          "stateName": "下侧趋势共振态",
+          "route": "趋势追多",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 656,
+          "validateN": 858,
+          "train": 56.71,
+          "validate": 45.45,
+          "gap": -11.26
+        },
+        {
+          "stateId": 3,
+          "stateName": "下侧趋势共振态",
+          "route": "防守等待",
+          "horizon": 3,
+          "light": "观察",
+          "trainN": 656,
+          "validateN": 858,
+          "train": 48.02,
+          "validate": 58.74,
+          "gap": 10.72
+        },
+        {
+          "stateId": 1,
+          "stateName": "过渡混合态",
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 1446,
+          "validateN": 1011,
+          "train": 54.98,
+          "validate": 65.58,
+          "gap": 10.6
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 1052,
+          "validateN": 759,
+          "train": 59.22,
+          "validate": 68.25,
+          "gap": 9.03
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 1,
+          "light": "绿灯",
+          "trainN": 1052,
+          "validateN": 764,
+          "train": 85.17,
+          "validate": 82.07,
+          "gap": -3.1
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 1052,
+          "validateN": 764,
+          "train": 80.61,
+          "validate": 78.14,
+          "gap": -2.47
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 1052,
+          "validateN": 759,
+          "train": 51.24,
+          "validate": 59.68,
+          "gap": 8.44
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 1052,
+          "validateN": 763,
+          "train": 79.75,
+          "validate": 79.42,
+          "gap": -0.33
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 1052,
+          "validateN": 763,
+          "train": 50.57,
+          "validate": 57.01,
+          "gap": 6.44
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 1052,
+          "validateN": 759,
+          "train": 79.75,
+          "validate": 76.42,
+          "gap": -3.33
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 1052,
+          "validateN": 759,
+          "train": 64.73,
+          "validate": 71.67,
+          "gap": 6.94
+        }
+      ],
+      "quality": "???"
+    },
+    {
+      "symbol": "IMX-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2021-12-14 04:00",
+        "trainRows": 4487,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 6,
+        "name": "放量波动扩张态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 288,
+      "avgTrainSuccessPct": 45.99,
+      "avgValidateSuccessPct": 46.62,
+      "avgGapPct": 0.63,
+      "avgAbsGapPct": 3.8,
+      "maxAbsGapPct": 13.47,
+      "largeGapCount": 27,
+      "largeGapSharePct": 9.38,
+      "topAbsGaps": [
+        {
+          "stateId": 0,
+          "stateName": "下侧趋势共振态",
+          "route": "低吸均值回归",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 370,
+          "validateN": 902,
+          "train": 56.49,
+          "validate": 43.02,
+          "gap": -13.47
+        },
+        {
+          "stateId": 4,
+          "stateName": "低波动压缩态",
+          "route": "向上突破",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 1152,
+          "validateN": 959,
+          "train": 35.33,
+          "validate": 48.59,
+          "gap": 13.26
+        },
+        {
+          "stateId": 4,
+          "stateName": "低波动压缩态",
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 1152,
+          "validateN": 956,
+          "train": 50.69,
+          "validate": 63.7,
+          "gap": 13.01
+        },
+        {
+          "stateId": 0,
+          "stateName": "下侧趋势共振态",
+          "route": "低吸均值回归",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 370,
+          "validateN": 902,
+          "train": 58.65,
+          "validate": 46.34,
+          "gap": -12.31
+        },
+        {
+          "stateId": 4,
+          "stateName": "低波动压缩态",
+          "route": "向上突破",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 1152,
+          "validateN": 959,
+          "train": 22.92,
+          "validate": 34.62,
+          "gap": 11.7
+        },
+        {
+          "stateId": 8,
+          "stateName": "放量波动扩张态",
+          "route": "向上突破",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 127,
+          "validateN": 100,
+          "train": 54.33,
+          "validate": 43,
+          "gap": -11.33
+        },
+        {
+          "stateId": 4,
+          "stateName": "低波动压缩态",
+          "route": "低吸均值回归",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 1152,
+          "validateN": 956,
+          "train": 34.38,
+          "validate": 23.54,
+          "gap": -10.84
+        },
+        {
+          "stateId": 0,
+          "stateName": "下侧趋势共振态",
+          "route": "向下突破",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 370,
+          "validateN": 902,
+          "train": 24.86,
+          "validate": 35.7,
+          "gap": 10.84
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 390,
+          "validateN": 564,
+          "train": 62.05,
+          "validate": 64.89,
+          "gap": 2.84
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 390,
+          "validateN": 564,
+          "train": 49.49,
+          "validate": 55.85,
+          "gap": 6.36
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 1,
+          "light": "绿灯",
+          "trainN": 390,
+          "validateN": 565,
+          "train": 83.08,
+          "validate": 81.06,
+          "gap": -2.02
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 390,
+          "validateN": 565,
+          "train": 78.46,
+          "validate": 82.12,
+          "gap": 3.66
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 390,
+          "validateN": 564,
+          "train": 77.44,
+          "validate": 79.61,
+          "gap": 2.17
+        },
+        {
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 390,
+          "validateN": 564,
+          "train": 59.49,
+          "validate": 57.62,
+          "gap": -1.87
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 390,
+          "validateN": 564,
+          "train": 78.72,
+          "validate": 79.08,
+          "gap": 0.36
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 390,
+          "validateN": 564,
+          "train": 67.44,
+          "validate": 68.97,
+          "gap": 1.53
+        }
+      ],
+      "quality": "???"
+    },
+    {
+      "symbol": "WLD-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2023-09-01 00:00",
+        "trainRows": 732,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 8,
+        "name": "放量波动扩张态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 256,
+      "avgTrainSuccessPct": 45.96,
+      "avgValidateSuccessPct": 46.12,
+      "avgGapPct": 0.16,
+      "avgAbsGapPct": 6.87,
+      "maxAbsGapPct": 28.19,
+      "largeGapCount": 92,
+      "largeGapSharePct": 35.94,
+      "topAbsGaps": [
+        {
+          "stateId": 0,
+          "stateName": "下侧趋势共振态",
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 52,
+          "validateN": 533,
+          "train": 28.85,
+          "validate": 57.04,
+          "gap": 28.19
+        },
+        {
+          "stateId": 0,
+          "stateName": "下侧趋势共振态",
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 52,
+          "validateN": 533,
+          "train": 40.38,
+          "validate": 63.79,
+          "gap": 23.41
+        },
+        {
+          "stateId": 8,
+          "stateName": "放量波动扩张态",
+          "route": "向下突破",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 30,
+          "validateN": 101,
+          "train": 63.33,
+          "validate": 40.59,
+          "gap": -22.74
+        },
+        {
+          "stateId": 0,
+          "stateName": "下侧趋势共振态",
+          "route": "趋势追多",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 52,
+          "validateN": 533,
+          "train": 73.08,
+          "validate": 50.47,
+          "gap": -22.61
+        },
+        {
+          "stateId": 6,
+          "stateName": "上侧趋势共振态",
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 127,
+          "validateN": 337,
+          "train": 66.93,
+          "validate": 44.51,
+          "gap": -22.42
+        },
+        {
+          "stateId": 0,
+          "stateName": "下侧趋势共振态",
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 52,
+          "validateN": 533,
+          "train": 26.92,
+          "validate": 49.34,
+          "gap": 22.42
+        },
+        {
+          "stateId": 7,
+          "stateName": "下侧趋势共振态",
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 108,
+          "validateN": 913,
+          "train": 33.33,
+          "validate": 55.31,
+          "gap": 21.98
+        },
+        {
+          "stateId": 7,
+          "stateName": "下侧趋势共振态",
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 108,
+          "validateN": 913,
+          "train": 70.37,
+          "validate": 48.85,
+          "gap": -21.52
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 30,
+          "validateN": 99,
+          "train": 76.67,
+          "validate": 64.65,
+          "gap": -12.02
+        },
+        {
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 30,
+          "validateN": 99,
+          "train": 50,
+          "validate": 59.6,
+          "gap": 9.6
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 30,
+          "validateN": 99,
+          "train": 83.33,
+          "validate": 69.7,
+          "gap": -13.63
+        },
+        {
+          "route": "高抛均值回归",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 30,
+          "validateN": 99,
+          "train": 73.33,
+          "validate": 78.79,
+          "gap": 5.46
+        },
+        {
+          "route": "高抛均值回归",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 30,
+          "validateN": 99,
+          "train": 80,
+          "validate": 77.78,
+          "gap": -2.22
+        },
+        {
+          "route": "趋势追多",
+          "horizon": 1,
+          "light": "黄灯",
+          "trainN": 30,
+          "validateN": 102,
+          "train": 46.67,
+          "validate": 52.94,
+          "gap": 6.27
+        },
+        {
+          "route": "防守等待",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 30,
+          "validateN": 99,
+          "train": 76.67,
+          "validate": 63.64,
+          "gap": -13.03
+        },
+        {
+          "route": "高抛均值回归",
+          "horizon": 3,
+          "light": "黄灯",
+          "trainN": 30,
+          "validateN": 101,
+          "train": 73.33,
+          "validate": 70.3,
+          "gap": -3.03
+        }
+      ],
+      "quality": "???"
+    },
+    {
+      "symbol": "AR-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2022-02-01 04:00",
+        "trainRows": 4193,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 2,
+        "name": "下侧趋势共振态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 288,
+      "avgTrainSuccessPct": 46.32,
+      "avgValidateSuccessPct": 46.33,
+      "avgGapPct": 0.01,
+      "avgAbsGapPct": 3.91,
+      "maxAbsGapPct": 15.2,
+      "largeGapCount": 32,
+      "largeGapSharePct": 11.11,
+      "topAbsGaps": [
+        {
+          "stateId": 5,
+          "stateName": "放量波动扩张态",
+          "route": "趋势做空",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 119,
+          "validateN": 146,
+          "train": 56.3,
+          "validate": 41.1,
+          "gap": -15.2
+        },
+        {
+          "stateId": 5,
+          "stateName": "放量波动扩张态",
+          "route": "趋势追多",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 119,
+          "validateN": 146,
+          "train": 43.7,
+          "validate": 58.22,
+          "gap": 14.52
+        },
+        {
+          "stateId": 5,
+          "stateName": "放量波动扩张态",
+          "route": "低吸均值回归",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 119,
+          "validateN": 146,
+          "train": 23.53,
+          "validate": 37.67,
+          "gap": 14.14
+        },
+        {
+          "stateId": 2,
+          "stateName": "下侧趋势共振态",
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 295,
+          "validateN": 763,
+          "train": 44.75,
+          "validate": 56.88,
+          "gap": 12.13
+        },
+        {
+          "stateId": 2,
+          "stateName": "下侧趋势共振态",
+          "route": "趋势追多",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 295,
+          "validateN": 763,
+          "train": 54.92,
+          "validate": 42.86,
+          "gap": -12.06
+        },
+        {
+          "stateId": 6,
+          "stateName": "下侧趋势共振态",
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 442,
+          "validateN": 1005,
+          "train": 49.1,
+          "validate": 61,
+          "gap": 11.9
+        },
+        {
+          "stateId": 6,
+          "stateName": "下侧趋势共振态",
+          "route": "防守等待",
+          "horizon": 5,
+          "light": "观察",
+          "trainN": 442,
+          "validateN": 1009,
+          "train": 49.55,
+          "validate": 60.36,
+          "gap": 10.81
+        },
+        {
+          "stateId": 6,
+          "stateName": "下侧趋势共振态",
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 442,
+          "validateN": 1005,
+          "train": 58.37,
+          "validate": 68.76,
+          "gap": 10.39
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 295,
+          "validateN": 763,
+          "train": 44.75,
+          "validate": 56.88,
+          "gap": 12.13
+        },
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 295,
+          "validateN": 763,
+          "train": 52.88,
+          "validate": 60.42,
+          "gap": 7.54
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 1,
+          "light": "绿灯",
+          "trainN": 295,
+          "validateN": 766,
+          "train": 89.49,
+          "validate": 88.38,
+          "gap": -1.11
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 295,
+          "validateN": 766,
+          "train": 89.49,
+          "validate": 88.12,
+          "gap": -1.37
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 295,
+          "validateN": 764,
+          "train": 91.19,
+          "validate": 85.47,
+          "gap": -5.72
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 295,
+          "validateN": 763,
+          "train": 59.32,
+          "validate": 68.81,
+          "gap": 9.49
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 295,
+          "validateN": 763,
+          "train": 88.81,
+          "validate": 85.71,
+          "gap": -3.1
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 295,
+          "validateN": 764,
+          "train": 48.14,
+          "validate": 53.01,
+          "gap": 4.87
+        }
+      ],
+      "quality": "???"
+    },
+    {
+      "symbol": "XLM-USDT",
+      "split": {
+        "mode": "calendar_holdout",
+        "trainTo": "2023-12-31",
+        "validateFrom": "2024-01-01",
+        "validateTo": "2026-06-01 16:00",
+        "trainFrom": "2018-02-19 00:00",
+        "trainRows": 12852,
+        "validationRows": 5297
+      },
+      "currentState": {
+        "id": 5,
+        "name": "低波动压缩态",
+        "date": "2026-06-01 16:00"
+      },
+      "comparableRows": 256,
+      "avgTrainSuccessPct": 45.95,
+      "avgValidateSuccessPct": 45.75,
+      "avgGapPct": -0.19,
+      "avgAbsGapPct": 3.06,
+      "maxAbsGapPct": 24.45,
+      "largeGapCount": 19,
+      "largeGapSharePct": 7.42,
+      "topAbsGaps": [
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "观察",
+          "trainN": 286,
+          "validateN": 144,
+          "train": 70.28,
+          "validate": 45.83,
+          "gap": -24.45
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 286,
+          "validateN": 144,
+          "train": 63.29,
+          "validate": 40.97,
+          "gap": -22.32
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "趋势追多",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 286,
+          "validateN": 144,
+          "train": 46.15,
+          "validate": 68.06,
+          "gap": 21.91
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "红灯",
+          "trainN": 286,
+          "validateN": 144,
+          "train": 53.85,
+          "validate": 31.94,
+          "gap": -21.91
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "向下突破",
+          "horizon": 5,
+          "light": "红灯",
+          "trainN": 286,
+          "validateN": 149,
+          "train": 52.1,
+          "validate": 31.54,
+          "gap": -20.56
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "向下突破",
+          "horizon": 3,
+          "light": "红灯",
+          "trainN": 286,
+          "validateN": 151,
+          "train": 41.61,
+          "validate": 24.5,
+          "gap": -17.11
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "向上突破",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 286,
+          "validateN": 144,
+          "train": 58.74,
+          "validate": 72.92,
+          "gap": 14.18
+        },
+        {
+          "stateId": 3,
+          "stateName": "放量波动扩张态",
+          "route": "防守等待",
+          "horizon": 5,
+          "light": "观察",
+          "trainN": 286,
+          "validateN": 149,
+          "train": 63.99,
+          "validate": 50.34,
+          "gap": -13.65
+        }
+      ],
+      "currentTopRoutes": [
+        {
+          "route": "震荡网格",
+          "horizon": 1,
+          "light": "绿灯",
+          "trainN": 1717,
+          "validateN": 685,
+          "train": 91.85,
+          "validate": 93.14,
+          "gap": 1.29
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 3,
+          "light": "绿灯",
+          "trainN": 1717,
+          "validateN": 685,
+          "train": 91.96,
+          "validate": 91.82,
+          "gap": -0.14
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 5,
+          "light": "绿灯",
+          "trainN": 1717,
+          "validateN": 685,
+          "train": 91.5,
+          "validate": 91.68,
+          "gap": 0.18
+        },
+        {
+          "route": "震荡网格",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 1717,
+          "validateN": 685,
+          "train": 91.56,
+          "validate": 92.41,
+          "gap": 0.85
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 10,
+          "light": "绿灯",
+          "trainN": 1717,
+          "validateN": 685,
+          "train": 52.77,
+          "validate": 55.04,
+          "gap": 2.27
+        },
+        {
+          "route": "向下突破",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 1717,
+          "validateN": 685,
+          "train": 53.23,
+          "validate": 56.79,
+          "gap": 3.56
+        },
+        {
+          "route": "防守等待",
+          "horizon": 10,
+          "light": "黄灯",
+          "trainN": 1717,
+          "validateN": 685,
+          "train": 63.37,
+          "validate": 64.96,
+          "gap": 1.59
+        },
+        {
+          "route": "趋势做空",
+          "horizon": 5,
+          "light": "黄灯",
+          "trainN": 1717,
+          "validateN": 685,
+          "train": 51.49,
+          "validate": 52.7,
+          "gap": 1.21
+        }
+      ],
+      "quality": "???"
+    }
+  ],
+  "errors": []
+}
