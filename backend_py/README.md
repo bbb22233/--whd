@@ -73,6 +73,12 @@ POST /api/scanner/cancel
 - `python_full`: 调用 Python download/clean/research/summary 完整编排器,默认跑 `BTC-USDT 1D`,可用 `symbols`/`bars` 参数扩大范围;默认写 `_py_full` 对照 reports,CLI 加 `--official` 后才写正式 report 名称。
 - `full`: 调用现有 Node 多周期扫描，会尝试下载/刷新数据。
 
+全量跑 `python_full` 前可先检查本地输入覆盖:
+
+```bash
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+```
+
 ## 验证
 
 ```bash

@@ -52,6 +52,7 @@ def parse_batch_args(argv: list[str]) -> dict[str, Any]:
     summary_only = False
     from_reports = False
     official = False
+    check_inputs = False
     index = 0
     while index < len(argv):
         arg = argv[index]
@@ -75,6 +76,9 @@ def parse_batch_args(argv: list[str]) -> dict[str, Any]:
         elif arg == "--official":
             official = True
             index += 1
+        elif arg == "--check-inputs":
+            check_inputs = True
+            index += 1
         else:
             index += 1
     return {
@@ -85,6 +89,7 @@ def parse_batch_args(argv: list[str]) -> dict[str, Any]:
         "summaryOnly": summary_only,
         "fromReports": from_reports,
         "official": official,
+        "checkInputs": check_inputs,
     }
 
 
@@ -196,6 +201,47 @@ def build_clean_payload(config: ResearchConfig, *, skip_download: bool, prefer_e
     return clean_payload, {"rawPath": str(raw_path), "cleanJsonPath": str(clean_json_path), "cleanCsvPath": str(clean_csv_path)}
 
 
+def input_requirement(config: ResearchConfig) -> dict[str, Any]:
+    recipe = DERIVED_BARS.get(config.bar)
+    source_bar = recipe["sourceBar"] if recipe else config.bar
+    source_config = replace(config, bar=source_bar)
+    raw_path = DATA_RAW_DIR / f"{file_stem(source_config)}_raw.json"
+    clean_path = DATA_CLEAN_DIR / f"{file_stem(config)}_clean.json"
+    return {
+        "instrument": config.instrument,
+        "bar": config.bar,
+        "sourceBar": source_bar,
+        "derived": bool(recipe),
+        "rawPath": str(raw_path),
+        "rawExists": raw_path.exists(),
+        "cleanPath": str(clean_path),
+        "cleanExists": clean_path.exists(),
+    }
+
+
+def check_inputs(config: ResearchConfig, symbols: list[str], bars: list[str]) -> dict[str, Any]:
+    requirements = []
+    for bar in bars:
+        bar_config = create_bar_config(config, bar)
+        for symbol in symbols:
+            requirements.append(input_requirement(create_symbol_config(bar_config, symbol)))
+    missing_raw = [row for row in requirements if not row["rawExists"]]
+    missing_clean = [row for row in requirements if not row["cleanExists"]]
+    return {
+        "step": "python-full-input-check",
+        "symbols": symbols,
+        "bars": bars,
+        "requiredCount": len(requirements),
+        "rawReadyCount": len(requirements) - len(missing_raw),
+        "rawMissingCount": len(missing_raw),
+        "cleanReadyCount": len(requirements) - len(missing_clean),
+        "cleanMissingCount": len(missing_clean),
+        "requirements": requirements,
+        "missingRaw": missing_raw,
+        "missingClean": missing_clean,
+    }
+
+
 def run_one_symbol_from_reports(base_config: ResearchConfig, instrument: str, suffix: str) -> dict[str, Any]:
     config = create_symbol_config(base_config, instrument)
     stem = file_stem(config)
@@ -305,6 +351,10 @@ def main(argv: list[str] | None = None) -> None:
     config: ResearchConfig = parsed["config"]
     symbols: list[str] = parsed["symbols"]
     bars: list[str] = parsed["bars"]
+    if parsed["checkInputs"]:
+        print(json.dumps(check_inputs(config, symbols, bars), ensure_ascii=False, indent=2))
+        return
+
     suffix = output_suffix(parsed["official"])
     started_at = datetime.now(timezone.utc)
     all_rows: list[dict[str, Any]] = []

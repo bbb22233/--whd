@@ -941,3 +941,42 @@ bar 8H: successCount 2, errorCount 0
 ### 备注
 - 该验证覆盖了普通下载周期和派生周期。
 - 下一步应扩大到默认 symbols 集合,建议先使用 `--skip-download` 验证本地已有 raw/clean 能覆盖多少,再决定是否让 `python_full` 负责联网补齐。
+
+---
+
+## 22. Python Full Input Coverage Check
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --check-inputs --symbols BTC-USDT ETH-USDT --bars 1D,4H,8H --days 3650
+```
+
+### 期望
+- 全量跑 `python_full` 前可快速检查本地 `data/raw` 与 `data/clean` 覆盖情况。
+- `--check-inputs` 不生成 reports,只输出 required/ready/missing 明细。
+- 8H 的 raw requirement 指向 4H raw,符合派生周期设计。
+
+### 实际
+```
+default symbols × 1D,4H,8H:
+requiredCount = 174
+rawReadyCount = 6
+rawMissingCount = 168
+cleanReadyCount = 6
+cleanMissingCount = 168
+
+BTC/ETH × 1D,4H,8H:
+requiredCount = 6
+rawReadyCount = 6
+rawMissingCount = 0
+cleanReadyCount = 6
+cleanMissingCount = 0
+```
+
+### 备注
+- 本地目前只有 BTC/ETH 的 1D/4H raw;BTC/ETH 的 8H 由 4H 派生,因此已覆盖 6 组。
+- 默认 58 symbols 若要离线全量跑,还缺 56 个 symbols 的 1D raw 和 56 个 symbols 的 4H raw;8H 会复用 4H raw。
