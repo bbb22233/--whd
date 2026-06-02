@@ -235,8 +235,7 @@ The next Python research migration should choose one of:
   required `1D,4H,8H` combinations.
 - Full default `python_full --skip-download --bars 1D,4H,8H --days 3650`
   validation passes with 174/174 successes and no errors.
-- Use `python_full --plan-outputs --official` and
-  `docs/python-official-cutover-checklist.md` before running
-  `python_full --official` as the default production report writer.
+- `python_full --official --skip-download --bars 1D,4H,8H --days 3650`
+  has written production report names with 174/174 successes and no errors.
 - Start replacing selected Node scanner/orchestrator paths only after full-scope
   Python output has been reviewed.

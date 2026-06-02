@@ -1651,3 +1651,87 @@ suffix = ""
 - 新增 `docs/python-official-cutover-checklist.md`,记录 official cutover 的 preflight、执行、post-check 和 rollback。
 - 本轮只新增 preflight 能力和 checklist,未执行 `python_full --official`,因此没有覆盖正式 tracked reports。
 - 下一步若执行 cutover,命令为 `uv run python -m backend_py.run_full_pipeline --skip-download --official --bars 1D,4H,8H --days 3650`。
+
+---
+
+## 35. Python Official Report Cutover
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+git status --short --branch
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --plan-outputs --official --skip-download --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --official --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.smoke_test
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+node --check app.js
+node --check server.mjs
+```
+
+### 期望
+- official cutover 前 input coverage 仍为 `174/174`。
+- official output plan 使用空 suffix,并明确 report 写入影响面。
+- 非 official full validation 先通过,再执行 official writer。
+- official writer 覆盖正式 `reports/` 后,API smoke test 与 Node syntax check 仍通过。
+
+### 实际
+```
+input coverage:
+requiredCount = 174
+rawReadyCount = 174
+rawMissingCount = 0
+cleanReadyCount = 174
+cleanMissingCount = 0
+
+official output plan:
+pathCount = 1748
+existingCount = 1350
+missingCount = 398
+official = true
+suffix = ""
+
+preflight python_full:
+successCount = 174
+weatherCount = 174
+insufficientHistoryCount = 0
+errorCount = 0
+official = false
+suffix = _py_full
+
+official python_full:
+successCount = 174
+weatherCount = 174
+insufficientHistoryCount = 0
+errorCount = 0
+official = true
+suffix = ""
+1D successCount = 58
+4H successCount = 58
+8H successCount = 58
+
+official combined report metadata:
+rowCount = 174
+symbolCount = 58
+bars = 1D, 4H, 8H
+skipDownload = true
+summaryOnly = false
+fromReports = false
+
+post-cutover checks:
+smoke_test = pass
+py_compile = pass
+node --check app.js = pass
+node --check server.mjs = pass
+
+reports git status:
+modified tracked reports = 1346
+new official reports = 228
+```
+
+### 备注
+- Python full pipeline 已正式写入 production report 文件名。
+- 当前 official combined report 只包含已完成覆盖的 `1D/4H/8H`;旧的 `1W` report 文件仍在仓库中,但不再出现在本次 official combined summary。
+- 下一步应审查 official reports diff,再切换/收敛 Node scanner/orchestrator 入口。

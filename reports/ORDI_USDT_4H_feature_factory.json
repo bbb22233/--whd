@@ -5,10 +5,10 @@
     "fromDate": null,
     "toDate": null,
     "firstDate": "2023-06-28 04:00",
-    "lastDate": "2026-05-31 00:00",
-    "snapshotCount": 6407,
+    "lastDate": "2026-06-02 12:00",
+    "snapshotCount": 6423,
     "featureCount": 47,
-    "generatedAt": "2026-05-31T04:33:39.325Z"
+    "generatedAt": "2026-06-02T18:09:05.766892Z"
   },
   "features": [
     {
@@ -37,11 +37,11 @@
     },
     {
       "key": "remainingMomentumPct",
-      "label": "剩余动能率"
+      "label": "波动超额率"
     },
     {
       "key": "remainingMomentumAtr",
-      "label": "剩余动能ATR"
+      "label": "波动超额ATR"
     },
     {
       "key": "atr3Pct",
@@ -109,19 +109,19 @@
     },
     {
       "key": "remainingMomentumAtr3",
-      "label": "3日剩余动能ATR"
+      "label": "3日波动超额ATR"
     },
     {
       "key": "remainingMomentumAtr8",
-      "label": "8日剩余动能ATR"
+      "label": "8日波动超额ATR"
     },
     {
       "key": "remainingMomentumAtr13",
-      "label": "13日剩余动能ATR"
+      "label": "13日波动超额ATR"
     },
     {
       "key": "remainingMomentumAtr21",
-      "label": "21日剩余动能ATR"
+      "label": "21日波动超额ATR"
     },
     {
       "key": "atr3To21",
@@ -204,408 +204,455 @@
     "rangePct": {
       "key": "rangePct",
       "label": "振幅率",
-      "mean": 4.083898343324693,
-      "std": 3.257402419622395,
+      "mean": 4.099809540443819,
+      "std": 3.4230868061269764,
       "min": 0.6174364040503916,
-      "max": 62.8030859662013
+      "max": 88.2871710073033,
+      "count": 6423
     },
     "atrPct": {
       "key": "atrPct",
       "label": "ATR率",
-      "mean": 4.116218726293605,
-      "std": 1.7380298206109288,
-      "min": 1.7647570536905868,
-      "max": 20.965081878496914
+      "mean": 4.130767063061363,
+      "std": 1.7751589202225382,
+      "min": 1.7762798378954243,
+      "max": 21.046194185757347,
+      "count": 6423
     },
     "atrPercentile": {
       "key": "atrPercentile",
       "label": "ATR百分位",
-      "mean": 39.17187015851117,
-      "std": 27.903347692484544,
-      "min": 0.007901390644753477,
-      "max": 99.99215686274509
+      "mean": 39.316474844112115,
+      "std": 27.99392408606224,
+      "min": 0.007898894154818325,
+      "max": 99.99215686274509,
+      "count": 6423
     },
     "volatilityMultiple": {
       "key": "volatilityMultiple",
       "label": "波动倍率",
-      "mean": 0.9845825416548468,
-      "std": 0.5332123771775339,
+      "mean": 0.9854025098783982,
+      "std": 0.5432315358099477,
       "min": 0.22639555434526273,
-      "max": 6.453090500243931
+      "max": 8.844937134739265,
+      "count": 6423
     },
     "volatilityMultiplePercentile": {
       "key": "volatilityMultiplePercentile",
       "label": "波动倍率百分位",
-      "mean": 50.67097042765255,
-      "std": 28.577422628362864,
+      "mean": 50.63337380882212,
+      "std": 28.61957277939043,
       "min": 0.04809542131589073,
-      "max": 99.97640025173065
+      "max": 99.9904470768055,
+      "count": 6423
     },
     "volatilityExcess": {
       "key": "volatilityExcess",
       "label": "波动超额",
-      "mean": -0.015417458345150277,
-      "std": 0.533212377177534,
+      "mean": -0.014597490121600923,
+      "std": 0.5432315358099474,
       "min": -0.7736044456547373,
-      "max": 5.453090500243931
+      "max": 7.844937134739265,
+      "count": 6423
     },
     "remainingMomentumPct": {
       "key": "remainingMomentumPct",
-      "label": "剩余动能率",
-      "mean": -0.032320382968925004,
-      "std": 2.74044534461406,
-      "min": -12.716736055147127,
-      "max": 52.844504931362565
+      "label": "波动超额率",
+      "mean": -0.030551078134130685,
+      "std": 2.971531896866909,
+      "min": -12.809270937272188,
+      "max": 107.4627610459289,
+      "count": 6423
     },
     "remainingMomentumAtr": {
       "key": "remainingMomentumAtr",
-      "label": "剩余动能ATR",
-      "mean": -0.015417458345150277,
-      "std": 0.533212377177534,
+      "label": "波动超额ATR",
+      "mean": -0.014597490121600923,
+      "std": 0.5432315358099474,
       "min": -0.7736044456547373,
-      "max": 5.453090500243931
+      "max": 7.844937134739265,
+      "count": 6423
     },
     "atr3Pct": {
       "key": "atr3Pct",
       "label": "3日ATR率",
-      "mean": 4.090441103563842,
-      "std": 2.3028491048085806,
-      "min": 1.103826919599725,
-      "max": 31.009509407957363
+      "mean": 4.105098941789442,
+      "std": 2.3871126520614685,
+      "min": 1.0991694220486712,
+      "max": 45.42632341150038,
+      "count": 6423
     },
     "atr8Pct": {
       "key": "atr8Pct",
       "label": "8日ATR率",
-      "mean": 4.101835335869023,
-      "std": 1.9307654193912926,
-      "min": 1.5439153803086574,
-      "max": 21.67833585753791
+      "mean": 4.116672786599978,
+      "std": 1.983777955017271,
+      "min": 1.545357393428497,
+      "max": 22.739881908699104,
+      "count": 6423
     },
     "atr13Pct": {
       "key": "atr13Pct",
       "label": "13日ATR率",
-      "mean": 4.113847942644156,
-      "std": 1.764768194993018,
-      "min": 1.7418270819713102,
-      "max": 21.287007084919416
+      "mean": 4.128432970892538,
+      "std": 1.8038582774786815,
+      "min": 1.7533337844120787,
+      "max": 21.40137124101701,
+      "count": 6423
     },
     "atr21Pct": {
       "key": "atr21Pct",
       "label": "21日ATR率",
-      "mean": 4.132437550631876,
-      "std": 1.583711380525942,
-      "min": 1.8718159279155502,
-      "max": 18.309434488425843
+      "mean": 4.146805400358011,
+      "std": 1.611262462404006,
+      "min": 1.8752851922580152,
+      "max": 18.230463740057672,
+      "count": 6423
     },
     "atr3Percentile": {
       "key": "atr3Percentile",
       "label": "3日ATR百分位",
-      "mean": 41.32219312791781,
-      "std": 27.918452548854074,
-      "min": 0.02586652871184687,
-      "max": 99.99215070643642
+      "mean": 41.406928506782805,
+      "std": 27.978590698616074,
+      "min": 0.02586206896551724,
+      "max": 99.9904671115348,
+      "count": 6423
     },
     "atr8Percentile": {
       "key": "atr8Percentile",
       "label": "8日ATR百分位",
-      "mean": 39.76965375011353,
-      "std": 27.92398299040843,
-      "min": 0.02368171771392485,
-      "max": 99.99216423758031
+      "mean": 39.87854646051533,
+      "std": 28.00864046093854,
+      "min": 0.02367797947908445,
+      "max": 99.99215317011927,
+      "count": 6423
     },
     "atr13Percentile": {
       "key": "atr13Percentile",
       "label": "13日ATR百分位",
-      "mean": 39.24261982828997,
-      "std": 27.904115550503384,
-      "min": 0.007900142202559647,
-      "max": 99.99215809284819
+      "mean": 39.3796145089477,
+      "std": 27.9966396831566,
+      "min": 0.007898894154818325,
+      "max": 99.99215809284819,
+      "count": 6423
     },
     "atr21Percentile": {
       "key": "atr21Percentile",
       "label": "21日ATR百分位",
-      "mean": 38.798552368154134,
-      "std": 27.911538023899155,
-      "min": 0.00791014080050625,
-      "max": 99.99214824120602
+      "mean": 38.97664063877544,
+      "std": 28.01024573168366,
+      "min": 0.007906388361796331,
+      "max": 99.99214824120602,
+      "count": 6423
     },
     "volatilityMultiple3": {
       "key": "volatilityMultiple3",
       "label": "振幅/3日ATR",
-      "mean": 0.9704604251980763,
-      "std": 0.3162061401775015,
-      "min": 0.18838444353846473,
-      "max": 2.5270587611416206
+      "mean": 0.9706651490414809,
+      "std": 0.31737177093167535,
+      "min": 0.16100643274473667,
+      "max": 2.6672006540861988,
+      "count": 6423
     },
     "volatilityMultiple8": {
       "key": "volatilityMultiple8",
       "label": "振幅/8日ATR",
-      "mean": 0.980794858041317,
-      "std": 0.4617818029331449,
-      "min": 0.2228335469801705,
-      "max": 4.817018778244192
+      "mean": 0.9813772553461663,
+      "std": 0.4668789816735756,
+      "min": 0.22228121553779953,
+      "max": 5.959362310808081,
+      "count": 6423
     },
     "volatilityMultiple13": {
       "key": "volatilityMultiple13",
       "label": "振幅/13日ATR",
-      "mean": 0.9842114764876679,
-      "std": 0.5237757043291675,
+      "mean": 0.9849983249015333,
+      "std": 0.5329985553074793,
       "min": 0.22776393548284068,
-      "max": 6.220156715740869
+      "max": 8.422042135010738,
+      "count": 6423
     },
     "volatilityMultiple21": {
       "key": "volatilityMultiple21",
       "label": "振幅/21日ATR",
-      "mean": 0.9858925496993403,
-      "std": 0.5864061039016687,
+      "mean": 0.9869070052196013,
+      "std": 0.6015462526925996,
       "min": 0.21515168946539182,
-      "max": 8.4760736110054
+      "max": 11.341395253876174,
+      "count": 6423
     },
     "volatilityMultiple3Percentile": {
       "key": "volatilityMultiple3Percentile",
       "label": "振幅/3日ATR百分位",
-      "mean": 50.561937276423116,
-      "std": 28.581698876420955,
-      "min": 0.01588814744200826,
-      "max": 99.96133622022889
+      "mean": 50.56289134010123,
+      "std": 28.6019689492752,
+      "min": 0.00952925481227368,
+      "max": 99.9904671115348,
+      "count": 6423
     },
     "volatilityMultiple8Percentile": {
       "key": "volatilityMultiple8Percentile",
       "label": "振幅/8日ATR百分位",
-      "mean": 50.64154512564007,
-      "std": 28.630266642483686,
-      "min": 0.047740292807129214,
-      "max": 99.97678377960068
+      "mean": 50.623038303513425,
+      "std": 28.665290216482383,
+      "min": 0.028615032430370085,
+      "max": 99.99045801526718,
+      "count": 6423
     },
     "volatilityMultiple13Percentile": {
       "key": "volatilityMultiple13Percentile",
       "label": "振幅/13日ATR百分位",
-      "mean": 50.68171483112563,
-      "std": 28.574759643296687,
+      "mean": 50.64649172478534,
+      "std": 28.615968937256298,
       "min": 0.04808617041738796,
-      "max": 99.97640396413404
+      "max": 99.99044890162368,
+      "count": 6423
     },
     "volatilityMultiple21Percentile": {
       "key": "volatilityMultiple21Percentile",
       "label": "振幅/21日ATR百分位",
-      "mean": 50.678584789897315,
-      "std": 28.546491864874774,
-      "min": 0.0389833151411196,
-      "max": 99.99212846347606
+      "mean": 50.62813135953649,
+      "std": 28.59293909245331,
+      "min": 0.03897723729342065,
+      "max": 99.99043428352785,
+      "count": 6423
     },
     "remainingMomentumAtr3": {
       "key": "remainingMomentumAtr3",
-      "label": "3日剩余动能ATR",
-      "mean": -0.029539574801924092,
-      "std": 0.3162061401775015,
-      "min": -0.8116155564615353,
-      "max": 1.5270587611416206
+      "label": "3日波动超额ATR",
+      "mean": -0.029334850958518763,
+      "std": 0.31737177093167523,
+      "min": -0.8389935672552633,
+      "max": 1.6672006540861988,
+      "count": 6423
     },
     "remainingMomentumAtr8": {
       "key": "remainingMomentumAtr8",
-      "label": "8日剩余动能ATR",
-      "mean": -0.01920514195868127,
-      "std": 0.4617818029331448,
-      "min": -0.7771664530198295,
-      "max": 3.817018778244192
+      "label": "8日波动超额ATR",
+      "mean": -0.018622744653833997,
+      "std": 0.4668789816735757,
+      "min": -0.7777187844622004,
+      "max": 4.959362310808081,
+      "count": 6423
     },
     "remainingMomentumAtr13": {
       "key": "remainingMomentumAtr13",
-      "label": "13日剩余动能ATR",
-      "mean": -0.01578852351232785,
-      "std": 0.5237757043291676,
+      "label": "13日波动超额ATR",
+      "mean": -0.015001675098468326,
+      "std": 0.5329985553074794,
       "min": -0.7722360645171593,
-      "max": 5.220156715740869
+      "max": 7.422042135010738,
+      "count": 6423
     },
     "remainingMomentumAtr21": {
       "key": "remainingMomentumAtr21",
-      "label": "21日剩余动能ATR",
-      "mean": -0.014107450300663928,
-      "std": 0.5864061039016687,
+      "label": "21日波动超额ATR",
+      "mean": -0.01309299478039835,
+      "std": 0.6015462526925998,
       "min": -0.7848483105346082,
-      "max": 7.4760736110054005
+      "max": 10.341395253876174,
+      "count": 6423
     },
     "atr3To21": {
       "key": "atr3To21",
       "label": "3/21日ATR比",
-      "mean": 0.9821680863040141,
-      "std": 0.3058096107115188,
+      "mean": 0.9821709521511586,
+      "std": 0.31011196910073935,
       "min": 0.36821740381659435,
-      "max": 4.185126898453095
+      "max": 4.252171742872421,
+      "count": 6423
     },
     "atr8To21": {
       "key": "atr8To21",
       "label": "8/21日ATR比",
-      "mean": 0.9825530506149504,
-      "std": 0.14829610633077867,
+      "mean": 0.9823171807062392,
+      "std": 0.1500990319699628,
       "min": 0.5919847865768614,
-      "max": 2.122828605241734
+      "max": 2.122828605241734,
+      "count": 6423
     },
     "atr13To21": {
       "key": "atr13To21",
       "label": "13/21日ATR比",
-      "mean": 0.9881063291781103,
-      "std": 0.07417730716483235,
+      "mean": 0.9879146371363748,
+      "std": 0.07510612214065956,
       "min": 0.7707056868720206,
-      "max": 1.4606689462143354
+      "max": 1.4606689462143354,
+      "count": 6423
     },
     "atr3To8": {
       "key": "atr3To8",
       "label": "3/8日ATR比",
-      "mean": 0.9836067609851276,
-      "std": 0.16681643782409988,
+      "mean": 0.9835376152275256,
+      "std": 0.1682208552770871,
       "min": 0.5349757249282544,
-      "max": 1.9772406425467022
+      "max": 2.234313455824267,
+      "count": 6423
     },
     "atr8To13": {
       "key": "atr8To13",
       "label": "8/13日ATR比",
-      "mean": 0.9893837732606654,
-      "std": 0.07505998300068542,
+      "mean": 0.9892217942839215,
+      "std": 0.07589964948383292,
       "min": 0.7279030434793194,
-      "max": 1.453326306925015
+      "max": 1.453326306925015,
+      "count": 6423
     },
     "volumeMultiple": {
       "key": "volumeMultiple",
       "label": "量能倍率",
-      "mean": 1.0732539023744279,
-      "std": 1.1191302265941254,
-      "min": 0.04979201676750793,
-      "max": 23.248394513926563
+      "mean": 1.076656039800307,
+      "std": 1.1494584433271426,
+      "min": 0.04979201676750792,
+      "max": 23.248394513926563,
+      "count": 6423
     },
     "d8": {
       "key": "d8",
       "label": "8日涨跌",
-      "mean": 0.31948252390795234,
-      "std": 10.202717185945808,
-      "min": -39.134188455846086,
-      "max": 233.99455464799686
+      "mean": 0.33006873881058035,
+      "std": 10.194393929609276,
+      "min": -39.94819930932413,
+      "max": 233.99455464799686,
+      "count": 6423
     },
     "d13": {
       "key": "d13",
       "label": "13日涨跌",
-      "mean": 0.5338005006041403,
-      "std": 13.434498442082198,
+      "mean": 0.5459404812633488,
+      "std": 13.423331224305528,
       "min": -50.99671669793621,
-      "max": 261.883408071749
+      "max": 261.883408071749,
+      "count": 6423
     },
     "d21": {
       "key": "d21",
       "label": "21日涨跌",
-      "mean": 0.9043611066323942,
-      "std": 17.985200295812195,
+      "mean": 0.9094794554842137,
+      "std": 17.9697248294577,
       "min": -48.8565956967444,
-      "max": 300.586642599278
+      "max": 300.586642599278,
+      "count": 6423
     },
     "d34": {
       "key": "d34",
       "label": "34日涨跌",
-      "mean": 1.5438075210713158,
-      "std": 23.724110760915963,
+      "mean": 1.513764299274353,
+      "std": 23.70377390330109,
       "min": -48.95798129998874,
-      "max": 263.96063960639606
+      "max": 263.96063960639606,
+      "count": 6423
     },
     "trendScore": {
       "key": "trendScore",
       "label": "趋势动能",
-      "mean": 0.6716134547474203,
-      "std": 13.135920406225631,
+      "mean": 0.6761810420749034,
+      "std": 13.123321846868611,
       "min": -39.12714309697066,
-      "max": 257.0300655234996
+      "max": 257.0300655234996,
+      "count": 6423
     },
     "resonanceCount": {
       "key": "resonanceCount",
       "label": "共振数量",
-      "mean": 3.321367254565319,
-      "std": 0.7480587042549914,
+      "mean": 3.320722403861124,
+      "std": 0.7479602079546027,
       "min": 2,
-      "max": 4
+      "max": 4,
+      "count": 6423
     },
     "middleDeviationRate": {
       "key": "middleDeviationRate",
       "label": "中值乖离率",
-      "mean": -0.484269940369743,
-      "std": 6.598459518773081,
+      "mean": -0.37065462351053197,
+      "std": 6.624816227630586,
       "min": -42.38936840663104,
-      "max": 56.768598813327266
+      "max": 56.768598813327266,
+      "count": 6423
     },
     "middleDeviationAtr": {
       "key": "middleDeviationAtr",
       "label": "中值乖离ATR",
-      "mean": -0.13425139909302267,
-      "std": 1.4112372410567513,
-      "min": -4.437214185488318,
-      "max": 5.5941859967630485
+      "mean": -0.11804758901182162,
+      "std": 1.4057097067698399,
+      "min": -4.225738053424568,
+      "max": 5.5941859967630485,
+      "count": 6423
     },
     "middlePositionPct": {
       "key": "middlePositionPct",
       "label": "中值位置百分位",
-      "mean": 43.9285260196903,
-      "std": 17.85412065918965,
+      "mean": 43.61867035140178,
+      "std": 17.917719953686316,
       "min": 0,
-      "max": 100
+      "max": 100,
+      "count": 6423
     },
     "maDeviationRate": {
       "key": "maDeviationRate",
       "label": "233MA乖离率",
-      "mean": 1.439501473040272,
-      "std": 36.45689949746525,
+      "mean": 1.389910945229487,
+      "std": 36.42563251438479,
       "min": -51.614348254224026,
-      "max": 295.2447540813142
+      "max": 295.24475408131434,
+      "count": 6423
     },
     "maDeviationAtr": {
       "key": "maDeviationAtr",
       "label": "233MA乖离ATR",
-      "mean": -2.18362361432977,
-      "std": 5.71326575096835,
-      "min": -20.386540193847843,
-      "max": 11.71403944528052
+      "mean": -2.1751846378156414,
+      "std": 5.682873005080914,
+      "min": -20.386540193847782,
+      "max": 11.714039445280518,
+      "count": 6423
     },
     "maPositionPct": {
       "key": "maPositionPct",
       "label": "MA位置百分位",
-      "mean": 57.113903464147775,
-      "std": 20.967502667818273,
+      "mean": 57.13917623312853,
+      "std": 20.879364366983282,
       "min": 0,
-      "max": 100
+      "max": 100,
+      "count": 6423
     },
     "stretchHeat": {
       "key": "stretchHeat",
       "label": "拉伸热度",
-      "mean": 33.27147884924836,
-      "std": 16.726258270853876,
-      "min": 0.7694811005501734,
-      "max": 100
+      "mean": 33.35192889371969,
+      "std": 16.73025028950697,
+      "min": 0.43824566588909164,
+      "max": 100,
+      "count": 6423
     }
   },
   "current": {
-    "date": "2026-05-31 00:00",
-    "close": 3.43,
-    "weatherName": "常态波动 / 强趋势下行 / 中值下侧偏离 / MA下侧极端",
-    "weatherConfidencePct": 73.92,
+    "date": "2026-06-02 12:00",
+    "close": 3.64,
+    "weatherName": "高波动扩张 / 强趋势上行 / 中值贴近 / MA下侧极端",
+    "weatherConfidencePct": 58.6,
     "labels": [
       {
         "dimension": "波动",
-        "label": "常态波动",
-        "confidence": 0.7146091156051917,
-        "tone": "neutral",
-        "confidencePct": 71.46
+        "label": "高波动扩张",
+        "confidence": 0.41605368434636725,
+        "tone": "positive",
+        "confidencePct": 41.61
       },
       {
         "dimension": "短波动",
-        "label": "短波动中性",
-        "confidence": 0.8875892538116033,
+        "label": "短波动升温",
+        "confidence": 1,
         "tone": "neutral",
-        "confidencePct": 88.76
+        "confidencePct": 100.0
       },
       {
         "dimension": "中值位置",
-        "label": "中值下侧偏离",
-        "confidence": 1,
-        "tone": "warning",
-        "side": -1,
-        "extremity": "deviation",
-        "confidencePct": 100
+        "label": "中值贴近",
+        "confidence": 0.08566340916406912,
+        "tone": "neutral",
+        "side": 0,
+        "extremity": "near",
+        "confidencePct": 8.57
       },
       {
         "dimension": "MA位置",
@@ -614,112 +661,68 @@
         "tone": "warning",
         "side": -1,
         "extremity": "extreme",
-        "confidencePct": 100
+        "confidencePct": 100.0
       },
       {
         "dimension": "趋势",
-        "label": "强趋势下行",
+        "label": "强趋势上行",
         "confidence": 1,
-        "tone": "negative",
-        "direction": "down",
+        "tone": "positive",
+        "direction": "up",
         "strength": "strong",
-        "confidencePct": 100
+        "confidencePct": 100.0
       },
       {
         "dimension": "量能",
-        "label": "缩量",
-        "confidence": 0.25528719955572354,
-        "tone": "neutral",
-        "confidencePct": 25.53
+        "label": "放量",
+        "confidence": 0.35,
+        "tone": "positive",
+        "confidencePct": 35.0
       },
       {
         "dimension": "动能",
-        "label": "剩余动能不足",
-        "confidence": 0.3168426990487348,
+        "label": "振幅已超ATR",
+        "confidence": 0.25,
         "tone": "neutral",
-        "confidencePct": 31.68
+        "confidencePct": 25.0
       }
     ],
     "strategyScores": {
-      "trendShort": 75.07,
-      "meanReversionLong": 55.52,
-      "waitDefense": 49.49,
-      "breakoutDown": 49,
-      "meanReversionShort": 17.52,
-      "trendLong": 11.07,
-      "gridNeutral": 2,
-      "breakoutUp": 0,
-      "trendFollowing": 75.07,
-      "breakout": 49,
-      "meanReversion": 55.52,
-      "grid": 2,
-      "wait": 49.49
+      "breakoutUp": 77.0,
+      "trendLong": 76.77,
+      "breakoutDown": 73.0,
+      "waitDefense": 37.22,
+      "trendShort": 20.77,
+      "meanReversionLong": 0.0,
+      "meanReversionShort": 0.0,
+      "gridNeutral": 0.0,
+      "trendFollowing": 76.77,
+      "breakout": 77.0,
+      "meanReversion": 0.0,
+      "grid": 0.0,
+      "wait": 37.22
     },
     "topRoutes": [
       {
-        "key": "trendShort",
-        "label": "趋势做空",
-        "family": "trend",
-        "direction": "short",
-        "score": 75.07,
-        "reasons": [
-          "多周期趋势向下"
-        ]
-      },
-      {
-        "key": "meanReversionLong",
-        "label": "低吸均值回归",
-        "family": "meanReversion",
+        "key": "breakoutUp",
+        "label": "向上突破",
+        "family": "breakout",
         "direction": "long",
-        "score": 55.52,
+        "score": 77.0,
         "reasons": [
-          "中值下侧偏离",
-          "趋势强下行，低吸降权"
+          "短周期ATR升温",
+          "放量或量能偏强"
         ]
       },
       {
-        "key": "waitDefense",
-        "label": "防守等待",
-        "family": "wait",
-        "direction": "neutral",
-        "score": 49.49,
-        "reasons": [
-          "MA位置极端，等待结构修复",
-          "剩余动能不足"
-        ]
-      }
-    ],
-    "strategyRoutes": [
-      {
-        "key": "trendShort",
-        "label": "趋势做空",
+        "key": "trendLong",
+        "label": "趋势追多",
         "family": "trend",
-        "direction": "short",
-        "score": 75.07,
-        "reasons": [
-          "多周期趋势向下"
-        ]
-      },
-      {
-        "key": "meanReversionLong",
-        "label": "低吸均值回归",
-        "family": "meanReversion",
         "direction": "long",
-        "score": 55.52,
+        "score": 76.77,
         "reasons": [
-          "中值下侧偏离",
-          "趋势强下行，低吸降权"
-        ]
-      },
-      {
-        "key": "waitDefense",
-        "label": "防守等待",
-        "family": "wait",
-        "direction": "neutral",
-        "score": 49.49,
-        "reasons": [
-          "MA位置极端，等待结构修复",
-          "剩余动能不足"
+          "多周期趋势向上",
+          "价格在MA下侧极端，追多需等待修复"
         ]
       },
       {
@@ -727,28 +730,83 @@
         "label": "向下突破",
         "family": "breakout",
         "direction": "short",
-        "score": 49,
+        "score": 73.0,
         "reasons": [
-          "趋势下行，下破顺势加权"
+          "短周期ATR升温",
+          "放量或量能偏强"
         ]
-      },
+      }
+    ],
+    "strategyRoutes": [
       {
-        "key": "meanReversionShort",
-        "label": "高抛均值回归",
-        "family": "meanReversion",
-        "direction": "short",
-        "score": 17.52,
-        "reasons": []
+        "key": "breakoutUp",
+        "label": "向上突破",
+        "family": "breakout",
+        "direction": "long",
+        "score": 77.0,
+        "reasons": [
+          "短周期ATR升温",
+          "放量或量能偏强"
+        ]
       },
       {
         "key": "trendLong",
         "label": "趋势追多",
         "family": "trend",
         "direction": "long",
-        "score": 11.07,
+        "score": 76.77,
         "reasons": [
-          "趋势向下，追多降权",
+          "多周期趋势向上",
           "价格在MA下侧极端，追多需等待修复"
+        ]
+      },
+      {
+        "key": "breakoutDown",
+        "label": "向下突破",
+        "family": "breakout",
+        "direction": "short",
+        "score": 73.0,
+        "reasons": [
+          "短周期ATR升温",
+          "放量或量能偏强"
+        ]
+      },
+      {
+        "key": "waitDefense",
+        "label": "防守等待",
+        "family": "wait",
+        "direction": "neutral",
+        "score": 37.22,
+        "reasons": [
+          "MA位置极端，等待结构修复"
+        ]
+      },
+      {
+        "key": "trendShort",
+        "label": "趋势做空",
+        "family": "trend",
+        "direction": "short",
+        "score": 20.77,
+        "reasons": [
+          "趋势向上，追空降权"
+        ]
+      },
+      {
+        "key": "meanReversionLong",
+        "label": "低吸均值回归",
+        "family": "meanReversion",
+        "direction": "long",
+        "score": 0.0,
+        "reasons": []
+      },
+      {
+        "key": "meanReversionShort",
+        "label": "高抛均值回归",
+        "family": "meanReversion",
+        "direction": "short",
+        "score": 0.0,
+        "reasons": [
+          "趋势强上行，高抛降权"
         ]
       },
       {
@@ -756,71 +814,60 @@
         "label": "震荡网格",
         "family": "grid",
         "direction": "neutral",
-        "score": 2,
+        "score": 0.0,
         "reasons": [
-          "当日振幅未超过ATR",
           "趋势动能强，网格降权"
-        ]
-      },
-      {
-        "key": "breakoutUp",
-        "label": "向上突破",
-        "family": "breakout",
-        "direction": "long",
-        "score": 0,
-        "reasons": [
-          "趋势下行，上破降权"
         ]
       }
     ],
     "values": {
-      "rangePct": 2.3236,
-      "atrPct": 3.7489,
-      "atrPercentile": 48.7247,
-      "volatilityMultiple": 0.6198,
-      "volatilityMultiplePercentile": 22.7362,
-      "volatilityExcess": -0.3802,
-      "remainingMomentumPct": -1.4254,
-      "remainingMomentumAtr": -0.3802,
-      "atr3Pct": 3.3674,
-      "atr8Pct": 3.5987,
-      "atr13Pct": 3.7352,
-      "atr21Pct": 3.7938,
-      "atr3Percentile": 42.8582,
-      "atr8Percentile": 45.9665,
-      "atr13Percentile": 48.6419,
-      "atr21Percentile": 48.6554,
-      "volatilityMultiple3": 0.69,
-      "volatilityMultiple8": 0.6457,
-      "volatilityMultiple13": 0.6221,
-      "volatilityMultiple21": 0.6125,
-      "volatilityMultiple3Percentile": 18.6003,
-      "volatilityMultiple8Percentile": 22.4442,
-      "volatilityMultiple13Percentile": 22.4913,
-      "volatilityMultiple21Percentile": 23.8631,
-      "remainingMomentumAtr3": -0.31,
-      "remainingMomentumAtr8": -0.3543,
-      "remainingMomentumAtr13": -0.3779,
-      "remainingMomentumAtr21": -0.3875,
-      "atr3To21": 0.8876,
-      "atr8To21": 0.9486,
-      "atr13To21": 0.9845,
-      "atr3To8": 0.9357,
-      "atr8To13": 0.9635,
-      "volumeMultiple": 0.5585,
-      "d8": 3.9358,
-      "d13": -0.5792,
-      "d21": -15.7959,
-      "d34": -14.9405,
-      "trendScore": -4.2136,
-      "resonanceCount": 3,
-      "middleDeviationRate": -7.1786,
-      "middleDeviationAtr": -2.0569,
-      "middlePositionPct": 23.7284,
-      "maDeviationRate": -23.6612,
-      "maDeviationAtr": -8.2437,
-      "maPositionPct": 37.8276,
-      "stretchHeat": 38.444
+      "rangePct": 6.3308,
+      "atrPct": 5.0677,
+      "atrPercentile": 78.9898,
+      "volatilityMultiple": 1.2746,
+      "volatilityMultiplePercentile": 80.134,
+      "volatilityExcess": 0.2746,
+      "remainingMomentumPct": 1.3918,
+      "remainingMomentumAtr": 0.2746,
+      "atr3Pct": 6.3786,
+      "atr8Pct": 5.7439,
+      "atr13Pct": 5.1511,
+      "atr21Pct": 4.6629,
+      "atr3Percentile": 89.3356,
+      "atr8Percentile": 86.2289,
+      "atr13Percentile": 79.9262,
+      "atr21Percentile": 71.3414,
+      "volatilityMultiple3": 1.0127,
+      "volatilityMultiple8": 1.1246,
+      "volatilityMultiple13": 1.254,
+      "volatilityMultiple21": 1.3853,
+      "volatilityMultiple3Percentile": 60.9424,
+      "volatilityMultiple8Percentile": 71.5328,
+      "volatilityMultiple13Percentile": 79.294,
+      "volatilityMultiple21Percentile": 84.2577,
+      "remainingMomentumAtr3": 0.0127,
+      "remainingMomentumAtr8": 0.1246,
+      "remainingMomentumAtr13": 0.254,
+      "remainingMomentumAtr21": 0.3853,
+      "atr3To21": 1.368,
+      "atr8To21": 1.2318,
+      "atr13To21": 1.1047,
+      "atr3To8": 1.1105,
+      "atr8To13": 1.1151,
+      "volumeMultiple": 1.7594,
+      "d8": 3.5287,
+      "d13": 6.6237,
+      "d21": 7.6013,
+      "d34": -8.7763,
+      "trendScore": 3.7535,
+      "resonanceCount": 3.0,
+      "middleDeviationRate": -1.5959,
+      "middleDeviationAtr": -0.32,
+      "middlePositionPct": 39.7734,
+      "maDeviationRate": -18.0341,
+      "maDeviationAtr": -4.3416,
+      "maPositionPct": 49.9835,
+      "stretchHeat": 10.2431
     }
   }
 }

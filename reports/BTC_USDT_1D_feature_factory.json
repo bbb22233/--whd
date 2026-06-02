@@ -8,7 +8,7 @@
     "lastDate": "2026-05-31",
     "snapshotCount": 2924,
     "featureCount": 47,
-    "generatedAt": "2026-06-02T03:24:59.351Z"
+    "generatedAt": "2026-06-02T18:01:30.590411Z"
   },
   "features": [
     {
@@ -447,7 +447,7 @@
     "remainingMomentumAtr21": {
       "key": "remainingMomentumAtr21",
       "label": "21日波动超额ATR",
-      "mean": 0.00007416602988511784,
+      "mean": 7.416602988511784e-05,
       "std": 0.5941290148075309,
       "min": -0.8592419931346162,
       "max": 5.520474499303386,
@@ -591,26 +591,26 @@
     "maDeviationRate": {
       "key": "maDeviationRate",
       "label": "233MA乖离率",
-      "mean": 11.631296635116186,
-      "std": 39.906185772004044,
-      "min": -55.6964933284945,
+      "mean": 11.631296635116193,
+      "std": 39.90618577200406,
+      "min": -55.69649332849451,
       "max": 199.6344676807791,
       "count": 2924
     },
     "maDeviationAtr": {
       "key": "maDeviationAtr",
       "label": "233MA乖离ATR",
-      "mean": 0.2613616094091424,
-      "std": 6.807546697231681,
-      "min": -22.30447371169001,
+      "mean": 0.26136160940914277,
+      "std": 6.8075466972316825,
+      "min": -22.304473711690004,
       "max": 12.888799738041794,
       "count": 2924
     },
     "maPositionPct": {
       "key": "maPositionPct",
       "label": "MA位置百分位",
-      "mean": 66.0831521308814,
-      "std": 21.341257815688795,
+      "mean": 66.08315213088137,
+      "std": 21.3412578156888,
       "min": 0,
       "max": 100,
       "count": 2924
@@ -618,9 +618,9 @@
     "stretchHeat": {
       "key": "stretchHeat",
       "label": "拉伸热度",
-      "mean": 36.18603167231228,
-      "std": 17.265039939118445,
-      "min": 0.6452566073456509,
+      "mean": 36.186031672312275,
+      "std": 17.265039939118438,
+      "min": 0.6452566073456367,
       "max": 100,
       "count": 2924
     }
@@ -661,7 +661,7 @@
         "tone": "warning",
         "side": -1,
         "extremity": "extreme",
-        "confidencePct": 100
+        "confidencePct": 100.0
       },
       {
         "dimension": "趋势",
@@ -670,12 +670,12 @@
         "tone": "negative",
         "direction": "down",
         "strength": "strong",
-        "confidencePct": 100
+        "confidencePct": 100.0
       },
       {
         "dimension": "量能",
         "label": "量能正常",
-        "confidence": 0.9366557753999862,
+        "confidence": 0.9366557753999866,
         "tone": "neutral",
         "confidencePct": 93.67
       },
@@ -688,18 +688,18 @@
       }
     ],
     "strategyScores": {
-      "trendShort": 84,
-      "meanReversionLong": 84,
-      "breakoutDown": 69,
+      "trendShort": 84.0,
+      "meanReversionLong": 84.0,
+      "breakoutDown": 69.0,
       "waitDefense": 36.24,
-      "trendLong": 32,
-      "meanReversionShort": 28,
-      "breakoutUp": 13,
-      "gridNeutral": 12,
-      "trendFollowing": 84,
-      "breakout": 69,
-      "meanReversion": 84,
-      "grid": 12,
+      "trendLong": 32.0,
+      "meanReversionShort": 28.0,
+      "breakoutUp": 13.0,
+      "gridNeutral": 12.0,
+      "trendFollowing": 84.0,
+      "breakout": 69.0,
+      "meanReversion": 84.0,
+      "grid": 12.0,
       "wait": 36.24
     },
     "topRoutes": [
@@ -708,7 +708,7 @@
         "label": "趋势做空",
         "family": "trend",
         "direction": "short",
-        "score": 84,
+        "score": 84.0,
         "reasons": [
           "多周期趋势向下"
         ]
@@ -718,7 +718,7 @@
         "label": "低吸均值回归",
         "family": "meanReversion",
         "direction": "long",
-        "score": 84,
+        "score": 84.0,
         "reasons": [
           "中值下侧偏离",
           "中值下侧极端",
@@ -730,7 +730,7 @@
         "label": "向下突破",
         "family": "breakout",
         "direction": "short",
-        "score": 69,
+        "score": 69.0,
         "reasons": [
           "趋势下行，下破顺势加权"
         ]
@@ -742,7 +742,7 @@
         "label": "趋势做空",
         "family": "trend",
         "direction": "short",
-        "score": 84,
+        "score": 84.0,
         "reasons": [
           "多周期趋势向下"
         ]
@@ -752,7 +752,7 @@
         "label": "低吸均值回归",
         "family": "meanReversion",
         "direction": "long",
-        "score": 84,
+        "score": 84.0,
         "reasons": [
           "中值下侧偏离",
           "中值下侧极端",
@@ -764,7 +764,7 @@
         "label": "向下突破",
         "family": "breakout",
         "direction": "short",
-        "score": 69,
+        "score": 69.0,
         "reasons": [
           "趋势下行，下破顺势加权"
         ]
@@ -784,7 +784,7 @@
         "label": "趋势追多",
         "family": "trend",
         "direction": "long",
-        "score": 32,
+        "score": 32.0,
         "reasons": [
           "趋势向下，追多降权",
           "价格在MA下侧极端，追多需等待修复"
@@ -795,7 +795,7 @@
         "label": "高抛均值回归",
         "family": "meanReversion",
         "direction": "short",
-        "score": 28,
+        "score": 28.0,
         "reasons": []
       },
       {
@@ -803,7 +803,7 @@
         "label": "向上突破",
         "family": "breakout",
         "direction": "long",
-        "score": 13,
+        "score": 13.0,
         "reasons": [
           "趋势下行，上破降权"
         ]
@@ -813,7 +813,7 @@
         "label": "震荡网格",
         "family": "grid",
         "direction": "neutral",
-        "score": 12,
+        "score": 12.0,
         "reasons": [
           "ATR处于低位",
           "趋势动能强，网格降权"
@@ -860,7 +860,7 @@
       "d21": -12.6696,
       "d34": -6.4898,
       "trendScore": -8.1515,
-      "resonanceCount": 4,
+      "resonanceCount": 4.0,
       "middleDeviationRate": -7.1435,
       "middleDeviationAtr": -2.8161,
       "middlePositionPct": 23.4373,
