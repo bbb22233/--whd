@@ -905,3 +905,39 @@ ScannerService().start("python_full") = succeeded, returnCode 0
 - 新增 `backend_py.run_full_pipeline`,作为 Python 版完整扫描编排入口。
 - 新增 `python_full` scanner mode。
 - 本轮验证生成的 `reports/*_py_full.*` 是临时对照产物,已加入 `.gitignore`;正式切换前不提交。
+
+---
+
+## 21. Python Full Orchestrator Expanded Sample
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols BTC-USDT ETH-USDT --bars 1D,4H,8H --days 3650
+```
+
+### 期望
+- `python_full` 从 BTC 单样本扩大到 `BTC/ETH × 1D/4H/8H`。
+- 1D/4H 读取本地 raw 并重新 clean。
+- 8H 从 4H clean 聚合生成。
+- 默认仍写 `_py_full` reports,不覆盖正式 Node reports。
+
+### 实际
+```
+run_full_pipeline BTC-USDT ETH-USDT 1D,4H,8H --skip-download:
+successCount = 6
+weatherCount = 6
+weightedWeatherCount = 4.2
+averagePeriodWeight = 0.7
+insufficientHistoryCount = 0
+errorCount = 0
+
+bar 1D: successCount 2, errorCount 0
+bar 4H: successCount 2, errorCount 0
+bar 8H: successCount 2, errorCount 0
+```
+
+### 备注
+- 该验证覆盖了普通下载周期和派生周期。
+- 下一步应扩大到默认 symbols 集合,建议先使用 `--skip-download` 验证本地已有 raw/clean 能覆盖多少,再决定是否让 `python_full` 负责联网补齐。

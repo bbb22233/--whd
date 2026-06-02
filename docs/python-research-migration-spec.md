@@ -229,7 +229,7 @@ node --check server.mjs
 The next Python research migration should choose one of:
 
 - Add a scanner mode for Python deviation parity across selected symbols/bars.
-- Expand `python_full` validation from BTC sample scopes to the full default
+- Expand `python_full` validation from `BTC/ETH × 1D/4H/8H` to the full default
   symbol set and bars.
 - Add an explicit cutover checklist for running `python_full --official` as the
   default production report writer.
