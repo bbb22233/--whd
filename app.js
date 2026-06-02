@@ -140,7 +140,7 @@ function renderComponentGrid(weather, deviations) {
     (row) => row.kindKey === "middle" && Number(row.horizon) === 10,
   );
   const maRule = (deviations?.currentRuleRows ?? []).find(
-    (row) => row.kindKey === "ma" && Number(row.horizon) === 10,
+    (row) => row.kindKey === "ma233" && Number(row.horizon) === 10,
   );
 
   const cards = [
@@ -377,6 +377,46 @@ function renderNotes(weather, features, deviations) {
     .join("");
 }
 
+function clearDashboardSections() {
+  const emptyNodes = [
+    "#quoteGrid",
+    "#componentGrid",
+    "#scoreList",
+    "#metricGrid",
+    "#componentTable",
+    "#deviationTable",
+    "#noteList",
+    "#fibTable",
+  ];
+  emptyNodes.forEach((selector) => {
+    const node = $(selector);
+    if (node) node.innerHTML = "";
+  });
+  setText("#lastPrice", "--");
+  const changeNode = $("#dailyChange");
+  if (changeNode) {
+    changeNode.textContent = "--";
+    changeNode.className = "change-chip neutral";
+  }
+}
+
+function renderInsufficient(metadata) {
+  setText("#instrument", metadata?.instrument ?? "--");
+  setText("#bar", metadata?.bar ?? "--");
+  setText("#gateText", "样本不足");
+  setText("#topRoute", "--");
+  const panel = $("#gatePanel");
+  if (panel) panel.className = "gate-panel gate-neutral";
+  setText("#weatherSummary", "历史数据不足，暂不输出灯号");
+  setText("#actionBias", "等待历史补齐");
+  $("#topMeta").innerHTML = [
+    makeMetaChip("数据", metadata?.dataStatus ?? "insufficient_history"),
+    makeMetaChip("样本", metadata?.snapshotCount ?? "--"),
+  ].join("");
+  setText("#footerLine", "current is empty; frontend rendered an insufficient-history state");
+  clearDashboardSections();
+}
+
 async function renderDashboard() {
   setText("#weatherSummary", "数据加载中...");
   const [weather, features, deviations, candles] = await Promise.all([
@@ -385,6 +425,11 @@ async function renderDashboard() {
     fetchJson(PATHS.deviations, true),
     fetchJson(PATHS.candles),
   ]);
+
+  if (!weather?.current) {
+    renderInsufficient(weather?.metadata);
+    return;
+  }
 
   const values = features.current?.values ?? {};
   const { current: candle, previous, metadata: candleMeta } = getCurrentCandle(candles, weather.current.date);
