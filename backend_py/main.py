@@ -174,7 +174,7 @@ def scanner_status() -> dict[str, Any]:
         raise HTTPException(status_code=404, detail=str(error)) from error
     return {
         "mode": "python_orchestrator",
-        "note": "Python backend can start scanner jobs; full uses Python official reports, summary/node_full keep legacy Node entrypoints.",
+        "note": "Python backend can start scanner jobs; summary/full use Python official reports, node_summary/node_full keep legacy Node entrypoints.",
         "scanner": scanner.snapshot(),
         "startedAt": metadata.get("startedAt"),
         "finishedAt": metadata.get("finishedAt"),

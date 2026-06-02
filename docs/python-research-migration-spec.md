@@ -236,9 +236,12 @@ The next Python research migration should choose one of:
   validation passes with 174/174 successes and no errors.
 - `python_full --official --skip-download --bars 1D,4H,8H --days 3650`
   has written production report names with 174/174 successes and no errors.
+- `/api/scanner/run?mode=summary` now routes to Python official summary-only
+  rebuild with `--from-reports --summary-only --skip-download --official
+  --bars 1D,4H,8H --days 3650`.
 - `/api/scanner/run?mode=full` now routes to Python official full pipeline with
   `--skip-download --official --bars 1D,4H,8H --days 3650`.
-- Legacy Node scanner remains available as `/api/scanner/run?mode=node_full`.
-- Next, review whether `summary` should also move from Node summary rebuild to
-  Python summary rebuild, then decide when to remove the legacy Node production
-  scripts entirely.
+- Legacy Node scanner remains available as `/api/scanner/run?mode=node_summary`
+  and `/api/scanner/run?mode=node_full`.
+- Next, monitor the Python official scanner entries in normal use, then decide
+  when to remove the legacy Node production scripts entirely.

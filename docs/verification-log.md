@@ -1770,3 +1770,38 @@ node --check server.mjs = pass
 ### 备注
 - 本轮只切换 scanner/API 入口和文档,未重新生成 official reports。
 - 当前 Codex shell 未默认包含用户本机 `uv/npm` PATH,验证时显式加入 `/Users/guanlan/.local/bin` 与 Node `bin`。
+
+---
+
+## 37. Python Official Summary Entry Cutover
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+git status --short --branch
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.smoke_test
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check app.js
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check server.mjs
+```
+
+### 期望
+- `/api/scanner/run?mode=summary` 不再调用 Node `multi:periods --from-reports --summary-only`,改为 Python official summary-only pipeline。
+- `summary` 默认使用 `--from-reports --summary-only --skip-download --official --days 3650 --bars 1D,4H,8H`。
+- legacy Node summary scanner 以显式 `node_summary` 模式保留。
+- smoke test 覆盖 `summary`、`node_summary`、`full` 与 `node_full` 的命令映射。
+
+### 实际
+```
+summary command = backend_py.run_full_pipeline --from-reports --summary-only --skip-download --official --days 3650 --bars 1D,4H,8H
+node_summary command = npm run multi:periods -- --from-reports --summary-only
+smoke_test = pass
+py_compile = pass
+node --check app.js = pass
+node --check server.mjs = pass
+```
+
+### 备注
+- 本轮只切换 scanner/API summary 入口和文档,未执行 summary rebuild,因此未重新生成 official reports。
+- `node_summary` 与 `node_full` 作为 legacy 回退入口暂时保留。

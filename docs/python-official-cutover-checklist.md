@@ -79,6 +79,8 @@ If the cutover commit has already been pushed, revert that commit instead of for
 
 After official reports are reviewed and committed:
 
+- `/api/scanner/run?mode=summary` should call `backend_py.run_full_pipeline --from-reports --summary-only --skip-download --official --days 3650 --bars 1D,4H,8H`.
 - `/api/scanner/run?mode=full` should call `backend_py.run_full_pipeline --skip-download --official --days 3650 --bars 1D,4H,8H`.
+- `/api/scanner/run?mode=node_summary` should remain as the legacy Node summary fallback until the rollback window closes.
 - `/api/scanner/run?mode=node_full` should remain as the legacy Node fallback until the rollback window closes.
-- `uv run python -m backend_py.smoke_test` must assert both mappings.
+- `uv run python -m backend_py.smoke_test` must assert all four mappings.

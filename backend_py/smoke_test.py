@@ -55,23 +55,35 @@ def main() -> None:
     scanner_payload = scanner_status()
     assert scanner_payload["mode"] == "python_orchestrator"
     assert scanner_payload["scanner"]["active"] is False
+    assert "summary" in scanner_payload["scanner"]["supportedModes"]
     assert "python_summary" in scanner_payload["scanner"]["supportedModes"]
     assert "python_router" in scanner_payload["scanner"]["supportedModes"]
     assert "python_research" in scanner_payload["scanner"]["supportedModes"]
     assert "python_data" in scanner_payload["scanner"]["supportedModes"]
     assert "python_full" in scanner_payload["scanner"]["supportedModes"]
+    assert "node_summary" in scanner_payload["scanner"]["supportedModes"]
     assert "node_full" in scanner_payload["scanner"]["supportedModes"]
+    summary_command = command_for_mode("summary")
+    assert "backend_py.run_full_pipeline" in summary_command
+    assert "--from-reports" in summary_command
+    assert "--summary-only" in summary_command
+    assert "--skip-download" in summary_command
+    assert "--official" in summary_command
+    assert summary_command[-2:] == ["--bars", "1D,4H,8H"]
     full_command = command_for_mode("full")
     assert "backend_py.run_full_pipeline" in full_command
     assert "--skip-download" in full_command
     assert "--official" in full_command
     assert full_command[-2:] == ["--bars", "1D,4H,8H"]
+    assert "multi:periods" in command_for_mode("node_summary")
     assert "multi:periods" in command_for_mode("node_full")
     assert "backend_py.build_summary" in command_for_mode("python_summary")
     assert "backend_py.run_router_parity" in command_for_mode("python_router")
     assert "backend_py.run_research_parity" in command_for_mode("python_research")
     assert "backend_py.run_data_pipeline" in command_for_mode("python_data")
     assert "backend_py.run_full_pipeline" in command_for_mode("python_full")
+    scoped_summary = command_for_mode("summary", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")
+    assert scoped_summary[-5:] == ["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H"]
     scoped_python_summary = command_for_mode("python_summary", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")
     assert scoped_python_summary[-5:] == ["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H"]
     scoped_python_router = command_for_mode("python_router", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")
