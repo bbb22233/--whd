@@ -12,7 +12,7 @@ from typing import Literal
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-ScannerMode = Literal["summary", "full", "python_summary", "python_router", "python_research", "python_data", "python_full"]
+ScannerMode = Literal["summary", "full", "node_full", "python_summary", "python_router", "python_research", "python_data", "python_full"]
 ScannerStatus = Literal["idle", "running", "succeeded", "failed", "cancelled"]
 
 
@@ -63,6 +63,18 @@ def command_for_mode(mode: ScannerMode, *, symbols: str | None = None, bars: str
         npm = npm_executable()
         return [npm, "run", "multi:periods", "--", "--from-reports", "--summary-only", *scanner_scope_args(symbols, bars)]
     if mode == "full":
+        scope = scanner_scope_args(symbols, bars or "1D,4H,8H")
+        return [
+            sys.executable,
+            "-m",
+            "backend_py.run_full_pipeline",
+            "--skip-download",
+            "--official",
+            "--days",
+            "3650",
+            *scope,
+        ]
+    if mode == "node_full":
         npm = npm_executable()
         return [npm, "run", "multi:periods"]
     if mode == "python_summary":
@@ -130,11 +142,12 @@ class ScannerJob:
 class ScannerSnapshot:
     active: bool
     lastJob: dict | None
-    supportedModes: list[str] = field(default_factory=lambda: ["summary", "full", "python_summary", "python_router", "python_research", "python_data", "python_full"])
+    supportedModes: list[str] = field(default_factory=lambda: ["summary", "full", "node_full", "python_summary", "python_router", "python_research", "python_data", "python_full"])
     modeNotes: dict[str, str] = field(
         default_factory=lambda: {
             "summary": "Rebuild combined summaries from existing reports; no download.",
-            "full": "Run the existing Node multi-period scanner; may download market data.",
+            "full": "Run the Python official full pipeline from existing raw/clean inputs and write production reports.",
+            "node_full": "Run the legacy Node multi-period scanner; may download market data.",
             "python_summary": "Run Python from-reports summary parity; defaults to BTC-USDT 1D and writes _py artifacts only.",
             "python_router": "Run Python full router parity against existing Node reports; defaults to BTC-USDT 1D and writes _py artifacts only.",
             "python_research": "Run Python feature/deviation/router/summary parity chain; defaults to BTC-USDT 1D and writes _py artifacts only.",
@@ -171,7 +184,7 @@ class ScannerService:
             startedAt=utc_now_iso(),
             note=(
                 "Python backend is running a Python parity path."
-                if mode in {"python_summary", "python_router", "python_research", "python_data", "python_full"}
+                if mode in {"full", "python_summary", "python_router", "python_research", "python_data", "python_full"}
                 else "Python backend is orchestrating the existing Node scanner."
             ),
         )

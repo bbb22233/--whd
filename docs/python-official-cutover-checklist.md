@@ -74,3 +74,11 @@ git restore reports
 ```
 
 If the cutover commit has already been pushed, revert that commit instead of force-pushing.
+
+## Scanner Entry Cutover
+
+After official reports are reviewed and committed:
+
+- `/api/scanner/run?mode=full` should call `backend_py.run_full_pipeline --skip-download --official --days 3650 --bars 1D,4H,8H`.
+- `/api/scanner/run?mode=node_full` should remain as the legacy Node fallback until the rollback window closes.
+- `uv run python -m backend_py.smoke_test` must assert both mappings.

@@ -1,13 +1,13 @@
 # Python Research Migration Spec
 
-> Goal: move research logic into the Python ecosystem without replacing the current Node production path too early.
+> Goal: move research logic into the Python ecosystem while keeping explicit rollback paths during production cutover.
 
 ## Phase 1 Scope
 
 This phase implements Python parity layers for the research outputs that can be
 matched safely against current Node golden reports.
 
-- Keep Node scripts as the production generator.
+- Keep Node scripts as rollback/fallback generators while Python parity is proven.
 - Add Python modules under `backend_py/research/`.
 - Generate Python comparison artifacts with `_py` suffix.
 - Compare Python output against the Node report, ignoring only runtime timestamps
@@ -15,7 +15,7 @@ matched safely against current Node golden reports.
 - Keep FastAPI/scanner Python paths explicit until parity coverage is broad
   enough to switch defaults.
 - OKX download and clean aggregation now have Python equivalents, but Node
-  remains the default production path until the full orchestrator is migrated.
+  remains available as `node_full` after the Python full orchestrator cutover.
 
 ## Files
 
@@ -87,7 +87,7 @@ Python implementation:
     replacing Node production reports.
   - Supports `--check-inputs` for raw/clean coverage inspection before large
     runs.
-  - Supports `--official` for the later cutover step when Python becomes the
+  - Supports `--official` for the cutover step when Python becomes the
     production report writer.
 
 ## Feature Factory Parity Contract
@@ -230,12 +230,15 @@ node --check server.mjs
 
 The next Python research migration should choose one of:
 
-- Add a scanner mode for Python deviation parity across selected symbols/bars.
 - Default-symbol raw/clean inputs are complete: local coverage is 174/174
   required `1D,4H,8H` combinations.
 - Full default `python_full --skip-download --bars 1D,4H,8H --days 3650`
   validation passes with 174/174 successes and no errors.
 - `python_full --official --skip-download --bars 1D,4H,8H --days 3650`
   has written production report names with 174/174 successes and no errors.
-- Start replacing selected Node scanner/orchestrator paths only after full-scope
-  Python output has been reviewed.
+- `/api/scanner/run?mode=full` now routes to Python official full pipeline with
+  `--skip-download --official --bars 1D,4H,8H --days 3650`.
+- Legacy Node scanner remains available as `/api/scanner/run?mode=node_full`.
+- Next, review whether `summary` should also move from Node summary rebuild to
+  Python summary rebuild, then decide when to remove the legacy Node production
+  scripts entirely.

@@ -1735,3 +1735,38 @@ new official reports = 228
 - Python full pipeline 已正式写入 production report 文件名。
 - 当前 official combined report 只包含已完成覆盖的 `1D/4H/8H`;旧的 `1W` report 文件仍在仓库中,但不再出现在本次 official combined summary。
 - 下一步应审查 official reports diff,再切换/收敛 Node scanner/orchestrator 入口。
+
+---
+
+## 36. Python Official Scanner Entry Cutover
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+git status --short --branch
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.smoke_test
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check app.js
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check server.mjs
+```
+
+### 期望
+- `/api/scanner/run?mode=full` 不再调用 Node `multi:periods`,改为 Python official full pipeline。
+- `full` 默认使用 `--skip-download --official --days 3650 --bars 1D,4H,8H`。
+- legacy Node full scanner 以显式 `node_full` 模式保留。
+- smoke test 覆盖 `full` 与 `node_full` 的命令映射。
+
+### 实际
+```
+full command = backend_py.run_full_pipeline --skip-download --official --days 3650 --bars 1D,4H,8H
+node_full command = npm run multi:periods
+smoke_test = pass
+py_compile = pass
+node --check app.js = pass
+node --check server.mjs = pass
+```
+
+### 备注
+- 本轮只切换 scanner/API 入口和文档,未重新生成 official reports。
+- 当前 Codex shell 未默认包含用户本机 `uv/npm` PATH,验证时显式加入 `/Users/guanlan/.local/bin` 与 Node `bin`。

@@ -60,6 +60,13 @@ def main() -> None:
     assert "python_research" in scanner_payload["scanner"]["supportedModes"]
     assert "python_data" in scanner_payload["scanner"]["supportedModes"]
     assert "python_full" in scanner_payload["scanner"]["supportedModes"]
+    assert "node_full" in scanner_payload["scanner"]["supportedModes"]
+    full_command = command_for_mode("full")
+    assert "backend_py.run_full_pipeline" in full_command
+    assert "--skip-download" in full_command
+    assert "--official" in full_command
+    assert full_command[-2:] == ["--bars", "1D,4H,8H"]
+    assert "multi:periods" in command_for_mode("node_full")
     assert "backend_py.build_summary" in command_for_mode("python_summary")
     assert "backend_py.run_router_parity" in command_for_mode("python_router")
     assert "backend_py.run_research_parity" in command_for_mode("python_research")
@@ -73,6 +80,8 @@ def main() -> None:
     assert scoped_python_research[-5:] == ["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H"]
     scoped_python_data = command_for_mode("python_data", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")
     assert scoped_python_data[-5:] == ["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H"]
+    scoped_full = command_for_mode("full", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")
+    assert scoped_full[-5:] == ["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H"]
     scoped_python_full = command_for_mode("python_full", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")
     assert scoped_python_full[-5:] == ["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H"]
     plan_args = parse_batch_args(["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H", "--official", "--plan-outputs"])
