@@ -1372,3 +1372,58 @@ cleanMissingCount = 63
 ### 备注
 - 当前本地已覆盖 37 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX, WLD, AR, XLM, ICP, HBAR, ALGO, LDO, CRV, ENS, PENDLE。
 - 继续分批补齐剩余 21 个 symbols。
+
+---
+
+## 30. Python Data Pipeline Small Batch Fill 8
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m backend_py.run_full_pipeline --check-inputs --symbols JUP-USDT PYTH-USDT TIA-USDT ONDO-USDT FET-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_data_pipeline --missing-only --symbols JUP-USDT PYTH-USDT TIA-USDT ONDO-USDT FET-USDT --bars 1D,4H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols JUP-USDT PYTH-USDT TIA-USDT ONDO-USDT FET-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+```
+
+### 期望
+- 第八批补齐 `JUP/PYTH/TIA/ONDO/FET × 1D/4H`。
+- 补齐后 `python_full --skip-download` 可验证该批 1D/4H/8H 全链路。
+- 本地覆盖度从 111 组提升到 126 组。
+
+### 实际
+```
+JUP/PYTH/TIA/ONDO/FET × 1D/4H:
+stepCount = 10
+successCount = 10
+errorCount = 0
+
+rawRows / cleanRows:
+JUP 1D = 855 / 854
+PYTH 1D = 927 / 926
+TIA 1D = 946 / 945
+ONDO 1D = 675 / 674
+FET 1D = 923 / 922
+JUP 4H = 5120 / 5119
+PYTH 4H = 5552 / 5551
+TIA 4H = 5671 / 5670
+ONDO 4H = 4041 / 4040
+FET 4H = 5529 / 5528
+
+python_full JUP/PYTH/TIA/ONDO/FET × 1D,4H,8H:
+successCount = 15
+weatherCount = 15
+errorCount = 0
+
+default symbols × 1D,4H,8H after fill:
+requiredCount = 174
+rawReadyCount = 126
+rawMissingCount = 48
+cleanReadyCount = 126
+cleanMissingCount = 48
+```
+
+### 备注
+- 当前本地已覆盖 42 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX, WLD, AR, XLM, ICP, HBAR, ALGO, LDO, CRV, ENS, PENDLE, JUP, PYTH, TIA, ONDO, FET。
+- 继续分批补齐剩余 16 个 symbols。
