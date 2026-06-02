@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from .reports_reader import ReportNotFound, ReportsReader, normalize_bar, normalize_instrument
+from .scanner_service import ScannerAlreadyRunning, ScannerCommandUnavailable, ScannerMode, ScannerService
 
 
 app = FastAPI(
@@ -18,11 +19,12 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://127.0.0.1:4177", "http://localhost:4177"],
     allow_credentials=False,
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
 reader = ReportsReader()
+scanner = ScannerService()
 
 
 def sort_rows(
@@ -138,8 +140,9 @@ def scanner_status() -> dict[str, Any]:
     except ReportNotFound as error:
         raise HTTPException(status_code=404, detail=str(error)) from error
     return {
-        "mode": "reports_reader",
-        "note": "Stage 1 migration reads existing reports; live scan execution remains in Node scripts.",
+        "mode": "python_orchestrator",
+        "note": "Python backend can start scanner jobs; current jobs still call the existing Node scripts.",
+        "scanner": scanner.snapshot(),
         "startedAt": metadata.get("startedAt"),
         "finishedAt": metadata.get("finishedAt"),
         "successCount": metadata.get("successCount"),
@@ -147,6 +150,21 @@ def scanner_status() -> dict[str, Any]:
         "errorCount": metadata.get("errorCount"),
         "sourceReport": metadata.get("sourceReport"),
     }
+
+
+@app.post("/api/scanner/run")
+def scanner_run(mode: ScannerMode = Query(default="summary")) -> dict[str, Any]:
+    try:
+        return {"started": True, "job": scanner.start(mode=mode)}
+    except ScannerAlreadyRunning as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+    except ScannerCommandUnavailable as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+
+
+@app.post("/api/scanner/cancel")
+def scanner_cancel() -> dict[str, Any]:
+    return scanner.cancel()
 
 
 if __name__ == "__main__":

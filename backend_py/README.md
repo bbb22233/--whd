@@ -30,7 +30,15 @@ GET /api/market/symbols
 GET /api/market/rows?bar=4H
 GET /api/market/current/BTC-USDT?bar=4H
 GET /api/scanner/status
+POST /api/scanner/run?mode=summary
+POST /api/scanner/run?mode=full
+POST /api/scanner/cancel
 ```
+
+扫描模式：
+
+- `summary`: 调用现有 Node 脚本从已有 reports 重建多周期汇总，不下载。
+- `full`: 调用现有 Node 多周期扫描，会尝试下载/刷新数据。
 
 ## 验证
 
