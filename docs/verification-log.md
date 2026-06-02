@@ -389,3 +389,42 @@ currentDate = 2026-05-31
 - 代理审查确认 `current` 完整字段顺序为 `date/close/weatherName/weatherConfidencePct/labels/strategyScores/topRoutes/strategyRoutes/values`。
 - 已同步更新 `docs/python-research-migration-spec.md`。
 - 计划中的 `ETH-USDT 4H` 抽样未执行:本地当前只有 `data/clean/BTC_USDT_1D_clean.json`,缺少 `ETH_USDT_4H_clean.json`。
+
+---
+
+## 11. Python From-Reports Summary Parity
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+node --check scripts/run-multi-symbol-1d.mjs
+npm run multi:periods -- --from-reports --summary-only --symbols BTC-USDT --bars 1D
+uv run python -m backend_py.build_summary --from-reports --summary-only --symbols BTC-USDT --bars 1D
+uv run python -m backend_py.compare_summary --from-reports --summary-only --symbols BTC-USDT --bars 1D
+git restore reports/multi_1D_market_weather_current.csv reports/multi_1D_market_weather_current.json reports/multi_period_market_weather_current.csv reports/multi_period_market_weather_current.json
+```
+
+### 期望
+- Python 从现有 `data/clean`、`reports/*_market_weather_router.json`、可选 feature/deviation reports 重建 summary。
+- `buildSummaryRow`、`historyQuality`、`qualitySummary` 与 Node from-reports 路径一致。
+- Python 只写 `_py` suffixed summary artifacts,不替换 Node 正式 summary。
+- 对比忽略 `startedAt` / `finishedAt`。
+
+### 实际
+```
+py_compile backend_py/*.py backend_py/research/*.py = 通过
+node --check scripts/run-multi-symbol-1d.mjs = 通过
+Node from-reports summary BTC-USDT 1D = 通过
+Python build_summary BTC-USDT 1D = 通过
+compare_summary BTC-USDT 1D = status ok
+rowCount = 1
+errorCount = 0
+weightedWeatherCount = 0.7
+```
+
+### 备注
+- 本地当前只有 `data/clean/BTC_USDT_1D_clean.json`,所以本轮显式限制 `--symbols BTC-USDT --bars 1D`。
+- Node 对照命令会覆盖正式 `multi_*` summary;验证后已用 `git restore` 恢复,避免破坏当前多币种前端数据。
+- `_py` summary JSON/CSV 已加入 `.gitignore`。

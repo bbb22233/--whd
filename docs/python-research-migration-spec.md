@@ -31,6 +31,14 @@ Python implementation:
   - Compares Node and Python reports.
   - Ignores `generatedAt`.
   - Recursively compares metadata, feature definitions, `featureStats`, and full `current`.
+- `backend_py/research/summary.py`
+  - Ports `historyQuality`, `qualitySummary`, and `buildSummaryRow`.
+- `backend_py/build_summary.py`
+  - Rebuilds from existing reports and clean payloads.
+  - Writes `_py` suffixed multi-period summary artifacts.
+- `backend_py/compare_summary.py`
+  - Compares Node and Python summary JSON.
+  - Ignores `startedAt` and `finishedAt`.
 
 ## Current Parity Contract
 
@@ -96,4 +104,5 @@ node --check server.mjs
 The next Python research migration should choose one of:
 
 - Add broader sample coverage after generating additional clean data, such as `ETH-USDT 4H`.
-- Port from-reports multi-period summary, which is lower algorithmic risk and mainly depends on report contracts.
+- Add a scanner mode that can call Python summary parity without replacing Node `summary`.
+- Port the next algorithmic layer after summary, likely market weather router only after broader parity coverage exists.
