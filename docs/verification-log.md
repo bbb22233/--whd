@@ -299,3 +299,49 @@ http://127.0.0.1:4177/ = 200 OK
 - 已新增 `docs/api-dashboard-spec.md` 作为代理执行规格。
 - 前端保留 `fetchLegacyDashboardData`,但 clean candles 降级为 optional,干净 clone 不再因为 `./data/clean/*_clean.json` 缺失而加载失败。
 - 本轮 `tool_search` 未暴露可用的浏览器控制工具,因此没有补可视化截图;已用本地 HTTP 和静态检查完成可运行验证。
+
+---
+
+## 9. Node -> Python 研究迁移第一步
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+uv run python -m backend_py.smoke_test
+node --check app.js
+node --check server.mjs
+for f in scripts/*.mjs; do node --check "$f" >/dev/null || exit 1; done
+npm run features -- --instrument BTC-USDT --bar 1D --days 3650
+uv run python -m backend_py.build_feature_factory --instrument BTC-USDT --bar 1D --days 3650
+uv run python -m backend_py.compare_feature_factory --instrument BTC-USDT --bar 1D --days 3650
+```
+
+### 期望
+- Python 新增 feature factory core parity 层,不替换 Node 生产脚本。
+- Python 从 `data/clean/BTC_USDT_1D_clean.json` 生成 `_feature_factory_py.json`。
+- Python 与 Node 当前 `reports/BTC_USDT_1D_feature_factory.json` 在核心数值字段一致。
+- 忽略 `generatedAt`、weather labels、strategy routes,这些仍由 Node 负责。
+- FastAPI dashboard/smoke test 不受影响。
+
+### 实际
+```
+py_compile backend_py/*.py backend_py/research/*.py = 通过
+backend_py.smoke_test = 通过
+node --check app.js = 通过
+node --check server.mjs = 通过
+node --check scripts/*.mjs = 通过
+npm run features BTC-USDT 1D = 通过,刷新 Node golden report 到 2026-05-31
+build_feature_factory.py BTC-USDT 1D = 通过
+compare_feature_factory.py BTC-USDT 1D = status ok
+snapshotCount = 2924
+featureCount = 47
+currentDate = 2026-05-31
+```
+
+### 备注
+- 已新增 `docs/python-research-migration-spec.md`。
+- 本阶段 Python 只覆盖 indicators + state feature dataset + core current values。
+- `_feature_factory_py.json` 与 rows CSV 是本地验证产物,已加入 `.gitignore`。
+- 下一阶段可继续补齐 `buildWeatherLabels` / `routeStrategies`,或按代理建议迁移 from-reports multi-period summary。
