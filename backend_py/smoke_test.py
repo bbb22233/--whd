@@ -55,9 +55,13 @@ def main() -> None:
     assert scanner_payload["mode"] == "python_orchestrator"
     assert scanner_payload["scanner"]["active"] is False
     assert "python_summary" in scanner_payload["scanner"]["supportedModes"]
+    assert "python_router" in scanner_payload["scanner"]["supportedModes"]
     assert "backend_py.build_summary" in command_for_mode("python_summary")
+    assert "backend_py.run_router_parity" in command_for_mode("python_router")
     scoped_python_summary = command_for_mode("python_summary", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")
     assert scoped_python_summary[-5:] == ["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H"]
+    scoped_python_router = command_for_mode("python_router", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")
+    assert scoped_python_router[-5:] == ["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H"]
 
     print(
         {

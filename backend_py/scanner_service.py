@@ -12,7 +12,7 @@ from typing import Literal
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-ScannerMode = Literal["summary", "full", "python_summary"]
+ScannerMode = Literal["summary", "full", "python_summary", "python_router"]
 ScannerStatus = Literal["idle", "running", "succeeded", "failed", "cancelled"]
 
 
@@ -75,6 +75,14 @@ def command_for_mode(mode: ScannerMode, *, symbols: str | None = None, bars: str
             "--summary-only",
             *scope,
         ]
+    if mode == "python_router":
+        scope = scanner_scope_args(symbols or "BTC-USDT", bars or "1D")
+        return [
+            sys.executable,
+            "-m",
+            "backend_py.run_router_parity",
+            *scope,
+        ]
     raise ValueError(f"Unsupported scanner mode: {mode}")
 
 
@@ -98,12 +106,13 @@ class ScannerJob:
 class ScannerSnapshot:
     active: bool
     lastJob: dict | None
-    supportedModes: list[str] = field(default_factory=lambda: ["summary", "full", "python_summary"])
+    supportedModes: list[str] = field(default_factory=lambda: ["summary", "full", "python_summary", "python_router"])
     modeNotes: dict[str, str] = field(
         default_factory=lambda: {
             "summary": "Rebuild combined summaries from existing reports; no download.",
             "full": "Run the existing Node multi-period scanner; may download market data.",
             "python_summary": "Run Python from-reports summary parity; defaults to BTC-USDT 1D and writes _py artifacts only.",
+            "python_router": "Run Python full router parity against existing Node reports; defaults to BTC-USDT 1D and writes _py artifacts only.",
         }
     )
 
@@ -134,8 +143,8 @@ class ScannerService:
             command=command,
             startedAt=utc_now_iso(),
             note=(
-                "Python backend is running the Python summary parity path."
-                if mode == "python_summary"
+                "Python backend is running a Python parity path."
+                if mode in {"python_summary", "python_router"}
                 else "Python backend is orchestrating the existing Node scanner."
             ),
         )

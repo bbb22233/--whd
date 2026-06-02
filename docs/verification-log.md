@@ -717,3 +717,51 @@ finalGate = 黄偏红
 - Comparer 数值容忍为 `1e-2`,用于吸收 JS `toFixed` 与 Python 浮点格式化在百分位中位数上的 0.01 边界差。
 - 本轮验证临时刷新了四组正式 Node deviation reports;验证后已恢复,不提交 report churn。
 - Router calibration/gate selection 已在第 15 步补齐;下一步可接入 scanner/orchestrator 的显式 Python router 模式。
+
+---
+
+## 17. Scanner Python Router Mode
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+uv run python -m backend_py.run_router_parity
+uv run python -m backend_py.run_router_parity --symbols BTC-USDT ETH-USDT --bars 1D,4H
+uv run python -m backend_py.smoke_test
+uv run python - <<'PY'
+import time
+from backend_py.scanner_service import ScannerService
+scanner = ScannerService()
+job = scanner.start("python_router")
+last = None
+for _ in range(120):
+    snapshot = scanner.snapshot()
+    last = snapshot["lastJob"]
+    if last and last["status"] != "running":
+        break
+    time.sleep(0.1)
+print({"startedMode": job["mode"], "status": last["status"], "returnCode": last["returnCode"]})
+assert last["status"] == "succeeded", last
+PY
+```
+
+### 期望
+- `/api/scanner/run?mode=python_router` 可运行。
+- `python_router` 默认跑 `BTC-USDT 1D`,只写 `_py` router artifacts,不替换 Node 正式报告。
+- `python_router` 可通过 `symbols/bars` 参数扩大范围,例如 `symbols=BTC-USDT,ETH-USDT&bars=1D,4H`。
+- `scanner/status` 的 `supportedModes` 包含 `python_router`。
+
+### 实际
+```
+py_compile backend_py/*.py backend_py/research/*.py = 通过
+backend_py.run_router_parity = status ok, BTC-USDT 1D, gate 黄, gateSource router_calibration
+backend_py.run_router_parity --symbols BTC-USDT ETH-USDT --bars 1D,4H = successCount 4, errorCount 0
+backend_py.smoke_test = 通过
+ScannerService().start("python_router") = succeeded, returnCode 0
+```
+
+### 备注
+- 新增 `backend_py.run_router_parity`,负责按 symbols/bars 批量执行 Python router build + compare。
+- `python_router` 与 `python_summary` 一样是显式 parity 模式,不会改变 Node 默认生产扫描路径。
