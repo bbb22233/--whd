@@ -1986,3 +1986,62 @@ node checks = pass
 ### 备注
 - 本轮只改 Python CLI official/preflight 能力、package scripts、测试和文档,未重新生成 official reports。
 - `weather:router` 的 missing output 是 standalone router observations CSV;旧 Node standalone router 也会生成该类输出。
+
+---
+
+## 41. Remaining Node Command Inventory
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+git status --short --branch
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.smoke_test
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check app.js
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check server.mjs
+python3 - <<'PY'
+import json
+p=json.load(open("package.json"))
+print("\\n".join(sorted(k for k,v in p["scripts"].items() if v.startswith("node "))))
+PY
+```
+
+### 期望
+- 剩余 Node package scripts 被明确分类为 legacy fallback、静态服务、研究/训练工具。
+- `backend_py.smoke_test` 断言当前允许保留的 Node script 集合。
+- 新增文档 `docs/remaining-node-command-inventory.md` 作为后续移除 Node 的工作清单。
+
+### 实际
+```
+remaining node scripts:
+backtest:deviations
+backtest:indicators
+backtest:position
+backtest:router
+backtest:volatility
+calibrate:router
+compare:macro
+download:macro
+journal:create
+legacy:clean
+legacy:download
+legacy:features
+legacy:multi:1d
+legacy:multi:periods
+legacy:multi:weather
+legacy:rules:deviations
+legacy:weather:router
+serve
+train:state
+train:trees
+validate:trees
+
+smoke_test = pass
+py_compile = pass
+node checks = pass
+```
+
+### 备注
+- 本轮只新增剩余 Node 命令盘点和测试白名单,未修改 reports/data。
+- 推荐迁移顺序: `calibrate:router`/`backtest:router` -> macro commands -> training commands -> historical backtests/journal -> optional `serve` cleanup。

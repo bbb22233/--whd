@@ -26,6 +26,7 @@ npm run weather:router -- --instrument BTC-USDT --days 3650
 
 Python API 是当前前端数据源与扫描入口。`summary` / `full` / `download` /
 `clean` 主路径已切到 Python,旧 Node 入口以 `legacy:*` 名称保留。
+剩余 Node 命令分类见 `docs/remaining-node-command-inventory.md`。
 
 ```bash
 uv sync

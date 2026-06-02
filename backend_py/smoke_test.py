@@ -113,6 +113,31 @@ def main() -> None:
     assert "scripts/build-deviation-rules.mjs" in package_scripts["legacy:rules:deviations"]
     assert "scripts/build-market-weather-router.mjs" in package_scripts["legacy:weather:router"]
 
+    node_scripts = {name for name, command in package_scripts.items() if command.startswith("node ")}
+    assert node_scripts == {
+        "serve",
+        "legacy:multi:1d",
+        "legacy:multi:weather",
+        "legacy:multi:periods",
+        "download:macro",
+        "legacy:download",
+        "legacy:clean",
+        "backtest:indicators",
+        "backtest:volatility",
+        "backtest:position",
+        "backtest:deviations",
+        "backtest:router",
+        "calibrate:router",
+        "legacy:rules:deviations",
+        "legacy:weather:router",
+        "legacy:features",
+        "journal:create",
+        "train:trees",
+        "validate:trees",
+        "compare:macro",
+        "train:state",
+    }
+
     scoped_summary = command_for_mode("summary", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")
     assert scoped_summary[-5:] == ["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H"]
     scoped_python_summary = command_for_mode("python_summary", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")

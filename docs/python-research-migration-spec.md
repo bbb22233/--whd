@@ -251,5 +251,7 @@ The next Python research migration should choose one of:
   and `/api/scanner/run?mode=node_full`; package-level legacy commands are
   available under `legacy:multi:*`, `legacy:download`, `legacy:clean`,
   `legacy:features`, `legacy:rules:deviations`, and `legacy:weather:router`.
+- Remaining Node research/training commands are tracked in
+  `docs/remaining-node-command-inventory.md`.
 - Next, monitor the Python official scanner entries in normal use, then decide
   when to remove the legacy Node production scripts entirely.
