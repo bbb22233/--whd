@@ -1097,3 +1097,58 @@ cleanMissingCount = 138
 ### 备注
 - 当前本地已覆盖 12 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT。
 - 后续继续每批 5 个 symbols 补齐,可控制 OKX 下载耗时和失败半径。
+
+---
+
+## 25. Python Data Pipeline Small Batch Fill 3
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m backend_py.run_full_pipeline --check-inputs --symbols BCH-USDT LTC-USDT UNI-USDT AAVE-USDT NEAR-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_data_pipeline --missing-only --symbols BCH-USDT LTC-USDT UNI-USDT AAVE-USDT NEAR-USDT --bars 1D,4H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols BCH-USDT LTC-USDT UNI-USDT AAVE-USDT NEAR-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+```
+
+### 期望
+- 第三批补齐 `BCH/LTC/UNI/AAVE/NEAR × 1D/4H`。
+- 补齐后 `python_full --skip-download` 可验证该批 1D/4H/8H 全链路。
+- 本地覆盖度从 36 组提升到 51 组。
+
+### 实际
+```
+BCH/LTC/UNI/AAVE/NEAR × 1D/4H:
+stepCount = 10
+successCount = 10
+errorCount = 0
+
+rawRows / cleanRows:
+BCH 1D = 2754 / 2753
+LTC 1D = 3066 / 3065
+UNI 1D = 2086 / 2085
+AAVE 1D = 2051 / 2050
+NEAR 1D = 2009 / 2008
+BCH 4H = 16516 / 16515
+LTC 4H = 18387 / 18386
+UNI 4H = 12509 / 12508
+AAVE 4H = 12298 / 12297
+NEAR 4H = 12046 / 12045
+
+python_full BCH/LTC/UNI/AAVE/NEAR × 1D,4H,8H:
+successCount = 15
+weatherCount = 15
+errorCount = 0
+
+default symbols × 1D,4H,8H after fill:
+requiredCount = 174
+rawReadyCount = 51
+rawMissingCount = 123
+cleanReadyCount = 51
+cleanMissingCount = 123
+```
+
+### 备注
+- 当前本地已覆盖 17 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR。
+- 继续分批补齐剩余 41 个 symbols。
