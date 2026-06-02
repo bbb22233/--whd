@@ -108,6 +108,19 @@ def clean_candles(instrument: str, bar: str) -> dict[str, Any]:
         raise HTTPException(status_code=404, detail=str(error)) from error
 
 
+@app.get("/api/dashboard/current")
+def dashboard_current(
+    instrument: str = Query(default="BTC-USDT"),
+    bar: str = Query(default="1D"),
+) -> dict[str, Any]:
+    try:
+        return reader.load_dashboard(instrument=instrument, bar=bar)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    except ReportNotFound as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+
+
 @app.get("/api/market/rows")
 def market_rows(
     instrument: str | None = Query(default=None),

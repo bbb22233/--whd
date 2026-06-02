@@ -1,6 +1,14 @@
 from __future__ import annotations
 
-from backend_py.main import clean_candles, health, market_current, market_overview, report_json, scanner_status
+from backend_py.main import (
+    clean_candles,
+    dashboard_current,
+    health,
+    market_current,
+    market_overview,
+    report_json,
+    scanner_status,
+)
 
 
 def optional_clean_candle_count(instrument: str, bar: str) -> tuple[str, int | None]:
@@ -31,6 +39,15 @@ def main() -> None:
     report_payload = report_json("BTC_USDT_1D_market_weather_router.json")
     assert report_payload["metadata"]["instrument"] == "BTC-USDT"
 
+    dashboard_payload = dashboard_current("BTC-USDT", "1D")
+    assert dashboard_payload["instrument"] == "BTC-USDT"
+    assert dashboard_payload["bar"] == "1D"
+    assert dashboard_payload["sources"]["weather"]["status"] == "ok"
+    assert dashboard_payload["sources"]["features"]["status"] == "ok"
+    assert dashboard_payload["weather"]["metadata"]["instrument"] == "BTC-USDT"
+    assert dashboard_payload["features"]["metadata"]["instrument"] == "BTC-USDT"
+    assert dashboard_payload["sources"]["candles"]["status"] in {"ok", "missing_optional"}
+
     clean_status, clean_candle_count = optional_clean_candle_count("BTC-USDT", "1D")
 
     scanner_payload = scanner_status()
@@ -45,6 +62,7 @@ def main() -> None:
             "btc4hGate": btc_payload["row"].get("gate"),
             "scannerMode": scanner_payload["mode"],
             "compatReport": report_payload["metadata"].get("bar"),
+            "dashboardCandlesStatus": dashboard_payload["sources"]["candles"]["status"],
             "cleanCandles": clean_candle_count,
             "cleanCandlesStatus": clean_status,
         }

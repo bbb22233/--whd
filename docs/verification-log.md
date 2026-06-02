@@ -252,3 +252,50 @@ node --check app.js = 通过
 - 这是迁移桥接层:前端数据入口先切到 Python API,但 Node 仍负责生成 reports/data。
 - 仍保留静态 fallback,避免 Python 后端未启动时页面直接不可用。
 - `backend_py.smoke_test` 已对缺失的未跟踪 clean data 做降级标记:`cleanCandlesStatus=missing_untracked_data`。
+
+---
+
+## 8. Python API — Dashboard 聚合端点迁移
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m backend_py.smoke_test
+uv run python -m py_compile backend_py/*.py
+node --check app.js
+node --check server.mjs
+uv run uvicorn backend_py.main:app --host 127.0.0.1 --port 8000
+curl -fsS "http://127.0.0.1:8000/api/dashboard/current?instrument=BTC-USDT&bar=1D"
+curl -i "http://127.0.0.1:8000/api/dashboard/current?instrument=BTC-USDT&bar=BAD"
+curl -i "http://127.0.0.1:8000/api/dashboard/current?instrument=NO-SUCH&bar=1D"
+node server.mjs
+curl -I http://127.0.0.1:4177/
+```
+
+### 期望
+- 前端主路径读取 `GET /api/dashboard/current?instrument=BTC-USDT&bar=1D`。
+- Dashboard API 一次返回 `weather/features/deviations/candles`。
+- `weather` 和 `features` 为必需源,缺失时返回 404。
+- `deviations` 和 `candles` 为可选源,缺失时返回 200 且字段为 `null`。
+- 非法 dashboard 周期返回 400。
+- Python API 不可用时,前端仍回退到旧的 reports/data 静态路径。
+
+### 实际
+```
+uv run python -m backend_py.smoke_test = 通过, dashboardCandlesStatus=ok
+uv run python -m py_compile backend_py/*.py = 通过
+node --check app.js = 通过
+node --check server.mjs = 通过
+/api/dashboard/current?instrument=BTC-USDT&bar=1D = 200 OK
+Dashboard sources = weather ok, features ok, deviations ok, candles ok
+/api/dashboard/current?instrument=BTC-USDT&bar=BAD = 400 Unsupported bar: BAD
+/api/dashboard/current?instrument=NO-SUCH&bar=1D = 404 Report not found
+ReportsReader 使用空 clean_dir 时 = candlesStatus missing_optional, candles null
+http://127.0.0.1:4177/ = 200 OK
+```
+
+### 备注
+- 已新增 `docs/api-dashboard-spec.md` 作为代理执行规格。
+- 前端保留 `fetchLegacyDashboardData`,但 clean candles 降级为 optional,干净 clone 不再因为 `./data/clean/*_clean.json` 缺失而加载失败。
+- 本轮 `tool_search` 未暴露可用的浏览器控制工具,因此没有补可视化截图;已用本地 HTTP 和静态检查完成可运行验证。

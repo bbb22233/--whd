@@ -9,6 +9,7 @@ const apiReport = (name, fallback) => ({
 });
 
 const PATHS = {
+  dashboard: `${API_BASE}/api/dashboard/current?instrument=${DEFAULT_INSTRUMENT}&bar=${DEFAULT_BAR}`,
   weather: apiReport(`${REPORT_PREFIX}_market_weather_router.json`, `./reports/${REPORT_PREFIX}_market_weather_router.json`),
   features: apiReport(`${REPORT_PREFIX}_feature_factory.json`, `./reports/${REPORT_PREFIX}_feature_factory.json`),
   deviations: apiReport(`${REPORT_PREFIX}_deviation_rules.json`, `./reports/${REPORT_PREFIX}_deviation_rules.json`),
@@ -73,6 +74,34 @@ async function fetchJson(source, optional = false) {
   throw lastError ?? new Error("No data source available");
 }
 
+async function fetchLegacyDashboardData() {
+  const [weather, features, deviations, candles] = await Promise.all([
+    fetchJson(PATHS.weather),
+    fetchJson(PATHS.features),
+    fetchJson(PATHS.deviations, true),
+    fetchJson(PATHS.candles, true),
+  ]);
+
+  return { weather, features, deviations, candles, sourceMode: "legacy_files" };
+}
+
+async function fetchDashboardData() {
+  try {
+    const payload = await fetchJson(PATHS.dashboard);
+    return {
+      weather: payload.weather,
+      features: payload.features,
+      deviations: payload.deviations,
+      candles: payload.candles,
+      sources: payload.sources,
+      sourceMode: "dashboard_api",
+    };
+  } catch (error) {
+    console.warn("Dashboard API failed; falling back to legacy JSON files", error);
+    return fetchLegacyDashboardData();
+  }
+}
+
 function setText(selector, text) {
   const node = $(selector);
   if (node) node.textContent = text ?? "--";
@@ -98,8 +127,10 @@ function renderQuoteGrid(candle, previousClose, values) {
   const intradayChange = candle ? (candle.close / candle.open - 1) * 100 : null;
   setText("#lastPrice", formatNumber(candle?.close, 2));
   const changeNode = $("#dailyChange");
-  changeNode.textContent = formatSignedPct(dailyChange);
-  changeNode.className = `change-chip ${signedClass(dailyChange)}`;
+  if (changeNode) {
+    changeNode.textContent = formatSignedPct(dailyChange);
+    changeNode.className = `change-chip ${signedClass(dailyChange)}`;
+  }
 
   const rows = [
     ["开盘", formatNumber(candle?.open, 2)],
@@ -124,7 +155,7 @@ function renderQuoteGrid(candle, previousClose, values) {
 
 function renderOverview(weather, candleMeta) {
   const current = weather.current;
-  const metadata = weather.metadata;
+  const metadata = weather.metadata ?? {};
   setText("#instrument", metadata.instrument);
   setText("#bar", metadata.bar);
   setText("#gateText", current.gate);
@@ -441,12 +472,7 @@ function renderInsufficient(metadata) {
 
 async function renderDashboard() {
   setText("#weatherSummary", "数据加载中...");
-  const [weather, features, deviations, candles] = await Promise.all([
-    fetchJson(PATHS.weather),
-    fetchJson(PATHS.features),
-    fetchJson(PATHS.deviations, true),
-    fetchJson(PATHS.candles),
-  ]);
+  const { weather, features, deviations, candles } = await fetchDashboardData();
 
   if (!weather?.current) {
     renderInsufficient(weather?.metadata);

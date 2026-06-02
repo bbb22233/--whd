@@ -31,6 +31,7 @@ uv run uvicorn backend_py.main:app --host 127.0.0.1 --port 8000
 ```bash
 uv run python -m backend_py.smoke_test
 curl -fsS http://127.0.0.1:8000/health
+curl -fsS "http://127.0.0.1:8000/api/dashboard/current?instrument=BTC-USDT&bar=1D"
 ```
 
 ## 当前主线输出

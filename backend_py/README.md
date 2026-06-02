@@ -46,6 +46,7 @@ GET /api/market/rows?bar=4H
 GET /api/market/current/BTC-USDT?bar=4H
 GET /api/reports/BTC_USDT_1D_market_weather_router.json
 GET /api/candles/BTC-USDT/1D
+GET /api/dashboard/current?instrument=BTC-USDT&bar=1D
 GET /api/scanner/status
 POST /api/scanner/run?mode=summary
 POST /api/scanner/run?mode=full
@@ -64,9 +65,11 @@ uv run python -m backend_py.smoke_test
 node --check app.js
 curl -fsS http://127.0.0.1:8000/health
 curl -fsS http://127.0.0.1:8000/api/market/overview
+curl -fsS "http://127.0.0.1:8000/api/dashboard/current?instrument=BTC-USDT&bar=1D"
 ```
 
 `data/clean/` 不进 Git。干净 clone 中 smoke test 会把 clean candles 标记为 `missing_untracked_data`;跑过 `npm run download` + `npm run clean` 后会变为 `ok`。
+Dashboard API 会把 `data/clean/` 作为可选源:缺少 clean candles 时仍返回 200,`candles` 为 `null`,前端继续渲染 reports 中的研究结果。
 
 ## 迁移边界
 
