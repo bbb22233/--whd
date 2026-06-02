@@ -174,7 +174,7 @@ def scanner_status() -> dict[str, Any]:
         raise HTTPException(status_code=404, detail=str(error)) from error
     return {
         "mode": "python_orchestrator",
-        "note": "Python backend can start scanner jobs; current jobs still call the existing Node scripts.",
+        "note": "Python backend can start scanner jobs; summary/full call Node, python_summary calls Python parity code.",
         "scanner": scanner.snapshot(),
         "startedAt": metadata.get("startedAt"),
         "finishedAt": metadata.get("finishedAt"),
@@ -186,9 +186,13 @@ def scanner_status() -> dict[str, Any]:
 
 
 @app.post("/api/scanner/run")
-def scanner_run(mode: ScannerMode = Query(default="summary")) -> dict[str, Any]:
+def scanner_run(
+    mode: ScannerMode = Query(default="summary"),
+    symbols: str | None = Query(default=None, description="Comma-separated symbols for summary modes, e.g. BTC-USDT,ETH-USDT"),
+    bars: str | None = Query(default=None, description="Comma-separated bars for summary modes, e.g. 1D,4H"),
+) -> dict[str, Any]:
     try:
-        return {"started": True, "job": scanner.start(mode=mode)}
+        return {"started": True, "job": scanner.start(mode=mode, symbols=symbols, bars=bars)}
     except ScannerAlreadyRunning as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
     except ScannerCommandUnavailable as error:

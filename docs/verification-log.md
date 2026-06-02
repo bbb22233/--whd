@@ -539,3 +539,52 @@ weightedWeatherCount = 2.8
 - `data/raw` 与 `data/clean` 仍按 `.gitignore` 保留为本地数据,不提交。
 - Node 小样本 summary 会覆盖正式 `multi_*` summary;验证后已恢复正式 summary。
 - Router 生成的 `*_market_weather_observations.csv` 明细文件体积较大,已删除本地副产物。
+
+---
+
+## 14. Parameterized Python Summary Scanner
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+uv run python -m backend_py.smoke_test
+node --check app.js
+node --check server.mjs
+for f in scripts/*.mjs; do node --check "$f" >/dev/null || exit 1; done
+uv run python - <<'PY'
+import time
+from backend_py.scanner_service import ScannerService
+scanner = ScannerService()
+job = scanner.start("python_summary", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")
+last = None
+for _ in range(100):
+    snapshot = scanner.snapshot()
+    last = snapshot["lastJob"]
+    if last and last["status"] != "running":
+        break
+    time.sleep(0.1)
+print({"startedMode": job["mode"], "status": last["status"], "returnCode": last["returnCode"]})
+assert last["status"] == "succeeded", last
+PY
+```
+
+### 期望
+- `/api/scanner/run?mode=python_summary&symbols=BTC-USDT,ETH-USDT&bars=1D,4H` 可运行。
+- `python_summary` 默认仍是 `BTC-USDT 1D`,但可通过 query 参数扩大范围。
+- `summary` 模式也可接收 `symbols/bars` 作为 Node from-reports scope。
+- `full` 模式暂不透传 scope,避免误触发大范围下载语义变化。
+
+### 实际
+```
+py_compile backend_py/*.py backend_py/research/*.py = 通过
+backend_py.smoke_test = 通过
+node --check app.js = 通过
+node --check server.mjs = 通过
+node --check scripts/*.mjs = 通过
+ScannerService().start("python_summary", symbols="BTC-USDT,ETH-USDT", bars="1D,4H") = succeeded, returnCode 0
+```
+
+### 备注
+- 参数化 `python_summary` 仍只写 `_py` summary artifacts,不覆盖正式 Node summary。

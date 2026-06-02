@@ -41,24 +41,39 @@ def npm_executable() -> str:
     return npm
 
 
-def command_for_mode(mode: ScannerMode) -> list[str]:
+def split_csv_values(value: str | None) -> list[str]:
+    if not value:
+        return []
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def scanner_scope_args(symbols: str | None = None, bars: str | None = None) -> list[str]:
+    args: list[str] = []
+    symbol_values = split_csv_values(symbols)
+    bar_values = split_csv_values(bars)
+    if symbol_values:
+        args.extend(["--symbols", *symbol_values])
+    if bar_values:
+        args.extend(["--bars", ",".join(bar_values)])
+    return args
+
+
+def command_for_mode(mode: ScannerMode, *, symbols: str | None = None, bars: str | None = None) -> list[str]:
     if mode == "summary":
         npm = npm_executable()
-        return [npm, "run", "multi:periods", "--", "--from-reports", "--summary-only"]
+        return [npm, "run", "multi:periods", "--", "--from-reports", "--summary-only", *scanner_scope_args(symbols, bars)]
     if mode == "full":
         npm = npm_executable()
         return [npm, "run", "multi:periods"]
     if mode == "python_summary":
+        scope = scanner_scope_args(symbols or "BTC-USDT", bars or "1D")
         return [
             sys.executable,
             "-m",
             "backend_py.build_summary",
             "--from-reports",
             "--summary-only",
-            "--symbols",
-            "BTC-USDT",
-            "--bars",
-            "1D",
+            *scope,
         ]
     raise ValueError(f"Unsupported scanner mode: {mode}")
 
@@ -88,7 +103,7 @@ class ScannerSnapshot:
         default_factory=lambda: {
             "summary": "Rebuild combined summaries from existing reports; no download.",
             "full": "Run the existing Node multi-period scanner; may download market data.",
-            "python_summary": "Run Python from-reports summary parity for the local BTC-USDT 1D sample; writes _py artifacts only.",
+            "python_summary": "Run Python from-reports summary parity; defaults to BTC-USDT 1D and writes _py artifacts only.",
         }
     )
 
@@ -110,8 +125,8 @@ class ScannerService:
                 )
             )
 
-    def start(self, mode: ScannerMode = "summary") -> dict:
-        command = command_for_mode(mode)
+    def start(self, mode: ScannerMode = "summary", *, symbols: str | None = None, bars: str | None = None) -> dict:
+        command = command_for_mode(mode, symbols=symbols, bars=bars)
         job = ScannerJob(
             id=str(uuid.uuid4()),
             mode=mode,
