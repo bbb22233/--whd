@@ -476,3 +476,66 @@ ScannerService().start("python_summary") = succeeded, returnCode 0
 ### 备注
 - `python_summary` 当前默认使用本地可验证样本: `BTC-USDT 1D`。
 - 后续生成更多 `data/clean` 后,可把该模式扩展为全 symbols/bars 或增加参数化 scanner API。
+
+---
+
+## 13. Python Parity Sample Expansion
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+npm run download -- --instrument BTC-USDT --bar 4H --days 3650
+npm run clean -- --instrument BTC-USDT --bar 4H --days 3650
+npm run download -- --instrument ETH-USDT --bar 1D --days 3650
+npm run clean -- --instrument ETH-USDT --bar 1D --days 3650
+npm run download -- --instrument ETH-USDT --bar 4H --days 3650
+npm run clean -- --instrument ETH-USDT --bar 4H --days 3650
+
+npm run features -- --instrument BTC-USDT --bar 4H --days 3650
+uv run python -m backend_py.build_feature_factory --instrument BTC-USDT --bar 4H --days 3650
+uv run python -m backend_py.compare_feature_factory --instrument BTC-USDT --bar 4H --days 3650
+
+npm run features -- --instrument ETH-USDT --bar 1D --days 3650
+uv run python -m backend_py.build_feature_factory --instrument ETH-USDT --bar 1D --days 3650
+uv run python -m backend_py.compare_feature_factory --instrument ETH-USDT --bar 1D --days 3650
+
+npm run features -- --instrument ETH-USDT --bar 4H --days 3650
+uv run python -m backend_py.build_feature_factory --instrument ETH-USDT --bar 4H --days 3650
+uv run python -m backend_py.compare_feature_factory --instrument ETH-USDT --bar 4H --days 3650
+
+npm run weather:router -- --instrument BTC-USDT --bar 1D --days 3650
+npm run weather:router -- --instrument BTC-USDT --bar 4H --days 3650
+npm run weather:router -- --instrument ETH-USDT --bar 1D --days 3650
+npm run weather:router -- --instrument ETH-USDT --bar 4H --days 3650
+npm run multi:periods -- --from-reports --summary-only --symbols BTC-USDT ETH-USDT --bars 1D,4H
+uv run python -m backend_py.build_summary --from-reports --summary-only --symbols BTC-USDT ETH-USDT --bars 1D,4H
+uv run python -m backend_py.compare_summary --from-reports --summary-only --symbols BTC-USDT ETH-USDT --bars 1D,4H
+```
+
+### 期望
+- Python feature factory parity 覆盖不再只依赖 `BTC-USDT 1D`。
+- 新增 `BTC-USDT 4H`、`ETH-USDT 1D`、`ETH-USDT 4H` 三个 clean 样本。
+- Python summary parity 覆盖 `BTC/ETH x 1D/4H` 四行。
+- 大型 `*_market_weather_observations.csv` 明细副产物不进 Git。
+
+### 实际
+```
+BTC-USDT 4H cleanRows = 18382
+ETH-USDT 1D cleanRows = 3156
+ETH-USDT 4H cleanRows = 18382
+
+compare_feature_factory BTC-USDT 4H = status ok, snapshotCount 18150, currentDate 2026-06-01 20:00
+compare_feature_factory ETH-USDT 1D = status ok, snapshotCount 2924, currentDate 2026-05-31
+compare_feature_factory ETH-USDT 4H = status ok, snapshotCount 18150, currentDate 2026-06-01 20:00
+
+compare_summary BTC/ETH 1D/4H = status ok
+rowCount = 4
+errorCount = 0
+weightedWeatherCount = 2.8
+```
+
+### 备注
+- `data/raw` 与 `data/clean` 仍按 `.gitignore` 保留为本地数据,不提交。
+- Node 小样本 summary 会覆盖正式 `multi_*` summary;验证后已恢复正式 summary。
+- Router 生成的 `*_market_weather_observations.csv` 明细文件体积较大,已删除本地副产物。
