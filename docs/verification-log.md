@@ -1483,3 +1483,60 @@ cleanMissingCount = 33
 ### 备注
 - 当前本地已覆盖 47 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX, WLD, AR, XLM, ICP, HBAR, ALGO, LDO, CRV, ENS, PENDLE, JUP, PYTH, TIA, ONDO, FET, PEPE, SHIB, BONK, FLOKI, WIF。
 - 继续分批补齐剩余 11 个 symbols。
+
+---
+
+## 32. Python Data Pipeline Small Batch Fill 10
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m backend_py.run_full_pipeline --check-inputs --symbols ORDI-USDT SATS-USDT NOT-USDT ENA-USDT W-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_data_pipeline --missing-only --symbols ORDI-USDT SATS-USDT NOT-USDT ENA-USDT W-USDT --bars 1D,4H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols ORDI-USDT SATS-USDT NOT-USDT ENA-USDT W-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+```
+
+### 期望
+- 第十批补齐 `ORDI/SATS/NOT/ENA/W × 1D/4H`。
+- 补齐后 `python_full --skip-download` 可验证该批 1D/4H/8H 全链路。
+- 本地覆盖度从 141 组提升到 156 组。
+
+### 实际
+```
+ORDI/SATS/NOT/ENA/W × 1D/4H:
+stepCount = 10
+successCount = 10
+errorCount = 0
+
+rawRows / cleanRows:
+ORDI 1D = 1111 / 1110
+SATS 1D = 899 / 898
+NOT 1D = 749 / 748
+ENA 1D = 260 / 259
+W 1D = 792 / 791
+ORDI 4H = 6656 / 6655
+SATS 4H = 5385 / 5384
+NOT 4H = 4484 / 4483
+ENA 4H = 1552 / 1551
+W 4H = 4742 / 4741
+
+python_full ORDI/SATS/NOT/ENA/W × 1D,4H,8H:
+successCount = 15
+weatherCount = 15
+insufficientHistoryCount = 0
+errorCount = 0
+
+default symbols × 1D,4H,8H after fill:
+requiredCount = 174
+rawReadyCount = 156
+rawMissingCount = 18
+cleanReadyCount = 156
+cleanMissingCount = 18
+```
+
+### 备注
+- 当前本地已覆盖 52 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX, WLD, AR, XLM, ICP, HBAR, ALGO, LDO, CRV, ENS, PENDLE, JUP, PYTH, TIA, ONDO, FET, PEPE, SHIB, BONK, FLOKI, WIF, ORDI, SATS, NOT, ENA, W。
+- `ENA` 日线历史较短,但 `python_full` 未出现 insufficient-history 或 error。
+- 继续分批补齐剩余 6 个 symbols。
