@@ -1427,3 +1427,59 @@ cleanMissingCount = 48
 ### 备注
 - 当前本地已覆盖 42 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX, WLD, AR, XLM, ICP, HBAR, ALGO, LDO, CRV, ENS, PENDLE, JUP, PYTH, TIA, ONDO, FET。
 - 继续分批补齐剩余 16 个 symbols。
+
+---
+
+## 31. Python Data Pipeline Small Batch Fill 9
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m backend_py.run_full_pipeline --check-inputs --symbols PEPE-USDT SHIB-USDT BONK-USDT FLOKI-USDT WIF-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_data_pipeline --missing-only --symbols PEPE-USDT SHIB-USDT BONK-USDT FLOKI-USDT WIF-USDT --bars 1D,4H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols PEPE-USDT SHIB-USDT BONK-USDT FLOKI-USDT WIF-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+```
+
+### 期望
+- 第九批补齐 `PEPE/SHIB/BONK/FLOKI/WIF × 1D/4H`。
+- 补齐后 `python_full --skip-download` 可验证该批 1D/4H/8H 全链路。
+- 本地覆盖度从 126 组提升到 141 组。
+
+### 实际
+```
+PEPE/SHIB/BONK/FLOKI/WIF × 1D/4H:
+stepCount = 10
+successCount = 10
+errorCount = 0
+
+rawRows / cleanRows:
+PEPE 1D = 1130 / 1129
+SHIB 1D = 1853 / 1852
+BONK 1D = 878 / 877
+FLOKI 1D = 1266 / 1265
+WIF 1D = 780 / 779
+PEPE 4H = 6771 / 6770
+SHIB 4H = 11110 / 11109
+BONK 4H = 5260 / 5259
+FLOKI 4H = 7587 / 7586
+WIF 4H = 4671 / 4670
+
+python_full PEPE/SHIB/BONK/FLOKI/WIF × 1D,4H,8H:
+successCount = 15
+weatherCount = 15
+insufficientHistoryCount = 0
+errorCount = 0
+
+default symbols × 1D,4H,8H after fill:
+requiredCount = 174
+rawReadyCount = 141
+rawMissingCount = 33
+cleanReadyCount = 141
+cleanMissingCount = 33
+```
+
+### 备注
+- 当前本地已覆盖 47 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX, WLD, AR, XLM, ICP, HBAR, ALGO, LDO, CRV, ENS, PENDLE, JUP, PYTH, TIA, ONDO, FET, PEPE, SHIB, BONK, FLOKI, WIF。
+- 继续分批补齐剩余 11 个 symbols。
