@@ -10,6 +10,7 @@ from backend_py.research.config import parse_args, report_stem
 
 
 VALUE_TOLERANCE = 1e-3
+METADATA_IGNORE_KEYS = {"generatedAt"}
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -22,16 +23,35 @@ def close_enough(left: Any, right: Any, tolerance: float = VALUE_TOLERANCE) -> b
     return left == right
 
 
+def compare_value(path: str, left: Any, right: Any, failures: list[str]) -> None:
+    if isinstance(left, dict) and isinstance(right, dict):
+        compare_mapping(path, left, right, failures)
+    elif isinstance(left, list) and isinstance(right, list):
+        if len(left) != len(right):
+            failures.append(f"{path}: length node={len(left)} python={len(right)}")
+            return
+        for index, (left_item, right_item) in enumerate(zip(left, right, strict=True)):
+            compare_value(f"{path}[{index}]", left_item, right_item, failures)
+    elif not close_enough(left, right):
+        failures.append(f"{path}: node={left!r} python={right!r}")
+
+
 def compare_mapping(path: str, left: dict[str, Any], right: dict[str, Any], failures: list[str]) -> None:
+    left_keys = set(left.keys())
+    right_keys = set(right.keys())
+    if path == "metadata":
+        left_keys -= METADATA_IGNORE_KEYS
+        right_keys -= METADATA_IGNORE_KEYS
+    if left_keys != right_keys:
+        failures.append(f"{path}: key mismatch node_only={sorted(left_keys - right_keys)} python_only={sorted(right_keys - left_keys)}")
+
     for key, left_value in left.items():
+        if path == "metadata" and key in METADATA_IGNORE_KEYS:
+            continue
         if key not in right:
-            failures.append(f"{path}.{key}: missing in python payload")
             continue
         right_value = right[key]
-        if isinstance(left_value, dict) and isinstance(right_value, dict):
-            compare_mapping(f"{path}.{key}", left_value, right_value, failures)
-        elif not close_enough(left_value, right_value):
-            failures.append(f"{path}.{key}: node={left_value!r} python={right_value!r}")
+        compare_value(f"{path}.{key}", left_value, right_value, failures)
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -44,21 +64,10 @@ def main(argv: list[str] | None = None) -> None:
     python_payload = load_json(python_path)
     failures: list[str] = []
 
-    for key in ["instrument", "bar", "fromDate", "toDate", "firstDate", "lastDate", "snapshotCount", "featureCount"]:
-        if node_payload["metadata"].get(key) != python_payload["metadata"].get(key):
-            failures.append(f"metadata.{key}: node={node_payload['metadata'].get(key)!r} python={python_payload['metadata'].get(key)!r}")
-
-    if node_payload["features"] != python_payload["features"]:
-        failures.append("features: feature definitions differ")
-
+    compare_mapping("metadata", node_payload["metadata"], python_payload["metadata"], failures)
+    compare_value("features", node_payload["features"], python_payload["features"], failures)
     compare_mapping("featureStats", node_payload["featureStats"], python_payload["featureStats"], failures)
-
-    node_current = node_payload.get("current") or {}
-    python_current = python_payload.get("current") or {}
-    for key in ["date", "close"]:
-        if not close_enough(node_current.get(key), python_current.get(key)):
-            failures.append(f"current.{key}: node={node_current.get(key)!r} python={python_current.get(key)!r}")
-    compare_mapping("current.values", node_current.get("values") or {}, python_current.get("values") or {}, failures)
+    compare_value("current", node_payload.get("current"), python_payload.get("current"), failures)
 
     if failures:
         print(json.dumps({"status": "failed", "failureCount": len(failures), "failures": failures[:50]}, ensure_ascii=False, indent=2))
@@ -72,7 +81,7 @@ def main(argv: list[str] | None = None) -> None:
                 "pythonPath": str(python_path),
                 "snapshotCount": python_payload["metadata"]["snapshotCount"],
                 "featureCount": python_payload["metadata"]["featureCount"],
-                "currentDate": python_current.get("date"),
+                "currentDate": (python_payload.get("current") or {}).get("date"),
             },
             ensure_ascii=False,
             indent=2,
@@ -82,4 +91,3 @@ def main(argv: list[str] | None = None) -> None:
 
 if __name__ == "__main__":
     main()
-

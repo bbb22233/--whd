@@ -4,12 +4,12 @@
 
 ## Phase 1 Scope
 
-This phase implements a Python parity layer for Feature Factory core values.
+This phase implements a Python parity layer for Feature Factory JSON output.
 
 - Keep Node scripts as the production generator.
 - Add Python modules under `backend_py/research/`.
 - Generate Python comparison artifacts with `_py` suffix.
-- Compare Python output against the Node report for stable numeric fields.
+- Compare Python output against the Node report for the full JSON schema, ignoring only runtime timestamps.
 - Do not change FastAPI routes in this phase.
 - Do not migrate OKX download, clean aggregation, market weather router, or deviation rules yet.
 
@@ -21,8 +21,8 @@ Python implementation:
   - Mirrors `backtest/config.mjs` naming and stem rules.
 - `backend_py/research/feature_factory.py`
   - Ports indicators and state feature dataset generation.
-  - Produces core `featureStats` and `current.values`.
-  - Does not yet port weather labels or strategy routes.
+  - Ports weather labels and strategy routing.
+  - Produces `featureStats`, `current.values`, `current.labels`, and strategy route fields.
 - `backend_py/build_feature_factory.py`
   - CLI that reads `data/clean/*_clean.json`.
   - Writes `reports/*_feature_factory_py.json`.
@@ -30,7 +30,7 @@ Python implementation:
 - `backend_py/compare_feature_factory.py`
   - Compares Node and Python reports.
   - Ignores `generatedAt`.
-  - Compares metadata, feature definitions, `featureStats`, and `current.values`.
+  - Recursively compares metadata, feature definitions, `featureStats`, and full `current`.
 
 ## Current Parity Contract
 
@@ -48,20 +48,19 @@ The Python report must match Node for:
 - `featureStats`
 - `current.date`
 - `current.close`
-- `current.values`
-
-The Python report may differ for now:
-
-- `metadata.generatedAt`
-- `metadata.pythonParityScope`
 - `current.weatherName`
 - `current.weatherConfidencePct`
 - `current.labels`
 - `current.strategyScores`
 - `current.topRoutes`
 - `current.strategyRoutes`
+- `current.values`
 
-Those excluded fields still belong to Node until the next migration phase ports weather labels and strategy routing.
+The Python report may differ for now:
+
+- `metadata.generatedAt`
+
+`generatedAt` is intentionally ignored because Node and Python are run at different times.
 
 ## Commands
 
@@ -77,7 +76,7 @@ Generate Python parity output:
 uv run python -m backend_py.build_feature_factory --instrument BTC-USDT --bar 1D --days 3650
 ```
 
-Compare core fields:
+Compare full JSON schema:
 
 ```bash
 uv run python -m backend_py.compare_feature_factory --instrument BTC-USDT --bar 1D --days 3650
@@ -96,6 +95,5 @@ node --check server.mjs
 
 The next Python research migration should choose one of:
 
-- Port `buildWeatherLabels` and `routeStrategies` to make Feature Factory JSON complete.
+- Add broader sample coverage after generating additional clean data, such as `ETH-USDT 4H`.
 - Port from-reports multi-period summary, which is lower algorithmic risk and mainly depends on report contracts.
-

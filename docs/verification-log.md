@@ -345,3 +345,47 @@ currentDate = 2026-05-31
 - 本阶段 Python 只覆盖 indicators + state feature dataset + core current values。
 - `_feature_factory_py.json` 与 rows CSV 是本地验证产物,已加入 `.gitignore`。
 - 下一阶段可继续补齐 `buildWeatherLabels` / `routeStrategies`,或按代理建议迁移 from-reports multi-period summary。
+
+---
+
+## 10. Python Feature Factory 完整 Schema Parity
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+uv run python -m backend_py.smoke_test
+node --check app.js
+node --check server.mjs
+for f in scripts/*.mjs; do node --check "$f" >/dev/null || exit 1; done
+npm run features -- --instrument BTC-USDT --bar 1D --days 3650
+uv run python -m backend_py.build_feature_factory --instrument BTC-USDT --bar 1D --days 3650
+uv run python -m backend_py.compare_feature_factory --instrument BTC-USDT --bar 1D --days 3650
+```
+
+### 期望
+- Python feature factory 不再只比 core values,而是补齐 `weatherName`、`labels`、`strategyScores`、`topRoutes`、`strategyRoutes`。
+- `compare_feature_factory.py` 递归比较 dict/list,保留 route 排序比较。
+- 仅忽略 `metadata.generatedAt`。
+- Node 仍是生产输出,Python 继续写 `_feature_factory_py.json` 作为对照产物。
+
+### 实际
+```
+py_compile backend_py/*.py backend_py/research/*.py = 通过
+backend_py.smoke_test = 通过
+node --check app.js = 通过
+node --check server.mjs = 通过
+node --check scripts/*.mjs = 通过
+npm run features BTC-USDT 1D = 通过
+build_feature_factory.py BTC-USDT 1D = 通过
+compare_feature_factory.py BTC-USDT 1D = status ok
+snapshotCount = 2924
+featureCount = 47
+currentDate = 2026-05-31
+```
+
+### 备注
+- 代理审查确认 `current` 完整字段顺序为 `date/close/weatherName/weatherConfidencePct/labels/strategyScores/topRoutes/strategyRoutes/values`。
+- 已同步更新 `docs/python-research-migration-spec.md`。
+- 计划中的 `ETH-USDT 4H` 抽样未执行:本地当前只有 `data/clean/BTC_USDT_1D_clean.json`,缺少 `ETH_USDT_4H_clean.json`。
