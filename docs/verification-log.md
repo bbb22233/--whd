@@ -1923,3 +1923,66 @@ node checks = pass
 ### 备注
 - 本轮只改 package scripts、测试和文档,未下载数据,未重写 `data/raw` 或 `data/clean`。
 - `download:macro` 暂时仍是 Node 宏观数据入口,尚未迁移。
+
+---
+
+## 40. Python Single-Symbol Research Script Cutover
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+git status --short --branch
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.smoke_test
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check app.js
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check server.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check scripts/build-feature-factory.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check scripts/build-deviation-rules.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check scripts/build-market-weather-router.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" npm --silent run features -- --instrument BTC-USDT --bar 1D --plan-outputs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" npm --silent run rules:deviations -- --instrument BTC-USDT --bar 1D --plan-outputs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" npm --silent run weather:router -- --instrument BTC-USDT --bar 1D --plan-outputs
+```
+
+### 期望
+- `npm run features` 指向 Python `backend_py.build_feature_factory --official`。
+- `npm run rules:deviations` 指向 Python `backend_py.build_deviation_rules --official`。
+- `npm run weather:router` 指向 Python `backend_py.build_market_weather_router --official`。
+- 旧 Node 单品种研究脚本移动到 `legacy:features` / `legacy:rules:deviations` / `legacy:weather:router`。
+- `--plan-outputs` 只列出输出计划,不写入 reports。
+
+### 实际
+```
+features plan:
+step = build-feature-factory-output-plan
+official = true
+suffix = ""
+pathCount = 2
+existingCount = 2
+missingCount = 0
+
+rules:deviations plan:
+step = build-deviation-rules-output-plan
+official = true
+suffix = ""
+pathCount = 3
+existingCount = 3
+missingCount = 0
+
+weather:router plan:
+step = build-market-weather-router-output-plan
+official = true
+suffix = ""
+pathCount = 6
+existingCount = 5
+missingCount = 1
+
+smoke_test = pass
+py_compile = pass
+node checks = pass
+```
+
+### 备注
+- 本轮只改 Python CLI official/preflight 能力、package scripts、测试和文档,未重新生成 official reports。
+- `weather:router` 的 missing output 是 standalone router observations CSV;旧 Node standalone router 也会生成该类输出。

@@ -102,3 +102,13 @@ After report package scripts are cut over:
 - `npm run clean` should call `backend_py.run_data_pipeline --clean-only`.
 - Legacy Node data scripts should move under `legacy:download` and `legacy:clean`.
 - Use `npm run download -- --max-symbols 0` and `npm run clean -- --max-symbols 0` for no-write CLI checks.
+
+## Single-Symbol Research Script Cutover
+
+After data package scripts are cut over:
+
+- `npm run features` should call `backend_py.build_feature_factory --official`.
+- `npm run rules:deviations` should call `backend_py.build_deviation_rules --official`.
+- `npm run weather:router` should call `backend_py.build_market_weather_router --official`.
+- Legacy Node research scripts should move under `legacy:features`, `legacy:rules:deviations`, and `legacy:weather:router`.
+- Use `--plan-outputs` for no-write CLI checks.

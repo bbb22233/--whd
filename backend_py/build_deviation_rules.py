@@ -27,18 +27,49 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
+def official_enabled(args: list[str]) -> bool:
+    return "--official" in args
+
+
+def plan_outputs_enabled(args: list[str]) -> bool:
+    return "--plan-outputs" in args
+
+
+def output_suffix(official: bool) -> str:
+    return "" if official else "_py"
+
+
+def output_plan(paths: list[Path], *, official: bool, suffix: str) -> dict[str, Any]:
+    return {
+        "step": "build-deviation-rules-output-plan",
+        "official": official,
+        "suffix": suffix,
+        "pathCount": len(paths),
+        "existingCount": sum(1 for path in paths if path.exists()),
+        "missingCount": sum(1 for path in paths if not path.exists()),
+        "paths": [{"path": str(path), "exists": path.exists()} for path in paths],
+    }
+
+
 def main(argv: list[str] | None = None) -> None:
     args = list(argv if argv is not None else sys.argv[1:])
     config = parse_args(args)
     stem = file_stem(config)
     report_name = report_stem(config)
     input_path = DATA_CLEAN_DIR / f"{stem}_clean.json"
+    official = official_enabled(args)
+    suffix = output_suffix(official)
+    output_json_path = REPORTS_DIR / f"{report_name}_deviation_rules{suffix}.json"
+    current_csv_path = REPORTS_DIR / f"{report_name}_deviation_rules_current{suffix}.csv"
+    library_csv_path = REPORTS_DIR / f"{report_name}_deviation_rule_library{suffix}.csv"
+
+    if plan_outputs_enabled(args):
+        print(json.dumps(output_plan([output_json_path, current_csv_path, library_csv_path], official=official, suffix=suffix), ensure_ascii=False, indent=2))
+        return
+
     clean_payload = json.loads(input_path.read_text(encoding="utf-8"))
     rules = build_deviation_rules_from_clean(clean_payload, config)
 
-    output_json_path = REPORTS_DIR / f"{report_name}_deviation_rules_py.json"
-    current_csv_path = REPORTS_DIR / f"{report_name}_deviation_rules_current_py.csv"
-    library_csv_path = REPORTS_DIR / f"{report_name}_deviation_rule_library_py.csv"
     write_json(output_json_path, rules)
     write_csv(current_csv_path, rules["currentRuleRows"])
     write_csv(library_csv_path, rules["ruleLibraryRows"])
@@ -46,6 +77,8 @@ def main(argv: list[str] | None = None) -> None:
         json.dumps(
             {
                 "step": "build-deviation-rules-py",
+                "official": official,
+                "suffix": suffix,
                 "inputPath": str(input_path),
                 "outputJsonPath": str(output_json_path),
                 "currentCsvPath": str(current_csv_path),

@@ -19,6 +19,8 @@ npm run weather:router -- --instrument BTC-USDT --days 3650
 
 `download` / `clean` 现在调用 Python data pipeline。旧 Node 数据入口保留为
 `legacy:download` / `legacy:clean`,只作为回退或对照使用。
+`features` / `rules:deviations` / `weather:router` 也已切到 Python official
+单品种研究入口;旧 Node 版本保留为对应的 `legacy:*` 命令。
 
 ## Python API
 

@@ -244,8 +244,12 @@ The next Python research migration should choose one of:
 - `npm run multi:summary` and `npm run multi:periods` now route to Python
   official pipeline.
 - `npm run download` and `npm run clean` now route to Python data pipeline.
+- `npm run features`, `npm run rules:deviations`, and
+  `npm run weather:router` now route to Python official single-symbol research
+  entrypoints.
 - Legacy Node scanner remains available as `/api/scanner/run?mode=node_summary`
   and `/api/scanner/run?mode=node_full`; package-level legacy commands are
-  available under `legacy:multi:*`, `legacy:download`, and `legacy:clean`.
+  available under `legacy:multi:*`, `legacy:download`, `legacy:clean`,
+  `legacy:features`, `legacy:rules:deviations`, and `legacy:weather:router`.
 - Next, monitor the Python official scanner entries in normal use, then decide
   when to remove the legacy Node production scripts entirely.
