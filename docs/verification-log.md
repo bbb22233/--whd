@@ -647,3 +647,64 @@ componentSummaryRowCount = 80
 - Python 复用已对齐的 feature snapshots、weather labels、strategy routing,并补齐 router component 观察、汇总、当前 component 表格。
 - Node 的中文 `localeCompare("zh-CN")` 排序在 Python 中用显式状态顺序表固定,避免不同运行环境排序差异。
 - 下一步应先迁移 deviation rules,再迁移 router calibration/gate,否则无法安全替换完整 `market_weather_router.json`。
+
+---
+
+## 16. Python Deviation Rules Parity
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+
+for instrument in BTC-USDT ETH-USDT; do
+  for bar in 1D 4H; do
+    node scripts/build-deviation-rules.mjs --instrument "$instrument" --bar "$bar" --days 3650
+    uv run python -m backend_py.build_deviation_rules --instrument "$instrument" --bar "$bar" --days 3650
+    uv run python -m backend_py.compare_deviation_rules --instrument "$instrument" --bar "$bar" --days 3650
+  done
+done
+```
+
+### 期望
+- Python 版 deviation study + deviation rules 与当前 Node golden reports 对齐。
+- 对齐范围包括 `finalWeather`、`currentRuleRows`、`ruleLibraryRows`。
+- 对比 metadata 包括 `instrument/bar/fromDate/toDate/firstDate/lastDate/snapshotCount/stateObservationRows/metricObservationRows/horizons/bucketScheme/rulePrinciple`。
+- `_py` deviation JSON/CSV 只作为本地验证产物,不替换 Node 正式报告。
+- 先刷新 Node golden report,避免仓库中旧 report 的日期或可选字段造成误判。
+
+### 实际
+```
+py_compile backend_py/*.py backend_py/research/*.py = 通过
+
+compare_deviation_rules BTC-USDT 1D = status ok
+snapshotCount = 2924
+currentRuleRowCount = 8
+ruleLibraryRowCount = 40
+finalGate = 黄灯
+
+compare_deviation_rules BTC-USDT 4H = status ok
+snapshotCount = 18150
+currentRuleRowCount = 8
+ruleLibraryRowCount = 40
+finalGate = 黄偏红
+
+compare_deviation_rules ETH-USDT 1D = status ok
+snapshotCount = 2924
+currentRuleRowCount = 8
+ruleLibraryRowCount = 40
+finalGate = 黄灯
+
+compare_deviation_rules ETH-USDT 4H = status ok
+snapshotCount = 18150
+currentRuleRowCount = 8
+ruleLibraryRowCount = 40
+finalGate = 黄偏红
+```
+
+### 备注
+- Python 复用已对齐的 indicator snapshots,并补齐 deviation state/metric observations、summary、rule library 与 final weather。
+- Comparer 数值容忍为 `1e-2`,用于吸收 JS `toFixed` 与 Python 浮点格式化在百分位中位数上的 0.01 边界差。
+- 本轮验证临时刷新了四组正式 Node deviation reports;验证后已恢复,不提交 report churn。
+- 下一步可迁移 router calibration/gate selection,因为 deviation rules 与 router component 两个前置层都已有 Python parity。

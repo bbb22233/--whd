@@ -53,6 +53,16 @@ Python implementation:
   - Compares Python router component output against Node router reports.
   - Ignores `generatedAt`.
   - Does not compare `current`, `deviationFinalWeather`, or calibration metadata.
+- `backend_py/research/deviation_rules.py`
+  - Ports deviation study state/metric aggregation and rule mapping.
+  - Produces `finalWeather`, `currentRuleRows`, and `ruleLibraryRows`.
+- `backend_py/build_deviation_rules.py`
+  - CLI that reads `data/clean/*_clean.json`.
+  - Writes `_deviation_rules_py.json` and `_py` rule CSV files.
+- `backend_py/compare_deviation_rules.py`
+  - Compares Python deviation rules against current Node deviation rule reports.
+  - Ignores runtime timestamps and tolerates known optional fields from older
+    generated reports.
 
 ## Feature Factory Parity Contract
 
@@ -111,6 +121,36 @@ The Python router component report may differ for now:
 Those fields remain Node-owned until deviation rules and router calibration are
 ported with their own golden comparisons.
 
+## Deviation Rules Parity Contract
+
+The Python deviation rule report must match Node for:
+
+- `metadata.instrument`
+- `metadata.bar`
+- `metadata.fromDate`
+- `metadata.toDate`
+- `metadata.firstDate`
+- `metadata.lastDate`
+- `metadata.snapshotCount`
+- `metadata.stateObservationRows`
+- `metadata.metricObservationRows`
+- `metadata.horizons`
+- `metadata.bucketScheme`
+- `metadata.rulePrinciple`
+- `finalWeather`
+- `currentRuleRows`
+- `ruleLibraryRows`
+
+The Python deviation rule report may differ for now:
+
+- `metadata.generatedAt`
+- optional legacy-report fields such as `metadata.metricBucketMode` or
+  `finalWeather.confidenceLimited` when an existing Node report was generated
+  before those fields were added.
+
+For strict parity, refresh the Node golden report with the current Node script
+before running the Python comparison.
+
 ## Commands
 
 Refresh the Node golden report from current clean candles:
@@ -138,6 +178,14 @@ uv run python -m backend_py.build_market_weather_router --instrument BTC-USDT --
 uv run python -m backend_py.compare_market_weather_router --instrument BTC-USDT --bar 1D --days 3650
 ```
 
+Generate and compare deviation rule parity output:
+
+```bash
+node scripts/build-deviation-rules.mjs --instrument BTC-USDT --bar 1D --days 3650
+uv run python -m backend_py.build_deviation_rules --instrument BTC-USDT --bar 1D --days 3650
+uv run python -m backend_py.compare_deviation_rules --instrument BTC-USDT --bar 1D --days 3650
+```
+
 Full validation:
 
 ```bash
@@ -151,6 +199,6 @@ node --check server.mjs
 
 The next Python research migration should choose one of:
 
-- Port deviation rules into Python and compare against `*_deviation_rules.json`.
 - Port router calibration/gate selection after deviation parity exists.
 - Add a scanner mode for Python router component parity across selected symbols/bars.
+- Add a scanner mode for Python deviation parity across selected symbols/bars.
