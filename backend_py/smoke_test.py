@@ -9,6 +9,7 @@ from backend_py.main import (
     report_json,
     scanner_status,
 )
+from backend_py.run_full_pipeline import output_plan, parse_batch_args
 from backend_py.scanner_service import command_for_mode
 
 
@@ -74,6 +75,19 @@ def main() -> None:
     assert scoped_python_data[-5:] == ["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H"]
     scoped_python_full = command_for_mode("python_full", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")
     assert scoped_python_full[-5:] == ["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H"]
+    plan_args = parse_batch_args(["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H", "--official", "--plan-outputs"])
+    plan_payload = output_plan(
+        plan_args["config"],
+        plan_args["symbols"],
+        plan_args["bars"],
+        official=plan_args["official"],
+        summary_only=plan_args["summaryOnly"],
+        from_reports=plan_args["fromReports"],
+    )
+    assert plan_payload["step"] == "python-full-output-plan"
+    assert plan_payload["official"] is True
+    assert plan_payload["suffix"] == ""
+    assert plan_payload["pathCount"] == 46
 
     print(
         {

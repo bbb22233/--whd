@@ -53,6 +53,7 @@ def parse_batch_args(argv: list[str]) -> dict[str, Any]:
     from_reports = False
     official = False
     check_inputs = False
+    plan_outputs = False
     index = 0
     while index < len(argv):
         arg = argv[index]
@@ -79,6 +80,9 @@ def parse_batch_args(argv: list[str]) -> dict[str, Any]:
         elif arg == "--check-inputs":
             check_inputs = True
             index += 1
+        elif arg == "--plan-outputs":
+            plan_outputs = True
+            index += 1
         else:
             index += 1
     return {
@@ -90,6 +94,7 @@ def parse_batch_args(argv: list[str]) -> dict[str, Any]:
         "fromReports": from_reports,
         "official": official,
         "checkInputs": check_inputs,
+        "planOutputs": plan_outputs,
     }
 
 
@@ -242,6 +247,68 @@ def check_inputs(config: ResearchConfig, symbols: list[str], bars: list[str]) ->
     }
 
 
+def planned_symbol_report_paths(*, config: ResearchConfig, suffix: str, summary_only: bool, from_reports: bool) -> list[Any]:
+    if from_reports:
+        return []
+    report_name = report_stem(config)
+    paths: list[Any] = []
+    if not summary_only:
+        paths.extend(
+            [
+                report_path(report_name, suffix, "feature_factory"),
+                report_path(report_name, suffix, "feature_factory_rows", "csv"),
+                report_path(report_name, suffix, "deviation_rules"),
+                report_path(report_name, suffix, "deviation_rules_current", "csv"),
+                report_path(report_name, suffix, "deviation_rule_library", "csv"),
+            ]
+        )
+    paths.extend(
+        [
+            report_path(report_name, suffix, "market_weather_router"),
+            report_path(report_name, suffix, "market_weather_current", "csv"),
+            report_path(report_name, suffix, "market_weather_scores", "csv"),
+            report_path(report_name, suffix, "market_weather_components_current", "csv"),
+            report_path(report_name, suffix, "market_weather_component_summary", "csv"),
+        ]
+    )
+    return paths
+
+
+def output_plan(config: ResearchConfig, symbols: list[str], bars: list[str], *, official: bool, summary_only: bool, from_reports: bool) -> dict[str, Any]:
+    suffix = output_suffix(official)
+    paths: list[Any] = []
+    for bar in bars:
+        bar_config = create_bar_config(config, bar)
+        for symbol in symbols:
+            paths.extend(planned_symbol_report_paths(config=create_symbol_config(bar_config, symbol), suffix=suffix, summary_only=summary_only, from_reports=from_reports))
+        output_stem = f"multi_{bar_config.bar}_market_weather_current"
+        paths.extend([summary_path(output_stem, suffix), summary_path(output_stem, suffix, "csv")])
+    paths.extend([summary_path("multi_period_market_weather_current", suffix), summary_path("multi_period_market_weather_current", suffix, "csv")])
+
+    unique_paths = list(dict.fromkeys(paths))
+    existing_paths = [path for path in unique_paths if path.exists()]
+    missing_paths = [path for path in unique_paths if not path.exists()]
+    return {
+        "step": "python-full-output-plan",
+        "official": official,
+        "suffix": suffix,
+        "symbols": symbols,
+        "bars": bars,
+        "summaryOnly": summary_only,
+        "fromReports": from_reports,
+        "pathCount": len(unique_paths),
+        "existingCount": len(existing_paths),
+        "missingCount": len(missing_paths),
+        "paths": [
+            {
+                "path": str(path),
+                "exists": path.exists(),
+            }
+            for path in unique_paths
+        ],
+    }
+
+
 def run_one_symbol_from_reports(base_config: ResearchConfig, instrument: str, suffix: str) -> dict[str, Any]:
     config = create_symbol_config(base_config, instrument)
     stem = file_stem(config)
@@ -353,6 +420,9 @@ def main(argv: list[str] | None = None) -> None:
     bars: list[str] = parsed["bars"]
     if parsed["checkInputs"]:
         print(json.dumps(check_inputs(config, symbols, bars), ensure_ascii=False, indent=2))
+        return
+    if parsed["planOutputs"]:
+        print(json.dumps(output_plan(config, symbols, bars, official=parsed["official"], summary_only=parsed["summaryOnly"], from_reports=parsed["fromReports"]), ensure_ascii=False, indent=2))
         return
 
     suffix = output_suffix(parsed["official"])

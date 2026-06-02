@@ -1610,3 +1610,44 @@ errorCount = 0
 - 当前本地已覆盖全部 58 个 default symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX, WLD, AR, XLM, ICP, HBAR, ALGO, LDO, CRV, ENS, PENDLE, JUP, PYTH, TIA, ONDO, FET, PEPE, SHIB, BONK, FLOKI, WIF, ORDI, SATS, NOT, ENA, W, STRK, ZK, ZRO, GALA, SAND, MANA。
 - 本地 default input coverage 已完成:raw/clean 均为 `174/174`。
 - 完整 default `python_full --skip-download` 已通过,下一步可进入 `--official` cutover checklist 和生产报告 writer 切换准备。
+
+---
+
+## 34. Python Official Cutover Preflight
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+uv run python -m backend_py.run_full_pipeline --plan-outputs --official --skip-download --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.smoke_test
+node --check app.js
+node --check server.mjs
+```
+
+### 期望
+- `run_full_pipeline` 支持 `--plan-outputs`,可在不写入 report 的情况下列出 official writer 影响面。
+- official output plan 使用空 suffix,匹配正式 report 文件名。
+- preflight 不覆盖 `reports/` 中任何正式产物。
+- smoke test 覆盖新的 output-plan 解析和路径计数。
+
+### 实际
+```
+python compile = pass
+node --check app.js = pass
+node --check server.mjs = pass
+smoke_test = pass
+
+official output plan:
+pathCount = 1748
+existingCount = 1350
+missingCount = 398
+official = true
+suffix = ""
+```
+
+### 备注
+- 新增 `docs/python-official-cutover-checklist.md`,记录 official cutover 的 preflight、执行、post-check 和 rollback。
+- 本轮只新增 preflight 能力和 checklist,未执行 `python_full --official`,因此没有覆盖正式 tracked reports。
+- 下一步若执行 cutover,命令为 `uv run python -m backend_py.run_full_pipeline --skip-download --official --bars 1D,4H,8H --days 3650`。
