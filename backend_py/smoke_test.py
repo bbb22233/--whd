@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from backend_py.main import (
     clean_candles,
     dashboard_current,
@@ -11,6 +14,9 @@ from backend_py.main import (
 )
 from backend_py.run_full_pipeline import output_plan, parse_batch_args
 from backend_py.scanner_service import command_for_mode
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def optional_clean_candle_count(instrument: str, bar: str) -> tuple[str, int | None]:
@@ -75,13 +81,23 @@ def main() -> None:
     assert "--skip-download" in full_command
     assert "--official" in full_command
     assert full_command[-2:] == ["--bars", "1D,4H,8H"]
-    assert "multi:periods" in command_for_mode("node_summary")
-    assert "multi:periods" in command_for_mode("node_full")
+    assert "legacy:multi:periods" in command_for_mode("node_summary")
+    assert "legacy:multi:periods" in command_for_mode("node_full")
     assert "backend_py.build_summary" in command_for_mode("python_summary")
     assert "backend_py.run_router_parity" in command_for_mode("python_router")
     assert "backend_py.run_research_parity" in command_for_mode("python_research")
     assert "backend_py.run_data_pipeline" in command_for_mode("python_data")
     assert "backend_py.run_full_pipeline" in command_for_mode("python_full")
+
+    package_scripts = json.loads((PROJECT_ROOT / "package.json").read_text(encoding="utf-8"))["scripts"]
+    assert "backend_py.run_full_pipeline" in package_scripts["multi:periods"]
+    assert "--official" in package_scripts["multi:periods"]
+    assert "--bars \"1D,4H,8H\"" in package_scripts["multi:periods"]
+    assert "backend_py.run_full_pipeline" in package_scripts["multi:summary"]
+    assert "--summary-only" in package_scripts["multi:summary"]
+    assert "scripts/run-multi-symbol-1d.mjs" in package_scripts["legacy:multi:periods"]
+    assert "scripts/run-multi-symbol-1d.mjs" in package_scripts["legacy:multi:1d"]
+
     scoped_summary = command_for_mode("summary", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")
     assert scoped_summary[-5:] == ["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H"]
     scoped_python_summary = command_for_mode("python_summary", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")

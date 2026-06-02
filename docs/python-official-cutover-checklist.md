@@ -84,3 +84,12 @@ After official reports are reviewed and committed:
 - `/api/scanner/run?mode=node_summary` should remain as the legacy Node summary fallback until the rollback window closes.
 - `/api/scanner/run?mode=node_full` should remain as the legacy Node fallback until the rollback window closes.
 - `uv run python -m backend_py.smoke_test` must assert all four mappings.
+
+## Package Script Cutover
+
+After scanner entries are cut over:
+
+- `npm run multi:summary` should call the Python official summary-only pipeline.
+- `npm run multi:periods` should call the Python official full pipeline.
+- Legacy Node package scripts should move under `legacy:multi:*`.
+- Use `npm run multi:summary -- --plan-outputs` and `npm run multi:periods -- --plan-outputs` for no-write CLI checks.

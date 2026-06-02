@@ -77,6 +77,17 @@ POST /api/scanner/cancel
 - `python_data`: 调用 Python OKX download + clean 数据入口,默认跑 `BTC-USDT 1D`,可用 `symbols`/`bars` 参数扩大范围,会写入 `data/raw` 与 `data/clean`。
 - `python_full`: 调用 Python download/clean/research/summary 完整编排器,默认跑 `BTC-USDT 1D`,可用 `symbols`/`bars` 参数扩大范围;默认写 `_py_full` 对照 reports,CLI 加 `--official` 后才写正式 report 名称。
 
+常用 npm 入口：
+
+```bash
+npm run multi:summary
+npm run multi:periods
+npm run multi:periods -- --symbols BTC-USDT,ETH-USDT --bars 1D,4H
+```
+
+- `multi:summary` / `multi:periods`: 调用 Python official pipeline。
+- `legacy:multi:periods`: 调用旧 Node 多周期扫描,只作为回退或对照入口使用。
+
 全量跑 `python_full` 前可先检查本地输入覆盖:
 
 ```bash

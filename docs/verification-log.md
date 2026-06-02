@@ -1805,3 +1805,71 @@ node --check server.mjs = pass
 ### 备注
 - 本轮只切换 scanner/API summary 入口和文档,未执行 summary rebuild,因此未重新生成 official reports。
 - `node_summary` 与 `node_full` 作为 legacy 回退入口暂时保留。
+
+---
+
+## 38. Python Official Package Script Cutover
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+git status --short --branch
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.smoke_test
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check app.js
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check server.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check scripts/run-multi-symbol-1d.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" npm --silent run multi:1d -- --plan-outputs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" npm --silent run multi:summary -- --plan-outputs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" npm --silent run multi:periods -- --plan-outputs
+```
+
+### 期望
+- `npm run multi:1d` 指向 Python official 1D full pipeline。
+- `npm run multi:summary` 指向 Python official summary-only pipeline。
+- `npm run multi:periods` 指向 Python official full pipeline。
+- 旧 Node 多周期脚本移动到 `legacy:multi:*`。
+- API 的 `node_summary` / `node_full` 回退入口调用 `legacy:multi:periods`。
+- package script preflight 只输出 plan,不写入 official reports。
+
+### 实际
+```
+multi:1d plan:
+step = python-full-output-plan
+official = true
+suffix = ""
+summaryOnly = false
+fromReports = false
+pathCount = 584
+existingCount = 584
+missingCount = 0
+
+multi:summary plan:
+step = python-full-output-plan
+official = true
+suffix = ""
+summaryOnly = true
+fromReports = true
+pathCount = 8
+existingCount = 8
+missingCount = 0
+
+multi:periods plan:
+step = python-full-output-plan
+official = true
+suffix = ""
+summaryOnly = false
+fromReports = false
+pathCount = 1748
+existingCount = 1748
+missingCount = 0
+
+smoke_test = pass
+py_compile = pass
+node checks = pass
+```
+
+### 备注
+- 本轮只改 package scripts、API legacy 回退命令、测试和文档,未重新生成 official reports。
+- `legacy:multi:periods` 暂时保留旧 `4H,8H,1D,1W` Node 范围;当前 Python official 主路径仍是 `1D,4H,8H`。

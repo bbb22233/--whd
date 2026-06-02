@@ -75,7 +75,7 @@ def command_for_mode(mode: ScannerMode, *, symbols: str | None = None, bars: str
         ]
     if mode == "node_summary":
         npm = npm_executable()
-        return [npm, "run", "multi:periods", "--", "--from-reports", "--summary-only", *scanner_scope_args(symbols, bars)]
+        return [npm, "run", "legacy:multi:periods", "--", "--from-reports", "--summary-only", *scanner_scope_args(symbols, bars)]
     if mode == "full":
         scope = scanner_scope_args(symbols, bars or "1D,4H,8H")
         return [
@@ -90,7 +90,7 @@ def command_for_mode(mode: ScannerMode, *, symbols: str | None = None, bars: str
         ]
     if mode == "node_full":
         npm = npm_executable()
-        return [npm, "run", "multi:periods"]
+        return [npm, "run", "legacy:multi:periods"]
     if mode == "python_summary":
         scope = scanner_scope_args(symbols or "BTC-USDT", bars or "1D")
         return [
