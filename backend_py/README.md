@@ -55,6 +55,8 @@ POST /api/scanner/run?mode=python_router
 POST /api/scanner/run?mode=python_router&symbols=BTC-USDT,ETH-USDT&bars=1D,4H
 POST /api/scanner/run?mode=python_research
 POST /api/scanner/run?mode=python_research&symbols=BTC-USDT,ETH-USDT&bars=1D,4H
+POST /api/scanner/run?mode=python_data
+POST /api/scanner/run?mode=python_data&symbols=BTC-USDT,ETH-USDT&bars=1D,4H
 POST /api/scanner/run?mode=full
 POST /api/scanner/cancel
 ```
@@ -65,12 +67,14 @@ POST /api/scanner/cancel
 - `python_summary`: 调用 Python from-reports summary parity 路径,默认跑 `BTC-USDT 1D`,可用 `symbols`/`bars` 参数扩大范围,只写 `_py` 对照产物。
 - `python_router`: 调用 Python 完整 router parity 路径,默认跑 `BTC-USDT 1D`,可用 `symbols`/`bars` 参数扩大范围,只写 `_py` 对照产物并对比现有 Node reports。
 - `python_research`: 调用 Python feature/deviation/router/summary parity 链路,默认跑 `BTC-USDT 1D`,可用 `symbols`/`bars` 参数扩大范围,只写 `_py` 对照产物;如果现有 Node golden 日期或汇总范围不匹配,对应 compare 会标记为 skipped,不会重写 Node 正式报告。
+- `python_data`: 调用 Python OKX download + clean 数据入口,默认跑 `BTC-USDT 1D`,可用 `symbols`/`bars` 参数扩大范围,会写入 `data/raw` 与 `data/clean`。
 - `full`: 调用现有 Node 多周期扫描，会尝试下载/刷新数据。
 
 ## 验证
 
 ```bash
 uv run python -m backend_py.smoke_test
+uv run python -m backend_py.compare_clean_data --instrument BTC-USDT --bar 1D --days 3650
 node --check app.js
 curl -fsS http://127.0.0.1:8000/health
 curl -fsS http://127.0.0.1:8000/api/market/overview

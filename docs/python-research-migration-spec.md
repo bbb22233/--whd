@@ -12,8 +12,10 @@ matched safely against current Node golden reports.
 - Generate Python comparison artifacts with `_py` suffix.
 - Compare Python output against the Node report, ignoring only runtime timestamps
   and explicitly documented out-of-scope sections.
-- Do not change FastAPI routes in this phase.
-- Do not migrate OKX download or clean aggregation yet.
+- Keep FastAPI/scanner Python paths explicit until parity coverage is broad
+  enough to switch defaults.
+- OKX download and clean aggregation now have Python equivalents, but Node
+  remains the default production path until the full orchestrator is migrated.
 
 ## Files
 
@@ -65,6 +67,19 @@ Python implementation:
   - Compares Python deviation rules against current Node deviation rule reports.
   - Ignores runtime timestamps and tolerates known optional fields from older
     generated reports.
+- `backend_py/research/okx.py`
+  - Ports OKX history-candles pagination, dynamic page budgeting, retry policy,
+    truncation metadata, and raw payload shape.
+- `backend_py/research/clean.py`
+  - Ports OKX raw candle normalization, structural validation, extreme candle
+    flagging, duplicate handling, missing-bar detection, and clean payload shape.
+- `backend_py/download_data.py` / `backend_py/clean_data.py`
+  - Python equivalents for the standalone Node download/clean CLIs.
+- `backend_py/compare_clean_data.py`
+  - Rebuilds Python clean payload from existing raw JSON and compares it against
+    the existing Node clean JSON, ignoring only `metadata.cleanedAt`.
+- `backend_py/run_data_pipeline.py`
+  - Batch Python download + clean entry point used by scanner mode `python_data`.
 
 ## Feature Factory Parity Contract
 
@@ -207,7 +222,8 @@ node --check server.mjs
 The next Python research migration should choose one of:
 
 - Add a scanner mode for Python deviation parity across selected symbols/bars.
-- Migrate OKX download and clean-candle generation into Python so the research
-  path no longer depends on Node for data ingestion.
+- Add Python multi-symbol/full orchestrator parity for the Node `full` scanner
+  path, using `python_data` for ingestion and `python_research` for research
+  outputs.
 - Start replacing selected Node scanner/orchestrator paths behind explicit
   Python modes after the parity modes have enough coverage.

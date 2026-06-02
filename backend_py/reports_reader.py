@@ -10,6 +10,7 @@ from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 REPORTS_DIR = PROJECT_ROOT / "reports"
+DATA_RAW_DIR = PROJECT_ROOT / "data" / "raw"
 DATA_CLEAN_DIR = PROJECT_ROOT / "data" / "clean"
 MULTI_PERIOD_REPORT = "multi_period_market_weather_current.json"
 REPORT_NAME_RE = re.compile(r"^[A-Za-z0-9_.-]+\.json$")

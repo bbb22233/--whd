@@ -812,3 +812,48 @@ ScannerService().start("python_research") = succeeded, returnCode 0
 - `deviation_compare` 跳过原因:仓库中 BTC-USDT 1D Node deviation golden 的 `lastDate` 为 `2026-05-29`,当前 router golden 的 `lastDate` 为 `2026-05-31`。
 - `summary_compare` 跳过原因:仓库中 Node summary 是全量 58 symbols/4 bars,本次默认 Python research 只跑 `BTC-USDT 1D`。
 - 新增 `backend_py.run_research_parity`,作为 Python 研究链路的一键 parity/orchestration 入口。
+
+---
+
+## 19. Python OKX Data Pipeline
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+
+for instrument in BTC-USDT ETH-USDT; do
+  for bar in 1D 4H; do
+    uv run python -m backend_py.compare_clean_data --instrument "$instrument" --bar "$bar" --days 3650
+  done
+done
+
+uv run python - <<'PY'
+from backend_py.research.config import ResearchConfig
+from backend_py.research.okx import download_okx_history
+payload = download_okx_history(ResearchConfig(instrument="BTC-USDT", bar="1D", days=2, requestLimit=100))
+print({"source": payload["source"], "instrument": payload["instrument"], "bar": payload["bar"], "rowCount": payload["rowCount"], "pageCount": payload["pageCount"], "truncated": payload["truncated"]})
+assert payload["rowCount"] > 0
+PY
+```
+
+### 期望
+- Python OKX download 复刻 Node `downloadOkxHistory` 的分页、动态 `maxPages`、retry、truncation metadata 和 raw JSON shape。
+- Python clean 复刻 Node `cleanOkxRaw` 的 candle normalization、结构校验、极端 K 线标记、重复处理和 missing bars 统计。
+- Python clean 从现有 raw 重建出的 payload 与 Node clean payload 对齐,只忽略运行时间字段 `metadata.cleanedAt`。
+- 新增 scanner mode `python_data`,但仍是显式模式,不会替换 Node 默认 `full` 生产路径。
+
+### 实际
+```
+py_compile backend_py/*.py backend_py/research/*.py = 通过
+compare_clean_data BTC-USDT 1D = status ok, cleanRows 3156, missingBars 0
+compare_clean_data BTC-USDT 4H = status ok, cleanRows 18382, missingBars 0
+compare_clean_data ETH-USDT 1D = status ok, cleanRows 3156, missingBars 0
+compare_clean_data ETH-USDT 4H = status ok, cleanRows 18382, missingBars 0
+download_okx_history BTC-USDT 1D days=2 = rowCount 2, pageCount 1, truncated false
+```
+
+### 备注
+- 新增 `backend_py.research.okx`, `backend_py.research.clean`, `backend_py.download_data`, `backend_py.clean_data`, `backend_py.compare_clean_data`, `backend_py.run_data_pipeline`。
+- `python_data` 会真实写入 `data/raw` 与 `data/clean`;它和只写 `_py` artifacts 的 parity 模式分开。
