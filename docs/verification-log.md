@@ -1152,3 +1152,58 @@ cleanMissingCount = 123
 ### 备注
 - 当前本地已覆盖 17 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR。
 - 继续分批补齐剩余 41 个 symbols。
+
+---
+
+## 26. Python Data Pipeline Small Batch Fill 4
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m backend_py.run_full_pipeline --check-inputs --symbols OP-USDT ARB-USDT SUI-USDT APT-USDT FIL-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_data_pipeline --missing-only --symbols OP-USDT ARB-USDT SUI-USDT APT-USDT FIL-USDT --bars 1D,4H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols OP-USDT ARB-USDT SUI-USDT APT-USDT FIL-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+```
+
+### 期望
+- 第四批补齐 `OP/ARB/SUI/APT/FIL × 1D/4H`。
+- 补齐后 `python_full --skip-download` 可验证该批 1D/4H/8H 全链路。
+- 本地覆盖度从 51 组提升到 66 组。
+
+### 实际
+```
+OP/ARB/SUI/APT/FIL × 1D/4H:
+stepCount = 10
+successCount = 10
+errorCount = 0
+
+rawRows / cleanRows:
+OP 1D = 1464 / 1463
+ARB 1D = 1169 / 1168
+SUI 1D = 1128 / 1127
+APT 1D = 1324 / 1323
+FIL 1D = 2009 / 2008
+OP 4H = 8779 / 8778
+ARB 4H = 7004 / 7003
+SUI 4H = 6758 / 6757
+APT 4H = 7937 / 7936
+FIL 4H = 12046 / 12045
+
+python_full OP/ARB/SUI/APT/FIL × 1D,4H,8H:
+successCount = 15
+weatherCount = 15
+errorCount = 0
+
+default symbols × 1D,4H,8H after fill:
+requiredCount = 174
+rawReadyCount = 66
+rawMissingCount = 108
+cleanReadyCount = 66
+cleanMissingCount = 108
+```
+
+### 备注
+- 当前本地已覆盖 22 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL。
+- 继续分批补齐剩余 36 个 symbols。
