@@ -232,8 +232,8 @@ The next Python research migration should choose one of:
 
 - Add a scanner mode for Python deviation parity across selected symbols/bars.
 - Continue filling missing default-symbol raw inputs in batches with
-  `run_data_pipeline --missing-only`; after the sixth batch, local coverage is
-  96/174 required `1D,4H,8H` combinations.
+  `run_data_pipeline --missing-only`; after the seventh batch, local coverage is
+  111/174 required `1D,4H,8H` combinations.
 - Expand `python_full` validation from `BTC/ETH × 1D/4H/8H` to the full default
   symbol set and bars after input coverage is available.
 - Add an explicit cutover checklist for running `python_full --official` as the

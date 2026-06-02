@@ -1317,3 +1317,58 @@ cleanMissingCount = 78
 ### 备注
 - 当前本地已覆盖 32 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX, WLD, AR, XLM, ICP, HBAR。
 - 继续分批补齐剩余 26 个 symbols。
+
+---
+
+## 29. Python Data Pipeline Small Batch Fill 7
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m backend_py.run_full_pipeline --check-inputs --symbols ALGO-USDT LDO-USDT CRV-USDT ENS-USDT PENDLE-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_data_pipeline --missing-only --symbols ALGO-USDT LDO-USDT CRV-USDT ENS-USDT PENDLE-USDT --bars 1D,4H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols ALGO-USDT LDO-USDT CRV-USDT ENS-USDT PENDLE-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+```
+
+### 期望
+- 第七批补齐 `ALGO/LDO/CRV/ENS/PENDLE × 1D/4H`。
+- 补齐后 `python_full --skip-download` 可验证该批 1D/4H/8H 全链路。
+- 本地覆盖度从 96 组提升到 111 组。
+
+### 实际
+```
+ALGO/LDO/CRV/ENS/PENDLE × 1D/4H:
+stepCount = 10
+successCount = 10
+errorCount = 0
+
+rawRows / cleanRows:
+ALGO 1D = 2544 / 2543
+LDO 1D = 1371 / 1370
+CRV 1D = 2120 / 2119
+ENS 1D = 1668 / 1667
+PENDLE 1D = 615 / 614
+ALGO 4H = 15233 / 15232
+LDO 4H = 8217 / 8216
+CRV 4H = 12712 / 12711
+ENS 4H = 10001 / 10000
+PENDLE 4H = 3682 / 3681
+
+python_full ALGO/LDO/CRV/ENS/PENDLE × 1D,4H,8H:
+successCount = 15
+weatherCount = 15
+errorCount = 0
+
+default symbols × 1D,4H,8H after fill:
+requiredCount = 174
+rawReadyCount = 111
+rawMissingCount = 63
+cleanReadyCount = 111
+cleanMissingCount = 63
+```
+
+### 备注
+- 当前本地已覆盖 37 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX, WLD, AR, XLM, ICP, HBAR, ALGO, LDO, CRV, ENS, PENDLE。
+- 继续分批补齐剩余 21 个 symbols。
