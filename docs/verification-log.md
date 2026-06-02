@@ -428,3 +428,51 @@ weightedWeatherCount = 0.7
 - 本地当前只有 `data/clean/BTC_USDT_1D_clean.json`,所以本轮显式限制 `--symbols BTC-USDT --bars 1D`。
 - Node 对照命令会覆盖正式 `multi_*` summary;验证后已用 `git restore` 恢复,避免破坏当前多币种前端数据。
 - `_py` summary JSON/CSV 已加入 `.gitignore`。
+
+---
+
+## 12. Scanner Python Summary Mode
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+uv run python -m backend_py.smoke_test
+node --check app.js
+node --check server.mjs
+uv run python - <<'PY'
+import time
+from backend_py.scanner_service import ScannerService
+scanner = ScannerService()
+job = scanner.start("python_summary")
+last = None
+for _ in range(100):
+    snapshot = scanner.snapshot()
+    last = snapshot["lastJob"]
+    if last and last["status"] != "running":
+        break
+    time.sleep(0.1)
+print({"startedMode": job["mode"], "status": last["status"], "returnCode": last["returnCode"]})
+assert last["status"] == "succeeded", last
+PY
+```
+
+### 期望
+- `/api/scanner/run?mode=python_summary` 可触发 Python from-reports summary parity。
+- 新模式只写 `_py` 对照产物,不替换正式 Node summary。
+- `scanner/status` 的 `supportedModes` 包含 `python_summary`。
+- 启动瞬间 `snapshot.active` 不因子线程 pid 尚未写入而闪烁为 false。
+
+### 实际
+```
+py_compile backend_py/*.py backend_py/research/*.py = 通过
+backend_py.smoke_test = 通过
+node --check app.js = 通过
+node --check server.mjs = 通过
+ScannerService().start("python_summary") = succeeded, returnCode 0
+```
+
+### 备注
+- `python_summary` 当前默认使用本地可验证样本: `BTC-USDT 1D`。
+- 后续生成更多 `data/clean` 后,可把该模式扩展为全 symbols/bars 或增加参数化 scanner API。

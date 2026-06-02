@@ -9,6 +9,7 @@ from backend_py.main import (
     report_json,
     scanner_status,
 )
+from backend_py.scanner_service import command_for_mode
 
 
 def optional_clean_candle_count(instrument: str, bar: str) -> tuple[str, int | None]:
@@ -53,6 +54,8 @@ def main() -> None:
     scanner_payload = scanner_status()
     assert scanner_payload["mode"] == "python_orchestrator"
     assert scanner_payload["scanner"]["active"] is False
+    assert "python_summary" in scanner_payload["scanner"]["supportedModes"]
+    assert "backend_py.build_summary" in command_for_mode("python_summary")
 
     print(
         {

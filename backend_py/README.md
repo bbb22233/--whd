@@ -49,6 +49,7 @@ GET /api/candles/BTC-USDT/1D
 GET /api/dashboard/current?instrument=BTC-USDT&bar=1D
 GET /api/scanner/status
 POST /api/scanner/run?mode=summary
+POST /api/scanner/run?mode=python_summary
 POST /api/scanner/run?mode=full
 POST /api/scanner/cancel
 ```
@@ -56,6 +57,7 @@ POST /api/scanner/cancel
 扫描模式：
 
 - `summary`: 调用现有 Node 脚本从已有 reports 重建多周期汇总，不下载。
+- `python_summary`: 调用 Python from-reports summary parity 路径,当前默认只跑本地可验证的 `BTC-USDT 1D`,只写 `_py` 对照产物。
 - `full`: 调用现有 Node 多周期扫描，会尝试下载/刷新数据。
 
 ## 验证

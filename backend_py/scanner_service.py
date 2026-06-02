@@ -4,6 +4,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 import shutil
 import subprocess
+import sys
 import threading
 import uuid
 from pathlib import Path
@@ -11,7 +12,7 @@ from typing import Literal
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-ScannerMode = Literal["summary", "full"]
+ScannerMode = Literal["summary", "full", "python_summary"]
 ScannerStatus = Literal["idle", "running", "succeeded", "failed", "cancelled"]
 
 
@@ -41,11 +42,24 @@ def npm_executable() -> str:
 
 
 def command_for_mode(mode: ScannerMode) -> list[str]:
-    npm = npm_executable()
     if mode == "summary":
+        npm = npm_executable()
         return [npm, "run", "multi:periods", "--", "--from-reports", "--summary-only"]
     if mode == "full":
+        npm = npm_executable()
         return [npm, "run", "multi:periods"]
+    if mode == "python_summary":
+        return [
+            sys.executable,
+            "-m",
+            "backend_py.build_summary",
+            "--from-reports",
+            "--summary-only",
+            "--symbols",
+            "BTC-USDT",
+            "--bars",
+            "1D",
+        ]
     raise ValueError(f"Unsupported scanner mode: {mode}")
 
 
@@ -69,11 +83,12 @@ class ScannerJob:
 class ScannerSnapshot:
     active: bool
     lastJob: dict | None
-    supportedModes: list[str] = field(default_factory=lambda: ["summary", "full"])
+    supportedModes: list[str] = field(default_factory=lambda: ["summary", "full", "python_summary"])
     modeNotes: dict[str, str] = field(
         default_factory=lambda: {
             "summary": "Rebuild combined summaries from existing reports; no download.",
             "full": "Run the existing Node multi-period scanner; may download market data.",
+            "python_summary": "Run Python from-reports summary parity for the local BTC-USDT 1D sample; writes _py artifacts only.",
         }
     )
 
@@ -87,9 +102,10 @@ class ScannerService:
 
     def snapshot(self) -> dict:
         with self._lock:
+            active = self._active_process is not None or self._last_job is not None and self._last_job.status == "running"
             return asdict(
                 ScannerSnapshot(
-                    active=self._active_process is not None,
+                    active=active,
                     lastJob=asdict(self._last_job) if self._last_job else None,
                 )
             )
@@ -102,11 +118,15 @@ class ScannerService:
             status="running",
             command=command,
             startedAt=utc_now_iso(),
-            note="Python backend is orchestrating the existing Node scanner.",
+            note=(
+                "Python backend is running the Python summary parity path."
+                if mode == "python_summary"
+                else "Python backend is orchestrating the existing Node scanner."
+            ),
         )
 
         with self._lock:
-            if self._active_process is not None:
+            if self._active_process is not None or self._last_job is not None and self._last_job.status == "running":
                 raise ScannerAlreadyRunning("A scanner job is already running")
             self._last_job = job
 
