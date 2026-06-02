@@ -1207,3 +1207,58 @@ cleanMissingCount = 108
 ### 备注
 - 当前本地已覆盖 22 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL。
 - 继续分批补齐剩余 36 个 symbols。
+
+---
+
+## 27. Python Data Pipeline Small Batch Fill 5
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m backend_py.run_full_pipeline --check-inputs --symbols ETC-USDT ATOM-USDT INJ-USDT STX-USDT IMX-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_data_pipeline --missing-only --symbols ETC-USDT ATOM-USDT INJ-USDT STX-USDT IMX-USDT --bars 1D,4H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols ETC-USDT ATOM-USDT INJ-USDT STX-USDT IMX-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+```
+
+### 期望
+- 第五批补齐 `ETC/ATOM/INJ/STX/IMX × 1D/4H`。
+- 补齐后 `python_full --skip-download` 可验证该批 1D/4H/8H 全链路。
+- 本地覆盖度从 66 组提升到 81 组。
+
+### 实际
+```
+ETC/ATOM/INJ/STX/IMX × 1D/4H:
+stepCount = 10
+successCount = 10
+errorCount = 0
+
+rawRows / cleanRows:
+ETC 1D = 3066 / 3065
+ATOM 1D = 2599 / 2598
+INJ 1D = 917 / 916
+STX 1D = 1918 / 1917
+IMX 1D = 1672 / 1671
+ETC 4H = 18387 / 18386
+ATOM 4H = 15585 / 15584
+INJ 4H = 5493 / 5492
+STX 4H = 11499 / 11498
+IMX 4H = 10022 / 10021
+
+python_full ETC/ATOM/INJ/STX/IMX × 1D,4H,8H:
+successCount = 15
+weatherCount = 15
+errorCount = 0
+
+default symbols × 1D,4H,8H after fill:
+requiredCount = 174
+rawReadyCount = 81
+rawMissingCount = 93
+cleanReadyCount = 81
+cleanMissingCount = 93
+```
+
+### 备注
+- 当前本地已覆盖 27 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT, BCH, LTC, UNI, AAVE, NEAR, OP, ARB, SUI, APT, FIL, ETC, ATOM, INJ, STX, IMX。
+- 继续分批补齐剩余 31 个 symbols。
