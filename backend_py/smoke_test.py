@@ -109,6 +109,7 @@ def main() -> None:
     assert "--official" in package_scripts["backtest:router"]
     assert "backend_py.calibrate_router" in package_scripts["calibrate:router"]
     assert "--official" in package_scripts["calibrate:router"]
+    assert "backend_py.download_macro_data" in package_scripts["download:macro"]
     assert "scripts/download-data.mjs" in package_scripts["legacy:download"]
     assert "scripts/clean-data.mjs" in package_scripts["legacy:clean"]
     assert "scripts/run-multi-symbol-1d.mjs" in package_scripts["legacy:multi:periods"]
@@ -118,6 +119,7 @@ def main() -> None:
     assert "scripts/build-market-weather-router.mjs" in package_scripts["legacy:weather:router"]
     assert "scripts/backtest-strategy-router.mjs" in package_scripts["legacy:backtest:router"]
     assert "scripts/calibrate-router.mjs" in package_scripts["legacy:calibrate:router"]
+    assert "scripts/download-macro-data.mjs" in package_scripts["legacy:download:macro"]
 
     node_scripts = {name for name, command in package_scripts.items() if command.startswith("node ")}
     assert node_scripts == {
@@ -125,7 +127,7 @@ def main() -> None:
         "legacy:multi:1d",
         "legacy:multi:weather",
         "legacy:multi:periods",
-        "download:macro",
+        "legacy:download:macro",
         "legacy:download",
         "legacy:clean",
         "backtest:indicators",

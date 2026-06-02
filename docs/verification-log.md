@@ -2116,3 +2116,63 @@ node checks = pass
 - 本轮新增 `backend_py.backtest_strategy_router` 与 `backend_py.calibrate_router`。
 - 新增 `_py` router research 对照产物已加入 `.gitignore`。
 - `backtest:router` 的 missing official path 是 standalone strategy router observations CSV;旧 Node standalone router backtest 也会生成该类输出。
+
+---
+
+## 43. Python Macro Data Script Cutover
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+git status --short --branch
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.smoke_test
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check scripts/download-macro-data.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check app.js
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check server.mjs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" npm --silent run download:macro -- --instrument BTC-USDT --bar 1D --plan-outputs
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python - <<'PY'
+from backend_py.research.macro_data import build_macro_feature_rows, parse_fred_csv, macro_rows_to_csv_rows
+source = {"key": "dollarIndex"}
+fred = parse_fred_csv("DATE,DTWEXBGS\n2024-01-01,100\n2024-01-22,105\n", source)
+rows = build_macro_feature_rows(["2024-01-01", "2024-01-22"], {"dollarIndex": fred})
+print({"fredRows": len(fred), "rows": len(rows), "lastDollar": rows[-1]["macroDollarIndex"], "csvKeys": list(macro_rows_to_csv_rows(rows)[-1].keys())[:3]})
+PY
+```
+
+### 期望
+- `npm run download:macro` 指向 Python `backend_py.download_macro_data`。
+- 旧 Node macro data script 移动到 `legacy:download:macro`。
+- Python macro 模块覆盖 FRED CSV 解析、stablecoin chart 解析、macro feature row 构建、CSV row 输出。
+- `--plan-outputs` 只列出输出计划,不下载外部 macro 数据。
+- `compare:macro` 暂时继续留在 Node,等待 Python decision-tree validation/training 迁移。
+
+### 实际
+```
+download:macro plan:
+step = download-macro-data-output-plan
+pathCount = 7
+existingCount = 0
+missingCount = 7
+
+macro row sample:
+fredRows = 2
+rows = 2
+lastDollar = 105.0
+csvKeys = date, macroDollarIndex, macroDollarIndex21dChangePct
+
+remaining node scripts no longer include:
+download:macro
+
+remaining macro node script:
+compare:macro
+
+smoke_test = pass
+py_compile = pass
+node checks = pass
+```
+
+### 备注
+- 本轮只新增 Python macro data pipeline、package script cutover、测试和文档;未下载外部 macro 数据,未写入 `data/macro`。
+- `compare:macro` 依赖 decision-tree validation,后续应和 Python ML/training stack 一起迁移。

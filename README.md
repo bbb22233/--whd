@@ -23,6 +23,8 @@ npm run weather:router -- --instrument BTC-USDT --days 3650
 单品种研究入口;旧 Node 版本保留为对应的 `legacy:*` 命令。
 `backtest:router` / `calibrate:router` 也已切到 Python official router
 研究入口;旧 Node 版本保留为对应的 `legacy:*` 命令。
+`download:macro` 已切到 Python macro data pipeline;旧 Node 版本保留为
+`legacy:download:macro`。
 
 ## Python API
 

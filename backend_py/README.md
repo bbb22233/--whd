@@ -81,6 +81,7 @@ POST /api/scanner/cancel
 
 ```bash
 npm run download -- --instrument BTC-USDT --bar 1D
+npm run download:macro -- --instrument BTC-USDT --bar 1D
 npm run clean -- --instrument BTC-USDT --bar 1D
 npm run features -- --instrument BTC-USDT --bar 1D
 npm run rules:deviations -- --instrument BTC-USDT --bar 1D
@@ -93,10 +94,12 @@ npm run multi:periods -- --symbols BTC-USDT,ETH-USDT --bars 1D,4H
 ```
 
 - `download` / `clean`: 调用 Python data pipeline。
+- `download:macro`: 调用 Python macro data pipeline。
 - `features` / `rules:deviations` / `weather:router`: 调用 Python official 单品种研究入口。
 - `backtest:router` / `calibrate:router`: 调用 Python official router 研究入口。
 - `multi:summary` / `multi:periods`: 调用 Python official pipeline。
 - `legacy:download` / `legacy:clean`: 调用旧 Node 数据脚本,只作为回退或对照入口使用。
+- `legacy:download:macro`: 调用旧 Node macro 数据脚本,只作为回退或对照入口使用。
 - `legacy:features` / `legacy:rules:deviations` / `legacy:weather:router`: 调用旧 Node 单品种研究脚本,只作为回退或对照入口使用。
 - `legacy:backtest:router` / `legacy:calibrate:router`: 调用旧 Node router 研究脚本,只作为回退或对照入口使用。
 - `legacy:multi:periods`: 调用旧 Node 多周期扫描,只作为回退或对照入口使用。

@@ -100,7 +100,9 @@ After report package scripts are cut over:
 
 - `npm run download` should call `backend_py.run_data_pipeline --download-only`.
 - `npm run clean` should call `backend_py.run_data_pipeline --clean-only`.
+- `npm run download:macro` should call `backend_py.download_macro_data`.
 - Legacy Node data scripts should move under `legacy:download` and `legacy:clean`.
+- Legacy Node macro data script should move under `legacy:download:macro`.
 - Use `npm run download -- --max-symbols 0` and `npm run clean -- --max-symbols 0` for no-write CLI checks.
 
 ## Single-Symbol Research Script Cutover
