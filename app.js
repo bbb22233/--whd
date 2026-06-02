@@ -1,8 +1,21 @@
+const API_BASE = "http://127.0.0.1:8000";
+const DEFAULT_INSTRUMENT = "BTC-USDT";
+const DEFAULT_BAR = "1D";
+const REPORT_PREFIX = `${DEFAULT_INSTRUMENT.replace("-", "_")}_${DEFAULT_BAR}`;
+
+const apiReport = (name, fallback) => ({
+  primary: `${API_BASE}/api/reports/${name}`,
+  fallback,
+});
+
 const PATHS = {
-  weather: "./reports/BTC_USDT_1D_market_weather_router.json",
-  features: "./reports/BTC_USDT_1D_feature_factory.json",
-  deviations: "./reports/BTC_USDT_1D_deviation_rules.json",
-  candles: "./data/clean/BTC_USDT_1D_clean.json",
+  weather: apiReport(`${REPORT_PREFIX}_market_weather_router.json`, `./reports/${REPORT_PREFIX}_market_weather_router.json`),
+  features: apiReport(`${REPORT_PREFIX}_feature_factory.json`, `./reports/${REPORT_PREFIX}_feature_factory.json`),
+  deviations: apiReport(`${REPORT_PREFIX}_deviation_rules.json`, `./reports/${REPORT_PREFIX}_deviation_rules.json`),
+  candles: {
+    primary: `${API_BASE}/api/candles/${DEFAULT_INSTRUMENT}/${DEFAULT_BAR}`,
+    fallback: `./data/clean/${REPORT_PREFIX}_clean.json`,
+  },
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -42,13 +55,22 @@ function gateClass(gate) {
   return "gate-neutral";
 }
 
-async function fetchJson(path, optional = false) {
-  const response = await fetch(path, { cache: "no-store" });
-  if (!response.ok) {
-    if (optional) return null;
-    throw new Error(`${path} ${response.status}`);
+async function fetchJson(source, optional = false) {
+  const candidates = typeof source === "string" ? [source] : [source.primary, source.fallback].filter(Boolean);
+  let lastError = null;
+
+  for (const path of candidates) {
+    try {
+      const response = await fetch(path, { cache: "no-store" });
+      if (!response.ok) throw new Error(`${path} ${response.status}`);
+      return response.json();
+    } catch (error) {
+      lastError = error;
+    }
   }
-  return response.json();
+
+  if (optional) return null;
+  throw lastError ?? new Error("No data source available");
 }
 
 function setText(selector, text) {

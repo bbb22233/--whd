@@ -4,12 +4,17 @@ from collections import Counter
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+import re
 from typing import Any
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 REPORTS_DIR = PROJECT_ROOT / "reports"
+DATA_CLEAN_DIR = PROJECT_ROOT / "data" / "clean"
 MULTI_PERIOD_REPORT = "multi_period_market_weather_current.json"
+REPORT_NAME_RE = re.compile(r"^[A-Za-z0-9_.-]+\.json$")
+SYMBOL_RE = re.compile(r"^[A-Z0-9]+-[A-Z0-9]+$")
+BAR_RE = re.compile(r"^[0-9A-Z]+$")
 
 
 class ReportNotFound(FileNotFoundError):
@@ -41,19 +46,49 @@ def count_by(rows: list[dict[str, Any]], key: str) -> dict[str, int]:
 
 
 class ReportsReader:
-    def __init__(self, reports_dir: Path | None = None) -> None:
+    def __init__(self, reports_dir: Path | None = None, clean_dir: Path | None = None) -> None:
         self.reports_dir = reports_dir or REPORTS_DIR
+        self.clean_dir = clean_dir or DATA_CLEAN_DIR
 
     @property
     def multi_period_path(self) -> Path:
         return self.reports_dir / MULTI_PERIOD_REPORT
 
     def load_json_report(self, name: str) -> dict[str, Any]:
+        if not REPORT_NAME_RE.fullmatch(name):
+            raise ValueError("Invalid report name")
         path = self.reports_dir / name
         if path.parent != self.reports_dir or path.suffix.lower() != ".json":
             raise ValueError("Only top-level JSON reports are allowed")
         if not path.exists():
             raise ReportNotFound(f"Report not found: {name}")
+        with path.open("r", encoding="utf-8") as file:
+            payload = json.load(file)
+        if isinstance(payload, dict):
+            payload.setdefault("_source", {})
+            payload["_source"].update(
+                {
+                    "reportName": name,
+                    "reportPath": str(path),
+                    "reportMtime": file_mtime_iso(path),
+                }
+            )
+        return payload
+
+    def load_clean_candles(self, instrument: str, bar: str) -> dict[str, Any]:
+        normalized_instrument = normalize_instrument(instrument)
+        normalized_bar = normalize_bar(bar)
+        if not normalized_instrument or not SYMBOL_RE.fullmatch(normalized_instrument):
+            raise ValueError("Invalid instrument")
+        if not normalized_bar or not BAR_RE.fullmatch(normalized_bar):
+            raise ValueError("Invalid bar")
+
+        name = f"{normalized_instrument.replace('-', '_')}_{normalized_bar}_clean.json"
+        path = self.clean_dir / name
+        if path.parent != self.clean_dir or path.suffix.lower() != ".json":
+            raise ValueError("Only top-level clean JSON files are allowed")
+        if not path.exists():
+            raise ReportNotFound(f"Clean candles not found: {name}")
         with path.open("r", encoding="utf-8") as file:
             payload = json.load(file)
         if isinstance(payload, dict):

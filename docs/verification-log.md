@@ -217,3 +217,35 @@ http://127.0.0.1:4177/ = 200 OK
 ### 备注
 - 已新增 `renderInsufficient` 守卫: `if (!weather?.current) { renderInsufficient(weather?.metadata); return; }`。
 - Codex 浏览器插件初始化失败(`failed to write kernel assets`),本轮未完成可视化浏览器截图验证;需在浏览器插件可用时补一次无 console 错误的可视复验。
+
+---
+
+## 7. Python API — 前端数据源迁移第一步
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+python -m backend_py.smoke_test
+node --check app.js
+# 临时启动 FastAPI 后:
+Invoke-RestMethod http://127.0.0.1:8000/api/reports/BTC_USDT_1D_market_weather_router.json
+Invoke-RestMethod http://127.0.0.1:8000/api/candles/BTC-USDT/1D
+```
+
+### 期望
+- Python 后端可读取 legacy report JSON 与 clean candles。
+- 前端 `PATHS` 优先指向 `http://127.0.0.1:8000/api/...`。
+- Python API 不可用时,前端仍可 fallback 到原静态文件路径。
+
+### 实际
+```
+python -m backend_py.smoke_test = 通过
+node --check app.js = 通过
+/api/reports/BTC_USDT_1D_market_weather_router.json = 200 OK, instrument BTC-USDT, bar 1D
+/api/candles/BTC-USDT/1D = 200 OK, candles 29
+```
+
+### 备注
+- 这是迁移桥接层:前端数据入口先切到 Python API,但 Node 仍负责生成 reports/data。
+- 仍保留静态 fallback,避免 Python 后端未启动时页面直接不可用。

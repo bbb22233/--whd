@@ -29,6 +29,8 @@ GET /api/market/overview
 GET /api/market/symbols
 GET /api/market/rows?bar=4H
 GET /api/market/current/BTC-USDT?bar=4H
+GET /api/reports/BTC_USDT_1D_market_weather_router.json
+GET /api/candles/BTC-USDT/1D
 GET /api/scanner/status
 POST /api/scanner/run?mode=summary
 POST /api/scanner/run?mode=full
