@@ -13,8 +13,7 @@ matched safely against current Node golden reports.
 - Compare Python output against the Node report, ignoring only runtime timestamps
   and explicitly documented out-of-scope sections.
 - Do not change FastAPI routes in this phase.
-- Do not migrate OKX download, clean aggregation, deviation rules, or router
-  calibration/gate selection yet.
+- Do not migrate OKX download or clean aggregation yet.
 
 ## Files
 
@@ -43,16 +42,19 @@ Python implementation:
   - Compares Node and Python summary JSON.
   - Ignores `startedAt` and `finishedAt`.
 - `backend_py/research/market_weather_router.py`
-  - Ports market weather router component classification and summaries.
-  - Reuses Python feature snapshots, weather labels, and strategy routing.
-  - Produces `strategyScores`, `currentComponentRows`, and `componentSummaryRows`.
+  - Ports market weather router component classification, strategy router
+    calibration, gate selection, and current snapshot row.
+  - Reuses Python feature snapshots, weather labels, strategy routing, and
+    deviation rules.
+  - Produces `current`, `strategyScores`, `deviationFinalWeather`,
+    `currentComponentRows`, and `componentSummaryRows`.
 - `backend_py/build_market_weather_router.py`
   - CLI that reads `data/clean/*_clean.json`.
   - Writes `_market_weather_router_py.json` and `_py` component/score CSV files.
 - `backend_py/compare_market_weather_router.py`
-  - Compares Python router component output against Node router reports.
+  - Compares Python router output against Node router reports.
   - Ignores `generatedAt`.
-  - Does not compare `current`, `deviationFinalWeather`, or calibration metadata.
+  - Compares calibration signals and gate selection.
 - `backend_py/research/deviation_rules.py`
   - Ports deviation study state/metric aggregation and rule mapping.
   - Produces `finalWeather`, `currentRuleRows`, and `ruleLibraryRows`.
@@ -94,9 +96,9 @@ The Python report may differ for now:
 
 `generatedAt` is intentionally ignored because Node and Python are run at different times.
 
-## Market Weather Router Component Parity Contract
+## Market Weather Router Parity Contract
 
-The Python market weather router component report must match Node for:
+The Python market weather router report must match Node for:
 
 - `metadata.instrument`
 - `metadata.bar`
@@ -106,20 +108,25 @@ The Python market weather router component report must match Node for:
 - `metadata.lastDate`
 - `metadata.snapshotCount`
 - `metadata.observationRows`
+- `metadata.routerCalibrationRows`
+- `metadata.routerCalibrationObservationRows`
+- `metadata.gateSource`
+- `metadata.calibrationConfidenceGate`
+- `metadata.currentCalibrationSignals`
 - `metadata.horizons`
+- `metadata.routerPrinciple`
+- `current`
 - `strategyScores`
+- `deviationFinalWeather`
 - `currentComponentRows`
 - `componentSummaryRows`
 
-The Python router component report may differ for now:
+The Python router report may differ for now:
 
 - `metadata.generatedAt`
-- `current`
-- `deviationFinalWeather`
-- router calibration metadata and gate selection
 
-Those fields remain Node-owned until deviation rules and router calibration are
-ported with their own golden comparisons.
+`generatedAt` is intentionally ignored because Node and Python are run at
+different times.
 
 ## Deviation Rules Parity Contract
 
@@ -171,7 +178,7 @@ Compare full JSON schema:
 uv run python -m backend_py.compare_feature_factory --instrument BTC-USDT --bar 1D --days 3650
 ```
 
-Generate and compare router component parity output:
+Generate and compare router parity output:
 
 ```bash
 uv run python -m backend_py.build_market_weather_router --instrument BTC-USDT --bar 1D --days 3650
@@ -199,6 +206,7 @@ node --check server.mjs
 
 The next Python research migration should choose one of:
 
-- Port router calibration/gate selection after deviation parity exists.
-- Add a scanner mode for Python router component parity across selected symbols/bars.
+- Add a scanner mode for Python router parity across selected symbols/bars.
 - Add a scanner mode for Python deviation parity across selected symbols/bars.
+- Start wiring selected Python research generators into scanner/orchestrator
+  paths behind explicit modes.

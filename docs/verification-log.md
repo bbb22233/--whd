@@ -591,7 +591,7 @@ ScannerService().start("python_summary", symbols="BTC-USDT,ETH-USDT", bars="1D,4
 
 ---
 
-## 15. Python Market Weather Router Component Parity
+## 15. Python Market Weather Router Full Parity
 
 **状态:✅ 通过**
 
@@ -608,11 +608,11 @@ done
 ```
 
 ### 期望
-- Python 版 market weather router component 层与 Node golden reports 对齐。
-- 对齐范围包括 `strategyScores`、`currentComponentRows`、`componentSummaryRows`。
-- 对比 metadata 包括 `instrument/bar/fromDate/toDate/firstDate/lastDate/snapshotCount/observationRows/horizons`。
+- Python 版完整 market weather router 与 Node golden reports 对齐。
+- 对齐范围包括 `current`、`strategyScores`、`deviationFinalWeather`、`currentComponentRows`、`componentSummaryRows`。
+- 对比 metadata 包括 `instrument/bar/fromDate/toDate/firstDate/lastDate/snapshotCount/observationRows/routerCalibrationRows/routerCalibrationObservationRows/gateSource/calibrationConfidenceGate/currentCalibrationSignals/horizons/routerPrinciple`。
 - `_py` router JSON/CSV 只作为本地验证产物,不替换 Node 正式报告。
-- 暂不比较 `current`、`deviationFinalWeather`、router calibration/gate selection;这些仍等待 deviation rules 与 calibration Python 迁移。
+- Router calibration/gate selection 已纳入比较。
 
 ### 实际
 ```
@@ -620,33 +620,42 @@ py_compile backend_py/*.py backend_py/research/*.py = 通过
 
 compare_market_weather_router BTC-USDT 1D = status ok
 snapshotCount = 2924
+gate = 黄
+gateSource = router_calibration
 strategyScoreCount = 5
 currentComponentRowCount = 20
 componentSummaryRowCount = 80
 
 compare_market_weather_router BTC-USDT 4H = status ok
 snapshotCount = 18150
+gate = 黄偏绿
+gateSource = router_calibration
 strategyScoreCount = 5
 currentComponentRowCount = 20
 componentSummaryRowCount = 80
 
 compare_market_weather_router ETH-USDT 1D = status ok
 snapshotCount = 2924
+gate = 绿
+gateSource = router_calibration
 strategyScoreCount = 5
 currentComponentRowCount = 20
 componentSummaryRowCount = 80
 
 compare_market_weather_router ETH-USDT 4H = status ok
 snapshotCount = 18150
+gate = 黄偏红
+gateSource = router_calibration
 strategyScoreCount = 5
 currentComponentRowCount = 20
 componentSummaryRowCount = 80
 ```
 
 ### 备注
-- Python 复用已对齐的 feature snapshots、weather labels、strategy routing,并补齐 router component 观察、汇总、当前 component 表格。
+- Python 复用已对齐的 feature snapshots、weather labels、strategy routing、deviation rules,并补齐 strategy router backtest、router calibration、confidence gate、主灯号 gate selection 与 current snapshot row。
 - Node 的中文 `localeCompare("zh-CN")` 排序在 Python 中用显式状态顺序表固定,避免不同运行环境排序差异。
-- 下一步应先迁移 deviation rules,再迁移 router calibration/gate,否则无法安全替换完整 `market_weather_router.json`。
+- Comparer 数值容忍为 `1e-2`,用于吸收 JS `toFixed` 与 Python 浮点格式化边界差。
+- 下一步可把 Python router parity 接入 scanner/orchestrator 的显式模式,仍不直接替换 Node 默认生产路径。
 
 ---
 
@@ -707,4 +716,4 @@ finalGate = 黄偏红
 - Python 复用已对齐的 indicator snapshots,并补齐 deviation state/metric observations、summary、rule library 与 final weather。
 - Comparer 数值容忍为 `1e-2`,用于吸收 JS `toFixed` 与 Python 浮点格式化在百分位中位数上的 0.01 边界差。
 - 本轮验证临时刷新了四组正式 Node deviation reports;验证后已恢复,不提交 report churn。
-- 下一步可迁移 router calibration/gate selection,因为 deviation rules 与 router component 两个前置层都已有 Python parity。
+- Router calibration/gate selection 已在第 15 步补齐;下一步可接入 scanner/orchestrator 的显式 Python router 模式。

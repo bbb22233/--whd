@@ -44,7 +44,9 @@ def main(argv: list[str] | None = None) -> None:
         output_json_path,
         {
             "metadata": result["metadata"],
+            "current": result["current"],
             "strategyScores": result["strategyScores"],
+            "deviationFinalWeather": result["deviationFinalWeather"],
             "currentComponentRows": result["currentComponentRows"],
             "componentSummaryRows": result["componentSummaryRows"],
         },
@@ -59,6 +61,7 @@ def main(argv: list[str] | None = None) -> None:
                 "inputPath": str(input_path),
                 "outputJsonPath": str(output_json_path),
                 "metadata": result["metadata"],
+                "current": result["current"],
                 "strategyScoreCount": len(result["strategyScores"]),
                 "currentComponentRowCount": len(result["currentComponentRows"]),
                 "componentSummaryRowCount": len(result["componentSummaryRows"]),
@@ -71,4 +74,3 @@ def main(argv: list[str] | None = None) -> None:
 
 if __name__ == "__main__":
     main()
-

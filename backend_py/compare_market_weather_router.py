@@ -9,9 +9,26 @@ from backend_py.reports_reader import REPORTS_DIR
 from backend_py.research.config import parse_args, report_stem
 
 
-VALUE_TOLERANCE = 1e-3
-METADATA_KEYS = ["instrument", "bar", "fromDate", "toDate", "firstDate", "lastDate", "snapshotCount", "observationRows", "horizons"]
-PAYLOAD_KEYS = ["strategyScores", "currentComponentRows", "componentSummaryRows"]
+VALUE_TOLERANCE = 1e-2
+METADATA_KEYS = [
+    "instrument",
+    "bar",
+    "fromDate",
+    "toDate",
+    "firstDate",
+    "lastDate",
+    "snapshotCount",
+    "observationRows",
+    "routerCalibrationRows",
+    "routerCalibrationObservationRows",
+    "gateSource",
+    "calibrationConfidenceGate",
+    "currentCalibrationSignals",
+    "horizons",
+    "routerPrinciple",
+]
+PAYLOAD_KEYS = ["current", "strategyScores", "deviationFinalWeather", "currentComponentRows", "componentSummaryRows"]
+OPTIONAL_KEYS = {"generatedAt"}
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -40,10 +57,12 @@ def compare_value(path: str, left: Any, right: Any, failures: list[str]) -> None
 def compare_mapping(path: str, left: dict[str, Any], right: dict[str, Any], failures: list[str]) -> None:
     left_keys = set(left.keys())
     right_keys = set(right.keys())
-    if left_keys != right_keys:
-        failures.append(f"{path}: key mismatch node_only={sorted(left_keys - right_keys)} python_only={sorted(right_keys - left_keys)}")
+    node_only = sorted(key for key in left_keys - right_keys if key not in OPTIONAL_KEYS)
+    python_only = sorted(key for key in right_keys - left_keys if key not in OPTIONAL_KEYS)
+    if node_only or python_only:
+        failures.append(f"{path}: key mismatch node_only={node_only} python_only={python_only}")
     for key, left_value in left.items():
-        if key not in right:
+        if key in OPTIONAL_KEYS or key not in right:
             continue
         compare_value(f"{path}.{key}", left_value, right[key], failures)
 
@@ -74,6 +93,8 @@ def main(argv: list[str] | None = None) -> None:
                 "nodePath": str(node_path),
                 "pythonPath": str(python_path),
                 "snapshotCount": python_payload["metadata"]["snapshotCount"],
+                "gate": python_payload["current"].get("gate") if python_payload.get("current") else None,
+                "gateSource": python_payload["metadata"].get("gateSource"),
                 "strategyScoreCount": len(python_payload["strategyScores"]),
                 "currentComponentRowCount": len(python_payload["currentComponentRows"]),
                 "componentSummaryRowCount": len(python_payload["componentSummaryRows"]),
@@ -86,4 +107,3 @@ def main(argv: list[str] | None = None) -> None:
 
 if __name__ == "__main__":
     main()
-
