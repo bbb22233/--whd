@@ -1042,3 +1042,58 @@ cleanMissingCount = 153
 ### 备注
 - 新增 `run_data_pipeline --missing-only` 与 `--max-symbols`,用于可控分批补资料。
 - `data/raw`、`data/clean` 和 `_py_full` reports 均不进入 Git。
+
+---
+
+## 24. Python Data Pipeline Small Batch Fill 2
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+uv run python -m backend_py.run_full_pipeline --check-inputs --symbols LINK-USDT AVAX-USDT TON-USDT TRX-USDT DOT-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_data_pipeline --missing-only --symbols LINK-USDT AVAX-USDT TON-USDT TRX-USDT DOT-USDT --bars 1D,4H --days 3650
+uv run python -m backend_py.run_full_pipeline --skip-download --symbols LINK-USDT AVAX-USDT TON-USDT TRX-USDT DOT-USDT --bars 1D,4H,8H --days 3650
+uv run python -m backend_py.run_full_pipeline --check-inputs --bars 1D,4H,8H --days 3650
+```
+
+### 期望
+- 第二批补齐 `LINK/AVAX/TON/TRX/DOT × 1D/4H`。
+- 补齐后 `python_full --skip-download` 可验证该批 1D/4H/8H 全链路。
+- 本地覆盖度从 21 组提升到 36 组。
+
+### 实际
+```
+LINK/AVAX/TON/TRX/DOT × 1D/4H:
+stepCount = 10
+successCount = 10
+errorCount = 0
+
+rawRows / cleanRows:
+LINK 1D = 3065 / 3064
+AVAX 1D = 2080 / 2079
+TON 1D = 1496 / 1495
+TRX 1D = 3065 / 3064
+DOT 1D = 2111 / 2110
+LINK 4H = 18386 / 18385
+AVAX 4H = 12476 / 12475
+TON 4H = 8973 / 8972
+TRX 4H = 18386 / 18385
+DOT 4H = 12662 / 12661
+
+python_full LINK/AVAX/TON/TRX/DOT × 1D,4H,8H:
+successCount = 15
+weatherCount = 15
+errorCount = 0
+
+default symbols × 1D,4H,8H after fill:
+requiredCount = 174
+rawReadyCount = 36
+rawMissingCount = 138
+cleanReadyCount = 36
+cleanMissingCount = 138
+```
+
+### 备注
+- 当前本地已覆盖 12 个 symbols 的 `1D/4H/8H`:BTC, ETH, SOL, BNB, XRP, DOGE, ADA, LINK, AVAX, TON, TRX, DOT。
+- 后续继续每批 5 个 symbols 补齐,可控制 OKX 下载耗时和失败半径。
