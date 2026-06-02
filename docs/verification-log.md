@@ -195,7 +195,7 @@ grep -rn "scoreStrategies\|scoreStrategyFit" backtest/   # 期望:空(死代码�
 ```bash
 node --check app.js
 rg -n '"kindKey": "ma233"|kindKey.*ma233' reports/BTC_USDT_1D_deviation_rules.json reports/BTC_USDT_4H_deviation_rules.json app.js
-Invoke-WebRequest http://127.0.0.1:4177/ -UseBasicParsing
+curl -I http://127.0.0.1:4177/
 ```
 
 ### 期望
@@ -226,26 +226,29 @@ http://127.0.0.1:4177/ = 200 OK
 
 ### 命令
 ```bash
-python -m backend_py.smoke_test
+uv run python -m backend_py.smoke_test
 node --check app.js
 # 临时启动 FastAPI 后:
-Invoke-RestMethod http://127.0.0.1:8000/api/reports/BTC_USDT_1D_market_weather_router.json
-Invoke-RestMethod http://127.0.0.1:8000/api/candles/BTC-USDT/1D
+curl -fsS http://127.0.0.1:8000/api/reports/BTC_USDT_1D_market_weather_router.json
+# 需要本地已生成 data/clean;干净 clone 可先跳过,或预期返回 404:
+curl -fsS http://127.0.0.1:8000/api/candles/BTC-USDT/1D
 ```
 
 ### 期望
 - Python 后端可读取 legacy report JSON 与 clean candles。
 - 前端 `PATHS` 优先指向 `http://127.0.0.1:8000/api/...`。
 - Python API 不可用时,前端仍可 fallback 到原静态文件路径。
+- `data/clean/` 不进 Git;干净 clone 中 clean candles 端点可返回明确 404,跑过 download/clean 后应返回 200。
 
 ### 实际
 ```
-python -m backend_py.smoke_test = 通过
+uv run python -m backend_py.smoke_test = 通过
 node --check app.js = 通过
 /api/reports/BTC_USDT_1D_market_weather_router.json = 200 OK, instrument BTC-USDT, bar 1D
-/api/candles/BTC-USDT/1D = 200 OK, candles 29
+/api/candles/BTC-USDT/1D = clean data 存在时 200 OK;干净 clone 中 404 Clean candles not found
 ```
 
 ### 备注
 - 这是迁移桥接层:前端数据入口先切到 Python API,但 Node 仍负责生成 reports/data。
 - 仍保留静态 fallback,避免 Python 后端未启动时页面直接不可用。
+- `backend_py.smoke_test` 已对缺失的未跟踪 clean data 做降级标记:`cleanCandlesStatus=missing_untracked_data`。

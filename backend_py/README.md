@@ -10,14 +10,29 @@ reports/multi_period_market_weather_current.json
 
 ## 启动
 
-```powershell
+推荐用根目录的 `pyproject.toml` 复现环境:
+
+```bash
+uv sync
+uv run uvicorn backend_py.main:app --host 127.0.0.1 --port 8000
+```
+
+也可以用系统 Python:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r backend_py/requirements.txt
 python -m uvicorn backend_py.main:app --host 127.0.0.1 --port 8000
 ```
 
-如果本机没有把 Python 加入 PATH，可使用 Codex 工作区运行时：
+Windows PowerShell:
 
 ```powershell
-& 'C:\Users\User\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m uvicorn backend_py.main:app --host 127.0.0.1 --port 8000
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r backend_py/requirements.txt
+python -m uvicorn backend_py.main:app --host 127.0.0.1 --port 8000
 ```
 
 ## API
@@ -44,9 +59,14 @@ POST /api/scanner/cancel
 
 ## 验证
 
-```powershell
-python -m backend_py.smoke_test
+```bash
+uv run python -m backend_py.smoke_test
+node --check app.js
+curl -fsS http://127.0.0.1:8000/health
+curl -fsS http://127.0.0.1:8000/api/market/overview
 ```
+
+`data/clean/` 不进 Git。干净 clone 中 smoke test 会把 clean candles 标记为 `missing_untracked_data`;跑过 `npm run download` + `npm run clean` 后会变为 `ok`。
 
 ## 迁移边界
 

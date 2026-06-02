@@ -11,10 +11,26 @@
 
 ## 常用命令
 
-```powershell
+```bash
 npm run download -- --instrument BTC-USDT --days 3650
 npm run clean -- --instrument BTC-USDT --days 3650
 npm run weather:router -- --instrument BTC-USDT --days 3650
+```
+
+## Python API
+
+Python API 是前端数据源迁移的桥接层,读取现有 `reports/` 和 `data/clean/` 产物,不替代当前 Node 研究流水线。
+
+```bash
+uv sync
+uv run uvicorn backend_py.main:app --host 127.0.0.1 --port 8000
+```
+
+验证:
+
+```bash
+uv run python -m backend_py.smoke_test
+curl -fsS http://127.0.0.1:8000/health
 ```
 
 ## 当前主线输出
@@ -28,7 +44,7 @@ reports/*_market_weather_router.json              完整天气路由结果
 
 ## 位置指标研究
 
-```powershell
+```bash
 npm run backtest:deviations -- --instrument BTC-USDT --days 3650
 npm run rules:deviations -- --instrument BTC-USDT --days 3650
 ```
@@ -44,7 +60,7 @@ reports/*_deviation_rule_library.csv     位置规则库
 
 ## 神经网络与决策树
 
-```powershell
+```bash
 npm run train:state -- --instrument BTC-USDT --days 3650
 npm run train:trees -- --instrument BTC-USDT --days 3650
 npm run validate:trees -- --instrument BTC-USDT --days 3650 --train-to 2023-12-31 --validate-from 2024-01-01
@@ -52,7 +68,7 @@ npm run validate:trees -- --instrument BTC-USDT --days 3650 --train-to 2023-12-3
 
 宏观对比：
 
-```powershell
+```bash
 npm run download:macro -- --instrument BTC-USDT --days 3650
 npm run train:trees -- --instrument BTC-USDT --days 3650 --macro
 npm run compare:macro -- --instrument BTC-USDT --days 3650 --train-to 2023-12-31 --validate-from 2024-01-01

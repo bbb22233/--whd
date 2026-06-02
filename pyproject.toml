@@ -1,0 +1,12 @@
+[project]
+name = "quant-monitor-terminal"
+version = "0.1.0"
+description = "Market weather research terminal with a Python API bridge."
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115,<1",
+  "uvicorn[standard]>=0.30,<1",
+]
+
+[tool.uv]
+package = false
