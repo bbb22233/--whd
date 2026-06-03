@@ -1,25 +1,122 @@
 const API_BASE = "http://127.0.0.1:8000";
 const DEFAULT_INSTRUMENT = "BTC-USDT";
 const DEFAULT_BAR = "1D";
-const REPORT_PREFIX = `${DEFAULT_INSTRUMENT.replace("-", "_")}_${DEFAULT_BAR}`;
+const SUPPORTED_BARS = ["1D", "4H", "8H", "1W"];
+const SYMBOL_PATTERN = /^[A-Z0-9]+-[A-Z0-9]+$/;
+const DEFAULT_SYMBOLS = [
+  "BTC-USDT",
+  "ETH-USDT",
+  "SOL-USDT",
+  "BNB-USDT",
+  "XRP-USDT",
+  "DOGE-USDT",
+  "ADA-USDT",
+  "LINK-USDT",
+  "AVAX-USDT",
+  "TON-USDT",
+  "TRX-USDT",
+  "DOT-USDT",
+  "BCH-USDT",
+  "LTC-USDT",
+  "UNI-USDT",
+  "AAVE-USDT",
+  "NEAR-USDT",
+  "OP-USDT",
+  "ARB-USDT",
+  "SUI-USDT",
+  "APT-USDT",
+  "FIL-USDT",
+  "ETC-USDT",
+  "ATOM-USDT",
+  "INJ-USDT",
+  "STX-USDT",
+  "IMX-USDT",
+  "WLD-USDT",
+  "AR-USDT",
+  "XLM-USDT",
+  "ICP-USDT",
+  "HBAR-USDT",
+  "ALGO-USDT",
+  "LDO-USDT",
+  "CRV-USDT",
+  "ENS-USDT",
+  "PENDLE-USDT",
+  "JUP-USDT",
+  "PYTH-USDT",
+  "TIA-USDT",
+  "ONDO-USDT",
+  "FET-USDT",
+  "PEPE-USDT",
+  "SHIB-USDT",
+  "BONK-USDT",
+  "FLOKI-USDT",
+  "WIF-USDT",
+  "ORDI-USDT",
+  "SATS-USDT",
+  "NOT-USDT",
+  "ENA-USDT",
+  "W-USDT",
+  "STRK-USDT",
+  "ZK-USDT",
+  "ZRO-USDT",
+  "GALA-USDT",
+  "SAND-USDT",
+  "MANA-USDT",
+];
 
 const apiReport = (name, fallback) => ({
   primary: `${API_BASE}/api/reports/${name}`,
   fallback,
 });
 
-const PATHS = {
-  dashboard: `${API_BASE}/api/dashboard/current?instrument=${DEFAULT_INSTRUMENT}&bar=${DEFAULT_BAR}`,
-  weather: apiReport(`${REPORT_PREFIX}_market_weather_router.json`, `./reports/${REPORT_PREFIX}_market_weather_router.json`),
-  features: apiReport(`${REPORT_PREFIX}_feature_factory.json`, `./reports/${REPORT_PREFIX}_feature_factory.json`),
-  deviations: apiReport(`${REPORT_PREFIX}_deviation_rules.json`, `./reports/${REPORT_PREFIX}_deviation_rules.json`),
-  candles: {
-    primary: `${API_BASE}/api/candles/${DEFAULT_INSTRUMENT}/${DEFAULT_BAR}`,
-    fallback: `./data/clean/${REPORT_PREFIX}_clean.json`,
-  },
-};
-
 const $ = (selector) => document.querySelector(selector);
+
+function normalizeInstrument(value) {
+  if (!value) return null;
+  const symbol = String(value).trim().toUpperCase().replaceAll("_", "-").replaceAll("/", "-");
+  if (!symbol) return null;
+  const normalized = !symbol.includes("-") && symbol.endsWith("USDT") ? `${symbol.slice(0, -4)}-USDT` : symbol;
+  return SYMBOL_PATTERN.test(normalized) ? normalized : null;
+}
+
+function normalizeBar(value) {
+  if (!value) return null;
+  const bar = String(value).trim().toUpperCase();
+  if (bar === "1") return "1D";
+  return SUPPORTED_BARS.includes(bar) ? bar : null;
+}
+
+function reportPrefix(instrument, bar) {
+  return `${instrument.replaceAll("-", "_")}_${bar}`;
+}
+
+function buildPaths(instrument, bar) {
+  const prefix = reportPrefix(instrument, bar);
+  const encodedInstrument = encodeURIComponent(instrument);
+  const encodedBar = encodeURIComponent(bar);
+  return {
+    dashboard: `${API_BASE}/api/dashboard/current?instrument=${encodedInstrument}&bar=${encodedBar}`,
+    weather: apiReport(`${prefix}_market_weather_router.json`, `./reports/${prefix}_market_weather_router.json`),
+    features: apiReport(`${prefix}_feature_factory.json`, `./reports/${prefix}_feature_factory.json`),
+    deviations: apiReport(`${prefix}_deviation_rules.json`, `./reports/${prefix}_deviation_rules.json`),
+    candles: {
+      primary: `${API_BASE}/api/candles/${encodedInstrument}/${encodedBar}`,
+      fallback: `./data/clean/${prefix}_clean.json`,
+    },
+  };
+}
+
+function scopeFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    instrument: normalizeInstrument(params.get("instrument")) || DEFAULT_INSTRUMENT,
+    bar: normalizeBar(params.get("bar")) || DEFAULT_BAR,
+  };
+}
+
+let currentScope = scopeFromUrl();
+let PATHS = buildPaths(currentScope.instrument, currentScope.bar);
+let renderToken = 0;
 
 function formatNumber(value, digits = 2) {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return "--";
@@ -74,20 +171,20 @@ async function fetchJson(source, optional = false) {
   throw lastError ?? new Error("No data source available");
 }
 
-async function fetchLegacyDashboardData() {
+async function fetchLegacyDashboardData(paths) {
   const [weather, features, deviations, candles] = await Promise.all([
-    fetchJson(PATHS.weather),
-    fetchJson(PATHS.features),
-    fetchJson(PATHS.deviations, true),
-    fetchJson(PATHS.candles, true),
+    fetchJson(paths.weather),
+    fetchJson(paths.features),
+    fetchJson(paths.deviations, true),
+    fetchJson(paths.candles, true),
   ]);
 
   return { weather, features, deviations, candles, sourceMode: "legacy_files" };
 }
 
-async function fetchDashboardData() {
+async function fetchDashboardData(paths = PATHS) {
   try {
-    const payload = await fetchJson(PATHS.dashboard);
+    const payload = await fetchJson(paths.dashboard);
     return {
       weather: payload.weather,
       features: payload.features,
@@ -98,7 +195,7 @@ async function fetchDashboardData() {
     };
   } catch (error) {
     console.warn("Dashboard API failed; falling back to legacy JSON files", error);
-    return fetchLegacyDashboardData();
+    return fetchLegacyDashboardData(paths);
   }
 }
 
@@ -470,12 +567,130 @@ function renderInsufficient(metadata) {
   clearDashboardSections();
 }
 
+function ensureOption(select, value) {
+  if (!select || !value) return;
+  const exists = Array.from(select.options).some((option) => option.value === value);
+  if (!exists) {
+    select.append(new Option(value, value));
+  }
+}
+
+function syncControls() {
+  setText("#instrument", currentScope.instrument);
+  setText("#bar", currentScope.bar);
+
+  const symbolSelect = $("#symbolSelect");
+  if (symbolSelect) {
+    ensureOption(symbolSelect, currentScope.instrument);
+    symbolSelect.value = currentScope.instrument;
+  }
+
+  const barSelect = $("#barSelect");
+  if (barSelect) {
+    barSelect.value = currentScope.bar;
+  }
+}
+
+function updateUrlFromScope() {
+  const url = new URL(window.location.href);
+  url.searchParams.set("instrument", currentScope.instrument);
+  url.searchParams.set("bar", currentScope.bar);
+  window.history.pushState({ ...currentScope }, "", url);
+}
+
+function setScope(instrument, bar, { push = false } = {}) {
+  currentScope = {
+    instrument: normalizeInstrument(instrument) || DEFAULT_INSTRUMENT,
+    bar: normalizeBar(bar) || DEFAULT_BAR,
+  };
+  PATHS = buildPaths(currentScope.instrument, currentScope.bar);
+  syncControls();
+  if (push) updateUrlFromScope();
+}
+
+function symbolListFromPayload(payload) {
+  const symbols = Array.isArray(payload?.symbols) ? payload.symbols : [];
+  return Array.from(new Set(symbols.map(normalizeInstrument).filter(Boolean)));
+}
+
+function renderSymbolOptions(symbols) {
+  const symbolSelect = $("#symbolSelect");
+  if (!symbolSelect) return;
+  const options = Array.from(new Set([currentScope.instrument, ...symbols].map(normalizeInstrument).filter(Boolean)));
+  symbolSelect.innerHTML = "";
+  options.forEach((symbol) => {
+    symbolSelect.append(new Option(symbol, symbol));
+  });
+  symbolSelect.disabled = options.length <= 1;
+  syncControls();
+}
+
+async function loadSymbols() {
+  try {
+    const response = await fetch(`${API_BASE}/api/market/symbols`, { cache: "no-store" });
+    if (!response.ok) throw new Error(`symbols ${response.status}`);
+    const symbols = symbolListFromPayload(await response.json());
+    return symbols.length ? symbols : DEFAULT_SYMBOLS;
+  } catch (error) {
+    console.warn("Market symbols API failed; using built-in symbols", error);
+    return DEFAULT_SYMBOLS;
+  }
+}
+
+function setupSelectors() {
+  renderSymbolOptions(DEFAULT_SYMBOLS);
+
+  const symbolSelect = $("#symbolSelect");
+  const barSelect = $("#barSelect");
+  const handleChange = () => {
+    setScope(symbolSelect?.value, barSelect?.value, { push: true });
+    renderDashboard().catch(handleDashboardError);
+  };
+
+  symbolSelect?.addEventListener("change", handleChange);
+  barSelect?.addEventListener("change", handleChange);
+  window.addEventListener("popstate", () => {
+    const nextScope = scopeFromUrl();
+    setScope(nextScope.instrument, nextScope.bar);
+    renderDashboard().catch(handleDashboardError);
+  });
+
+  loadSymbols().then(renderSymbolOptions).catch((error) => {
+    console.warn("Unable to load market symbols", error);
+  });
+}
+
+function handleDashboardError(error) {
+  console.error(error);
+  renderInsufficient({
+    instrument: currentScope.instrument,
+    bar: currentScope.bar,
+    dataStatus: "report_missing",
+    snapshotCount: "--",
+  });
+}
+
 async function renderDashboard() {
+  const token = ++renderToken;
+  const scope = { ...currentScope };
+  const paths = PATHS;
+  syncControls();
   setText("#weatherSummary", "数据加载中...");
-  const { weather, features, deviations, candles } = await fetchDashboardData();
+  let payload;
+  try {
+    payload = await fetchDashboardData(paths);
+  } catch (error) {
+    if (token !== renderToken) return;
+    console.warn("Dashboard data unavailable; rendering insufficient state", error);
+    renderInsufficient({ instrument: scope.instrument, bar: scope.bar, dataStatus: "report_missing", snapshotCount: "--" });
+    return;
+  }
+
+  if (token !== renderToken) return;
+  const { weather, features, deviations, candles } = payload;
 
   if (!weather?.current) {
-    renderInsufficient(weather?.metadata);
+    renderInsufficient(weather?.metadata ?? { instrument: scope.instrument, bar: scope.bar, dataStatus: "insufficient_history" });
     return;
   }
 
@@ -494,13 +709,8 @@ async function renderDashboard() {
 }
 
 $("#reloadButton").addEventListener("click", () => {
-  renderDashboard().catch((error) => {
-    console.error(error);
-    setText("#weatherSummary", `加载失败: ${error.message}`);
-  });
+  renderDashboard().catch(handleDashboardError);
 });
 
-renderDashboard().catch((error) => {
-  console.error(error);
-  setText("#weatherSummary", `加载失败: ${error.message}`);
-});
+setupSelectors();
+renderDashboard().catch(handleDashboardError);

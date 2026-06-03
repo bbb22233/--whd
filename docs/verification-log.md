@@ -2334,3 +2334,70 @@ node --check server.mjs = pass
 - 回归脚本用 suffix 双路径比较:Node official 临时生成后复制为 `_node`,随即 `git restore reports`;Python 生成 `_py`;compare 只比 `_node` vs `_py`。
 - cleanup 在正常完成、异常失败、Ctrl-C 中断三种路径都会执行,避免 Node 临时 official 或 `_py` shadow 留在工作区。
 - 本次不纳入 1W,不下载数据,不修改 `data/`。
+
+## 46. N3 Frontend Symbol/Bar Selector
+
+**日期:** 2026-06-02
+**范围:** `app.js` / `index.html` / `styles.css` + M3/N3 文档状态;后端与 `data/` 未改。
+**状态:** ✅ 通过
+
+### 命令
+```bash
+GIT_SSH_COMMAND='ssh -o BatchMode=yes -o ConnectTimeout=10' git pull --ff-only origin main
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check app.js
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run uvicorn backend_py.main:app --host 127.0.0.1 --port 8000
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node server.mjs
+```
+
+### 期望
+- URL `?instrument=&bar=` 驱动详情页 scope,并同步 `#symbolSelect/#barSelect`。
+- `buildPaths(instrument, bar)` 同时重建 dashboard API、report API、静态 report fallback、clean candle fallback。
+- 下拉切换更新 URL 并重渲染,浏览器后退恢复上一 scope。
+- Python API 关闭时,静态 fallback 仍使用所选品种/周期前缀,不能回退到 BTC。
+- 薄历史或无报告 scope 显示 M5 `样本不足` 灰灯,不整页崩。
+
+### 实际
+```
+git pull --ff-only origin main = Already up to date
+node --check app.js = pass
+
+Direct URL with Python API on:
+url = /?instrument=ETH-USDT&bar=4H
+#instrument = ETH-USDT
+#bar = 4H
+#symbolSelect = ETH-USDT
+#barSelect = 4H
+#gateText = 黄偏红
+expected gate from reports/ETH_USDT_4H_market_weather_router.json = 黄偏红
+
+Selector change:
+ETH-USDT/4H -> SUI-USDT/8H
+URL = /?instrument=SUI-USDT&bar=8H
+#gateText = 黄偏绿
+expected gate from reports/SUI_USDT_8H_market_weather_router.json = 黄偏绿
+
+Browser back:
+SUI-USDT/8H -> SUI-USDT/4H -> ETH-USDT/4H
+final #instrument/#bar/#gateText = ETH-USDT / 4H / 黄偏红
+
+URL normalization:
+?instrument=BTC_USDT&bar=4h -> BTC-USDT / 4H
+?instrument=BTCUSDT&bar=1 -> BTC-USDT / 1D
+
+API-down fallback:
+Python API stopped; static server kept on 127.0.0.1:4177
+url = /?instrument=ETH-USDT&bar=4H
+#instrument = ETH-USDT
+#bar = 4H
+#gateText = 黄偏红
+Result proves fallback used ./reports/ETH_USDT_4H_*.json, not BTC fallback.
+
+Thin history / missing report:
+APT-USDT 1W -> #gateText = 样本不足, #gatePanel = gate-panel gate-neutral
+NO-SUCH 1D -> #gateText = 样本不足, #gatePanel = gate-panel gate-neutral
+```
+
+### 备注
+- `kindKey === "ma233"` 保持不变,M4 未回退。
+- `renderInsufficient` 保持为 M5 灰灯入口;N3 只把无 current / 无报告路径接到该入口。
+- `/api/market/symbols` 失败时使用内置 58 品种列表,URL 参数行为仍可用。

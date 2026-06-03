@@ -17,6 +17,21 @@
             <span id="bar">--</span>
           </h1>
         </div>
+        <div class="selector-group" aria-label="市场范围">
+          <label class="select-field" for="symbolSelect">
+            <span>品种</span>
+            <select id="symbolSelect" aria-label="选择品种"></select>
+          </label>
+          <label class="select-field" for="barSelect">
+            <span>周期</span>
+            <select id="barSelect" aria-label="选择周期">
+              <option value="1D">1D</option>
+              <option value="4H">4H</option>
+              <option value="8H">8H</option>
+              <option value="1W">1W</option>
+            </select>
+          </label>
+        </div>
         <div class="top-meta" id="topMeta"></div>
         <button class="icon-button" id="reloadButton" type="button" title="刷新数据" aria-label="刷新数据">
           ↻

@@ -29,7 +29,7 @@
 **完成定义**:1W 也 `FAIL=0`;`reports/` 不再混旧 Node 1W;combined 含 1W。
 **依赖**:N1(用同一把尺子验 1W)。
 
-## N3 — 前端 M3:品种/周期选择器 🖥️ 不联网
+## N3 — 前端 M3:品种/周期选择器 🖥️ 不联网 ✅ 已完成
 **目标**:网页不再硬编码 BTC/1D,能切币切周期。
 **范围**:严格按 `docs/frontend-m3-spec.md`:URL 参数 `?instrument=&bar=` + `buildPaths()`(**主路和 fallback 都按所选重建**)+ 选择器(从 `/api/market/symbols` 填充)。**只动 `app.js` / `index.html` / 可能 `styles.css`,后端不动。** 保 M4/M5 不破。
 **完成定义**:`?instrument=ETH-USDT&bar=4H` 正常;切换更新 URL+重渲染;薄历史走 M5 占位不崩;API 关掉时 fallback 用**所选品种**文件(非 BTC);`node --check app.js` 过。
@@ -73,7 +73,7 @@
 | ② 对账沉淀成可复跑回归 | ✅ N1(`04bedc0`) |
 | ③ **冻结 golden 接管"标准答案"**(N1 不再依赖现场 Node) | ⬜ N7 |
 | ④ Node 入口全迁/弃用 | 🟡 `remaining-node-command-inventory` 在清 |
-| ⑤ 前端全走 REST、不靠 Node | 🟡 N3 进行中 |
+| ⑤ 前端全走 REST、不靠 Node | ✅ N3(7c7fd52,API-down fallback 用所选品种) |
 
 > 注:原"Python 生产观察一段"已删除——Node 非线上服务,无运行时可观察;真正的门槛是 ③(用冻结快照接管回归基准)。
 
