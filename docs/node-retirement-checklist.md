@@ -38,6 +38,15 @@
 - Node **研究代码已删**;改造后的 N1(Python vs 冻结 golden)`FAIL=0`;无任何脚本/入口再调被删的 Node。
 - 前端(`app.js`/`server.mjs`)不受影响。
 
+## ⚠️ 环境约束:N7 不能在 Web/一次性容器里做(2026-06 实测)
+冻结 golden 的本质是**把输入 `data/clean` 子集 pin 进仓库**,再让 Python 重算去比。但在 Claude Code Web 的一次性容器里实测发现:
+- `data/` 被 `.gitignore`,**源数据不随仓库走**,容器重建后 `data/clean` 为空;生成已提交 `reports/` 的那批快照已随旧容器回收。
+- 网络策略**封禁 OKX**(下载实测 `HTTP 403 Forbidden`),无法现取数据补。
+- 仓库里**没有任何 candle/clean/fixture** 可作输入(reports 只存派生特征,不含原始 OHLCV)。
+→ 没有输入数据,既跑不了现有 N1,也无法冻结"输入+输出"fixture,更无法验证改造后的回归。
+**因此 N7 必须在有 `data/clean` 的环境执行**(用户本机 Mac,或网络策略放行 OKX 后先下载一小批固定子集)。
+**铁律**:在能跑通"改造后 N1(Python vs 冻结 golden)`FAIL=0`"之前,**不得删 Node**——否则回归安全网会断且无法当场验证。
+
 ## 风险与回滚
 - 删除是 git 操作,**可 revert**;但删前务必先完成步骤 1–2(冻结 golden),否则回归网会断。
 - 若 1W 尚未联网对平(N2 未做),可先删 1D/4H/8H 相关无歧义部分,1W 相关保留到 N2 完成——**但更稳的做法是 N2 先行**,一次性删干净。
