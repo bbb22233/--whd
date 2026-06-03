@@ -53,7 +53,8 @@
 **范围**:新增 `docs/target-architecture.md`(Python 算+数据 / REST 当窗口 / 前端摆盘;Rust 暂不引入决策)、`docs/node-retirement-checklist.md`(砍 Node 前置 + 顺序)、`docs/parity-helpers.md`(jsround/jssum/jsnumber + None 键省略留痕)。纯文档。
 **依赖**:无,随时可做。
 
-## N7 — 冻结 golden 接管"标准答案",然后砍 Node 🔒 不联网【删 Node 的真正前提】
+## N7 — 冻结 golden 接管"标准答案",然后砍 Node 🔒 不联网【删 Node 的真正前提】📋 施工方案见 `docs/n7-golden-cutover-spec.md`
+> ⚠️ **必须在有 `data/clean` 的环境执行**(本机 Mac,或网络放行 OKX 后先下载)。Web 一次性容器无源数据 + OKX 403,做不了;细节见 `node-retirement-checklist.md` 环境约束节。
 **背景**:Node 从来不是线上服务,只是本地生成报告的脚本——**所以没有"运行时观察期"这回事**。但当前 N1 回归是**现场跑 Node 生成 golden 再比**,即 Node 仍兼着"标准答案"角色;**直接删 Node 会让 N1 回归失去比对基准**。删之前必须先把这个角色换走。
 **步骤**:
 1. **冻结 golden 快照**:钉一小批固定输入(pin 一份 `data/clean` 子集,纳入仓库或 `tests/fixtures/`)+ 对应"正确输出"快照存进 `tests/golden/`(这份输出 = 当前已对平的 Python official,等价 Node)。
