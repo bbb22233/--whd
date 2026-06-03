@@ -28,6 +28,10 @@ from backend_py.research.summary import build_summary_row, quality_summary
 CliMain = Callable[[list[str] | None], None]
 REPORT_KINDS = ("feature_factory", "deviation_rules", "market_weather_router")
 DEFAULT_BARS = ["1D", "4H", "8H"]
+GOLDEN_SYMBOLS = ["BTC-USDT", "SOL-USDT", "DOGE-USDT", "ENA-USDT"]
+GOLDEN_BARS = ["1D", "4H", "8H"]
+FIXTURE_CLEAN_DIR = PROJECT_ROOT / "tests" / "fixtures" / "data" / "clean"
+GOLDEN_DIR = PROJECT_ROOT / "tests" / "golden"
 
 
 def split_csv_values(values: list[str] | None) -> list[str]:
@@ -41,9 +45,10 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--days", type=int, default=3650)
     parser.add_argument("--node-suffix", default="_node")
     parser.add_argument("--python-suffix", default="_py")
+    parser.add_argument("--golden", action="store_true", help="Compare Python output against frozen tests/golden fixtures instead of live Node.")
     parsed = parser.parse_args(argv)
-    parsed.symbols = split_csv_values(parsed.symbols) or DEFAULT_SYMBOLS
-    parsed.bars = split_csv_values(parsed.bars) or DEFAULT_BARS
+    parsed.symbols = split_csv_values(parsed.symbols) or (GOLDEN_SYMBOLS if parsed.golden else DEFAULT_SYMBOLS)
+    parsed.bars = split_csv_values(parsed.bars) or (GOLDEN_BARS if parsed.golden else DEFAULT_BARS)
     if parsed.python_suffix != "_py":
         parser.error("current Python parity builders write _py artifacts; keep --python-suffix _py")
     return parsed
@@ -51,17 +56,14 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 
 def parity_env() -> dict[str, str]:
     env = os.environ.copy()
-    path_parts = [
-        "/Users/guanlan/.local/bin",
-        "/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin",
-        env.get("PATH", ""),
-    ]
+    node = shutil.which("node")
+    path_parts = [str(Path(node).parent) if node else "", env.get("PATH", "")]
     env["PATH"] = ":".join(part for part in path_parts if part)
     return env
 
 
-def run_subprocess(command: list[str], label: str) -> str:
-    result = subprocess.run(command, cwd=PROJECT_ROOT, env=parity_env(), text=True, capture_output=True, check=False)
+def run_subprocess(command: list[str], label: str, *, env: dict[str, str] | None = None) -> str:
+    result = subprocess.run(command, cwd=PROJECT_ROOT, env=env or parity_env(), text=True, capture_output=True, check=False)
     if result.returncode:
         tail = "\n".join((result.stdout + "\n" + result.stderr).splitlines()[-80:])
         raise RuntimeError(f"{label} failed with exitCode={result.returncode}\n{tail}")
@@ -123,6 +125,26 @@ def copy_node_golden(symbols: list[str], bars: list[str], days: int, suffix: str
     copy_json(summary_json_path("multi_period_market_weather_current"), summary_json_path("multi_period_market_weather_current", suffix))
     copied += 1
     return copied
+
+
+def stage_frozen_golden(symbols: list[str], bars: list[str], days: int, suffix: str) -> dict[str, Any]:
+    copied = 0
+    missing: list[str] = []
+    for bar in bars:
+        for symbol in symbols:
+            config = parse_research_args(["--instrument", symbol, "--bar", bar, "--days", str(days)])
+            report_name = report_stem(config)
+            for kind in REPORT_KINDS:
+                source = GOLDEN_DIR / f"{report_name}_{kind}.json"
+                target = report_json_path(report_name, kind, suffix)
+                if not source.exists():
+                    missing.append(str(source))
+                    continue
+                copy_json(source, target)
+                copied += 1
+    if missing:
+        raise FileNotFoundError("missing frozen golden files:\n" + "\n".join(missing[:20]))
+    return {"successCount": len(symbols) * len(bars), "errorCount": 0, "copiedJsonCount": copied, "source": str(GOLDEN_DIR)}
 
 
 def run_node_golden(symbols: list[str], bars: list[str], days: int, node_suffix: str) -> dict[str, Any]:
@@ -190,6 +212,36 @@ def build_python_shadows(symbols: list[str], bars: list[str], days: int, node_su
     return passes, failures, failure_details
 
 
+def build_python_shadows_from_fixture(symbols: list[str], bars: list[str], days: int, node_suffix: str, python_suffix: str) -> tuple[int, int, list[dict[str, Any]]]:
+    passes = 0
+    failures = 0
+    failure_details: list[dict[str, Any]] = []
+    env = parity_env()
+    env["RESEARCH_DATA_CLEAN_DIR"] = str(FIXTURE_CLEAN_DIR)
+    builders = [
+        ("feature", "backend_py.build_feature_factory", compare_feature_factory),
+        ("deviation", "backend_py.build_deviation_rules", compare_deviation_rules),
+        ("router", "backend_py.build_market_weather_router", compare_market_weather_router),
+    ]
+    for bar in bars:
+        for symbol in symbols:
+            args = scoped_args(symbol, bar, days)
+            for label, module, compare_fn in builders:
+                try:
+                    run_subprocess([sys.executable, "-m", module, *args], f"{label}_build_fixture", env=env)
+                except Exception as error:  # noqa: BLE001 - keep scoped failures visible.
+                    failures += 1
+                    failure_details.append({"instrument": symbol, "bar": bar, "step": f"{label}_build_fixture", "status": "failed", "message": str(error)})
+                    continue
+                compare_result = run_cli(f"{label}_compare", compare_fn, compare_args(symbol, bar, days, node_suffix, python_suffix))
+                if compare_result["status"] == "ok":
+                    passes += 1
+                else:
+                    failures += 1
+                    failure_details.append({"instrument": symbol, "bar": bar, **compare_result})
+    return passes, failures, failure_details
+
+
 def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -198,7 +250,7 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(f"{json.dumps(payload, ensure_ascii=False, indent=2)}\n", encoding="utf-8")
 
 
-def build_summary_from_suffix(symbols: list[str], bars: list[str], days: int, suffix: str) -> dict[str, Any]:
+def build_summary_from_suffix(symbols: list[str], bars: list[str], days: int, suffix: str, *, clean_dir: Path = DATA_CLEAN_DIR) -> dict[str, Any]:
     started_at = datetime.now(timezone.utc)
     all_rows: list[dict[str, Any]] = []
     all_errors: list[dict[str, Any]] = []
@@ -211,7 +263,7 @@ def build_summary_from_suffix(symbols: list[str], bars: list[str], days: int, su
             stem = file_stem(config)
             report_name = report_stem(config)
             try:
-                clean_payload = read_json(DATA_CLEAN_DIR / f"{stem}_clean.json")
+                clean_payload = read_json(clean_dir / f"{stem}_clean.json")
                 feature_result = read_json(report_json_path(report_name, "feature_factory", suffix))
                 weather_result = read_json(report_json_path(report_name, "market_weather_router", suffix))
                 deviation_rules = read_json(report_json_path(report_name, "deviation_rules", suffix))
@@ -276,9 +328,15 @@ def build_summary_from_suffix(symbols: list[str], bars: list[str], days: int, su
 def run_check(parsed: argparse.Namespace) -> dict[str, Any]:
     remove_suffix_artifacts(parsed.node_suffix, parsed.python_suffix)
     require_clean_reports()
-    node = run_node_golden(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix)
-    passes, failures, failure_details = build_python_shadows(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix, parsed.python_suffix)
-    python_summary = build_summary_from_suffix(parsed.symbols, parsed.bars, parsed.days, parsed.python_suffix)
+    clean_dir = FIXTURE_CLEAN_DIR if parsed.golden else DATA_CLEAN_DIR
+    if parsed.golden:
+        node = stage_frozen_golden(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix)
+        build_summary_from_suffix(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix, clean_dir=clean_dir)
+        passes, failures, failure_details = build_python_shadows_from_fixture(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix, parsed.python_suffix)
+    else:
+        node = run_node_golden(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix)
+        passes, failures, failure_details = build_python_shadows(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix, parsed.python_suffix)
+    python_summary = build_summary_from_suffix(parsed.symbols, parsed.bars, parsed.days, parsed.python_suffix, clean_dir=clean_dir)
     summary_result = run_cli(
         "summary_compare",
         compare_summary,
@@ -288,6 +346,7 @@ def run_check(parsed: argparse.Namespace) -> dict[str, Any]:
         failure_details.append(summary_result)
     return {
         "step": "python-official-parity-regression",
+        "mode": "frozen-golden" if parsed.golden else "live-node",
         "symbols": parsed.symbols,
         "bars": parsed.bars,
         "node": node,

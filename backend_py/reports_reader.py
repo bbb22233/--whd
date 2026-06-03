@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import Counter
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import re
 from typing import Any
@@ -11,7 +12,7 @@ from typing import Any
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 REPORTS_DIR = PROJECT_ROOT / "reports"
 DATA_RAW_DIR = PROJECT_ROOT / "data" / "raw"
-DATA_CLEAN_DIR = PROJECT_ROOT / "data" / "clean"
+DATA_CLEAN_DIR = Path(os.environ.get("RESEARCH_DATA_CLEAN_DIR") or (PROJECT_ROOT / "data" / "clean"))
 MULTI_PERIOD_REPORT = "multi_period_market_weather_current.json"
 REPORT_NAME_RE = re.compile(r"^[A-Za-z0-9_.-]+\.json$")
 SYMBOL_RE = re.compile(r"^[A-Z0-9]+-[A-Z0-9]+$")
