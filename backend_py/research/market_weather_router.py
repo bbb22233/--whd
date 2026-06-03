@@ -11,6 +11,7 @@ from .feature_factory import (
     clamp,
     finite,
     js_round,
+    js_sum,
     route_strategies,
 )
 from .deviation_rules import build_deviation_rules, run_deviation_study_from_snapshots
@@ -23,7 +24,7 @@ def safe_divide(numerator: Any, denominator: Any) -> float:
 
 
 def average(values: list[float]) -> float:
-    return sum(values) / len(values) if values else 0
+    return js_sum(values) / len(values) if values else 0
 
 
 def median(values: list[float]) -> float:

@@ -2176,3 +2176,88 @@ node checks = pass
 ### 备注
 - 本轮只新增 Python macro data pipeline、package script cutover、测试和文档;未下载外部 macro 数据,未写入 `data/macro`。
 - `compare:macro` 依赖 decision-tree validation,后续应和 Python ML/training stack 一起迁移。
+
+---
+
+## 44. Python Official Parity Gate: 1D/4H/8H Full Cutover Acceptance
+
+**状态:✅ 通过**
+
+### 命令
+```bash
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m py_compile backend_py/research/*.py backend_py/compare_summary.py
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.build_deviation_rules --instrument AAVE-USDT --bar 1D --days 3650
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.run_full_pipeline --official --skip-download --bars 1D,4H,8H --days 3650
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node scripts/run-multi-symbol-1d.mjs --skip-download --bars 1D,4H,8H
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.run_research_parity --symbols "$SYMBOLS" --bars 1D,4H,8H --days 3650
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.run_full_pipeline --official --skip-download --bars 1D,4H,8H --days 3650
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.smoke_test
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check app.js
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check server.mjs
+```
+
+### 期望
+- Python official report writer 覆盖 58 symbols x 1D/4H/8H,并与当前 Node golden 全量 parity。
+- Step C `compare_feature_factory / compare_deviation_rules / compare_market_weather_router` 全部 `FAIL=0`。
+- Step D `compare_summary --from-reports` `status ok`。
+- 收尾后正式 `reports/` 保持修复后的 Python official,不留下临时 Node golden 或 `_py` 影子。
+- 1W 不纳入本次范围;1W 缺 raw/clean 数据,单开后续下载和验收任务。
+
+### 实际
+```
+js_round 单点:
+SOL-USDT 8H ruleLibraryRows[5].medianPositionPct: 50.49 -> 50.48 (= Node)
+
+js_sum 单点:
+DOGE-USDT 4H featureStats.maDeviationAtr.mean = 2602.7060855431077
+DOGE-USDT 4H featureStats.maDeviationAtr.std = 49385.167585555624
+DOGE-USDT 4H featureStats.maPositionPct.mean = 16.582441233142003
+DOGE-USDT 4H featureStats.stretchHeat.mean = 55.435550256353814
+DOGE-USDT 4H featureStats.stretchHeat.std = 8.41901621804308
+
+js_number_to_string 单点:
+AAVE-USDT 1D finalWeather.bigCycle = 大周期偏弱，10日继续远离概率 54% (= Node)
+
+Python official regenerate:
+successCount = 174
+errorCount = 0
+
+Node golden regenerate:
+successCount = 174
+errorCount = 0
+
+Full parity:
+overallSuccessCount = 1046
+overallErrorCount = 0
+Step C PASS = 522
+Step C FAIL = 0
+Summary status = ok
+Summary rowCount = 174
+Summary errorCount = 0
+Summary weightedWeatherCount = 120.83
+
+Python official restore:
+successCount = 174
+errorCount = 0
+
+smoke_test:
+health = ok
+rowCount = 174
+symbolCount = 58
+scannerMode = python_orchestrator
+dashboardCandlesStatus = ok
+
+py_compile = pass
+node --check app.js = pass
+node --check server.mjs = pass
+```
+
+### 备注
+- 本轮修复三类 parity helper 差异:
+  - `js_round`:忠实复刻 Node `Number(value.toFixed(digits))` 在 `.xx5` 边界上的行为。
+  - `js_sum`:故意使用 JS-style 左到右朴素累加,避免 CPython 3.12+ `sum()` 补偿求和改变 ULP。
+  - `js_number_to_string`:finalWeather 概率文案复刻 JS Number 字符串化,整数概率不保留 `.0`。
+- `compare_summary` 忽略 `skipDownload / summaryOnly / fromReports` 三个生成模式 metadata;这些是产物出身标记,不是市场数据。summary rows 与聚合值仍严格比较。
+- `reports/` 已落回修复后的 Python official;临时 Node golden 和 `_py` 影子均未保留。
+- 1W 本次未纳入:本地 1W raw/clean 数据缺失,后续应单独执行下载 1W data -> Python official 1W -> Node golden parity -> default bars/combined summary 收口。

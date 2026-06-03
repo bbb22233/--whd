@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import math
-from typing import Any, Callable
+from typing import Any, Callable, Iterable
 
 from .config import ResearchConfig
 
@@ -29,15 +29,29 @@ def clamp(value: Any, minimum: float, maximum: float) -> float:
 def js_round(value: Any, digits: int = 4) -> float:
     if not finite(value):
         return 0
-    factor = 10**digits
-    number = float(value) * factor
-    if number >= 0:
-        return math.floor(number + 0.5) / factor
-    return math.ceil(number - 0.5) / factor
+    from decimal import Decimal, ROUND_HALF_UP
+
+    quant = Decimal(1).scaleb(-digits)
+    return float(Decimal(float(value)).quantize(quant, rounding=ROUND_HALF_UP))
+
+
+def js_sum(values: Iterable[float]) -> float:
+    total = 0.0
+    for value in values:
+        total += value
+    return total
+
+
+def js_number_to_string(value: Any) -> str:
+    if not finite(value):
+        return str(value)
+    number = float(value)
+    integer = int(number)
+    return str(integer) if number == integer else repr(number)
 
 
 def average(values: list[float]) -> float:
-    return sum(values) / len(values) if values else 0
+    return js_sum(values) / len(values) if values else 0
 
 
 def percent_change(current: float, previous: float) -> float:
@@ -215,7 +229,7 @@ def build_indicator_snapshots(candles: list[dict[str, Any]], config: ResearchCon
         previous_volumes = [candle["volume"] for candle in candles[max(0, index - indicator.volumeMaPeriod) : index]]
         volume_ma = average(previous_volumes)
         momentum_values = {f"d{period}": percent_change(latest["close"], candles[index - period]["close"]) for period in indicator.momentumPeriods}
-        trend_score = sum(momentum_values[f"d{period}"] * indicator.trendWeights.get(str(period), 0) for period in indicator.momentumPeriods)
+        trend_score = js_sum(momentum_values[f"d{period}"] * indicator.trendWeights.get(str(period), 0) for period in indicator.momentumPeriods)
         resonance_state = resonance([momentum_values[f"d{period}"] for period in indicator.momentumPeriods])
         middle_position_pct = position_pct(middle_deviation_atr, middle_valley_atr, middle_peak_atr)
         ma_position_pct = position_pct(ma_deviation_atr, ma_valley_atr, ma_peak_atr)

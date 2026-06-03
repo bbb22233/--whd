@@ -29,7 +29,7 @@
         "successRatePct": 45.8,
         "successLiftPct": -3.66,
         "directionalWinRatePct": 45.8,
-        "avgRouteReturnPct": 0.0,
+        "avgRouteReturnPct": -0.0,
         "reason": "方向胜率不足，不宜当进攻信号",
         "occurrences": 2334,
         "rawLight": "红灯",
@@ -176,12 +176,12 @@
       5,
       10
     ],
-    "generatedAt": "2026-06-02T18:11:52.587539Z",
+    "generatedAt": "2026-06-03T02:00:04.978107Z",
     "routerPrinciple": "ATR/振幅/波动超额负责波动天气，中值乖离负责短期拉伸，233MA乖离负责大周期过滤。输出是策略适配天气，不是买卖信号。"
   },
   "current": {
     "date": "2026-06-02 08:00",
-    "close": 7.73,
+    "close": 7.72,
     "gate": "黄偏红",
     "topWeatherRoute": "向下突破",
     "topWeatherScore": 79.0,
@@ -257,7 +257,7 @@
   ],
   "deviationFinalWeather": {
     "date": "2026-06-02 08:00",
-    "close": 7.73,
+    "close": 7.72,
     "weather": "短期下侧偏离 + 大周期弱势深水区",
     "shortTerm": "短期略偏回归，10日回归概率 56.41%",
     "bigCycle": "大周期偏弱，10日继续远离概率 52.99%",
@@ -270,7 +270,7 @@
   "currentComponentRows": [
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "波动状态",
       "state": "低波动启动",
       "currentConfidencePct": 81.12,
@@ -284,13 +284,13 @@
       "strongAtrDownProbabilityPct": 0.0,
       "futureRemainingMomentumPositivePct": 47.28,
       "avgAtrChangePct": 1.5466,
-      "medianAtrChangePct": -0.4129,
+      "medianAtrChangePct": -0.4128,
       "avgFutureVolatilityMultiple": 1.1463,
       "medianFutureRemainingMomentumAtr": -0.0319
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "波动状态",
       "state": "低波动启动",
       "currentConfidencePct": 81.12,
@@ -304,13 +304,13 @@
       "strongAtrDownProbabilityPct": 3.49,
       "futureRemainingMomentumPositivePct": 43.83,
       "avgAtrChangePct": 3.9359,
-      "medianAtrChangePct": 0.2632,
+      "medianAtrChangePct": 0.2631,
       "avgFutureVolatilityMultiple": 1.091,
       "medianFutureRemainingMomentumAtr": -0.0766
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "波动状态",
       "state": "低波动启动",
       "currentConfidencePct": 81.12,
@@ -330,7 +330,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "波动状态",
       "state": "低波动启动",
       "currentConfidencePct": 81.12,
@@ -350,7 +350,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "短ATR状态",
       "state": "短ATR中性",
       "currentConfidencePct": 85.64,
@@ -370,7 +370,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "短ATR状态",
       "state": "短ATR中性",
       "currentConfidencePct": 85.64,
@@ -390,7 +390,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "短ATR状态",
       "state": "短ATR中性",
       "currentConfidencePct": 85.64,
@@ -410,7 +410,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "短ATR状态",
       "state": "短ATR中性",
       "currentConfidencePct": 85.64,
@@ -430,7 +430,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "波动超额状态",
       "state": "振幅已超ATR",
       "currentConfidencePct": 74.8,
@@ -450,7 +450,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "波动超额状态",
       "state": "振幅已超ATR",
       "currentConfidencePct": 74.8,
@@ -464,13 +464,13 @@
       "strongAtrDownProbabilityPct": 3.79,
       "futureRemainingMomentumPositivePct": 47.68,
       "avgAtrChangePct": 5.1194,
-      "medianAtrChangePct": 0.919,
+      "medianAtrChangePct": 0.9189,
       "avgFutureVolatilityMultiple": 1.124,
       "medianFutureRemainingMomentumAtr": -0.0341
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "波动超额状态",
       "state": "振幅已超ATR",
       "currentConfidencePct": 74.8,
@@ -490,7 +490,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "波动超额状态",
       "state": "振幅已超ATR",
       "currentConfidencePct": 74.8,
@@ -510,7 +510,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "趋势状态",
       "state": "强趋势下行",
       "currentConfidencePct": 100.0,
@@ -530,7 +530,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "趋势状态",
       "state": "强趋势下行",
       "currentConfidencePct": 100.0,
@@ -550,7 +550,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "趋势状态",
       "state": "强趋势下行",
       "currentConfidencePct": 100.0,
@@ -570,7 +570,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "趋势状态",
       "state": "强趋势下行",
       "currentConfidencePct": 100.0,
@@ -586,11 +586,11 @@
       "avgAtrChangePct": -3.1239,
       "medianAtrChangePct": -9.7639,
       "avgFutureVolatilityMultiple": 0.9148,
-      "medianFutureRemainingMomentumAtr": -0.2083
+      "medianFutureRemainingMomentumAtr": -0.2082
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "量能状态",
       "state": "放量",
       "currentConfidencePct": 48.38,
@@ -610,7 +610,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "量能状态",
       "state": "放量",
       "currentConfidencePct": 48.38,
@@ -630,7 +630,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "量能状态",
       "state": "放量",
       "currentConfidencePct": 48.38,
@@ -650,7 +650,7 @@
     },
     {
       "date": "2026-06-02 08:00",
-      "close": 7.73,
+      "close": 7.72,
       "component": "量能状态",
       "state": "放量",
       "currentConfidencePct": 48.38,
@@ -791,7 +791,7 @@
       "strongAtrDownProbabilityPct": 27.61,
       "futureRemainingMomentumPositivePct": 34.17,
       "avgAtrChangePct": -1.2546,
-      "medianAtrChangePct": -4.6026,
+      "medianAtrChangePct": -4.6025,
       "avgFutureVolatilityMultiple": 0.9684,
       "medianFutureRemainingMomentumAtr": -0.1783,
       "lastSeen": "2026-05-31 08:00"
@@ -845,7 +845,7 @@
       "strongAtrDownProbabilityPct": 3.79,
       "futureRemainingMomentumPositivePct": 47.68,
       "avgAtrChangePct": 5.1194,
-      "medianAtrChangePct": 0.919,
+      "medianAtrChangePct": 0.9189,
       "avgFutureVolatilityMultiple": 1.124,
       "medianFutureRemainingMomentumAtr": -0.0341,
       "lastSeen": "2026-05-29 08:00"
@@ -953,7 +953,7 @@
       "strongAtrDownProbabilityPct": 31.37,
       "futureRemainingMomentumPositivePct": 39.81,
       "avgAtrChangePct": 4.5149,
-      "medianAtrChangePct": -2.0687,
+      "medianAtrChangePct": -2.0686,
       "avgFutureVolatilityMultiple": 1.0352,
       "medianFutureRemainingMomentumAtr": -0.1164,
       "lastSeen": "2026-05-29 00:00"
@@ -971,7 +971,7 @@
       "strongAtrDownProbabilityPct": 0.0,
       "futureRemainingMomentumPositivePct": 31.99,
       "avgAtrChangePct": -0.4017,
-      "medianAtrChangePct": -1.7854,
+      "medianAtrChangePct": -1.7853,
       "avgFutureVolatilityMultiple": 0.9146,
       "medianFutureRemainingMomentumAtr": -0.205,
       "lastSeen": "2026-05-30 00:00"
@@ -1007,7 +1007,7 @@
       "strongAtrDownProbabilityPct": 26.82,
       "futureRemainingMomentumPositivePct": 33.27,
       "avgAtrChangePct": -0.9276,
-      "medianAtrChangePct": -4.2375,
+      "medianAtrChangePct": -4.2374,
       "avgFutureVolatilityMultiple": 0.9442,
       "medianFutureRemainingMomentumAtr": -0.1829,
       "lastSeen": "2026-05-30 00:00"
@@ -1043,7 +1043,7 @@
       "strongAtrDownProbabilityPct": 0.0,
       "futureRemainingMomentumPositivePct": 47.28,
       "avgAtrChangePct": 1.5466,
-      "medianAtrChangePct": -0.4129,
+      "medianAtrChangePct": -0.4128,
       "avgFutureVolatilityMultiple": 1.1463,
       "medianFutureRemainingMomentumAtr": -0.0319,
       "lastSeen": "2026-06-02 00:00"
@@ -1061,7 +1061,7 @@
       "strongAtrDownProbabilityPct": 3.49,
       "futureRemainingMomentumPositivePct": 43.83,
       "avgAtrChangePct": 3.9359,
-      "medianAtrChangePct": 0.2632,
+      "medianAtrChangePct": 0.2631,
       "avgFutureVolatilityMultiple": 1.091,
       "medianFutureRemainingMomentumAtr": -0.0766,
       "lastSeen": "2026-06-01 00:00"
@@ -1153,7 +1153,7 @@
       "avgAtrChangePct": 1.5705,
       "medianAtrChangePct": -3.4607,
       "avgFutureVolatilityMultiple": 0.9475,
-      "medianFutureRemainingMomentumAtr": -0.1836,
+      "medianFutureRemainingMomentumAtr": -0.1835,
       "lastSeen": "2026-02-28 00:00"
     },
     {
@@ -1711,7 +1711,7 @@
       "avgAtrChangePct": 4.308,
       "medianAtrChangePct": 1.4129,
       "avgFutureVolatilityMultiple": 1.1301,
-      "medianFutureRemainingMomentumAtr": -0.0079,
+      "medianFutureRemainingMomentumAtr": -0.0078,
       "lastSeen": "2026-05-12 00:00"
     },
     {
@@ -1819,7 +1819,7 @@
       "avgAtrChangePct": -3.1239,
       "medianAtrChangePct": -9.7639,
       "avgFutureVolatilityMultiple": 0.9148,
-      "medianFutureRemainingMomentumAtr": -0.2083,
+      "medianFutureRemainingMomentumAtr": -0.2082,
       "lastSeen": "2026-05-30 00:00"
     },
     {
@@ -1837,7 +1837,7 @@
       "avgAtrChangePct": -0.5584,
       "medianAtrChangePct": -1.9198,
       "avgFutureVolatilityMultiple": 0.8827,
-      "medianFutureRemainingMomentumAtr": -0.2405,
+      "medianFutureRemainingMomentumAtr": -0.2404,
       "lastSeen": "2026-05-25 16:00"
     },
     {
@@ -1873,7 +1873,7 @@
       "avgAtrChangePct": -0.9391,
       "medianAtrChangePct": -4.398,
       "avgFutureVolatilityMultiple": 0.97,
-      "medianFutureRemainingMomentumAtr": -0.1803,
+      "medianFutureRemainingMomentumAtr": -0.1802,
       "lastSeen": "2026-05-25 16:00"
     },
     {

@@ -10,8 +10,11 @@ from backend_py.build_summary import parse_batch_args
 
 
 VALUE_TOLERANCE = 1e-3
-BAR_METADATA_IGNORE_KEYS = {"startedAt", "finishedAt"}
-COMBINED_METADATA_IGNORE_KEYS = {"startedAt", "finishedAt"}
+MODE_METADATA_IGNORE_KEYS = {"skipDownload", "summaryOnly", "fromReports"}
+# Generation-mode markers can differ when parity builds Python summaries from reports;
+# market rows and aggregate values are still compared strictly.
+BAR_METADATA_IGNORE_KEYS = {"startedAt", "finishedAt", *MODE_METADATA_IGNORE_KEYS}
+COMBINED_METADATA_IGNORE_KEYS = {"startedAt", "finishedAt", *MODE_METADATA_IGNORE_KEYS}
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -114,4 +117,3 @@ def main(argv: list[str] | None = None) -> None:
 
 if __name__ == "__main__":
     main()
-

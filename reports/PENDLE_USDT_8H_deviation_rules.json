@@ -23,14 +23,14 @@
       "极高:90-100%"
     ],
     "metricBucketMode": "causal_prefix_percentile",
-    "generatedAt": "2026-06-02T18:12:43.632150Z",
+    "generatedAt": "2026-06-03T02:01:40.788188Z",
     "rulePrinciple": "中值乖离负责短期拉伸/回归，233MA乖离负责大周期天气过滤。规则只识别状态，不直接给交易方向。"
   },
   "finalWeather": {
     "date": "2026-06-02 08:00",
     "close": 1.33,
     "weather": "短期过冷 + 大周期偏弱",
-    "shortTerm": "短期略偏回归，10日回归概率 84.0%",
+    "shortTerm": "短期略偏回归，10日回归概率 84%",
     "bigCycle": "大周期偏弱，10日继续远离概率 76.81%",
     "gate": "黄灯",
     "actionBias": "可观察短线回归，但仍受大周期弱势约束",
@@ -97,7 +97,7 @@
       "atrUpProbabilityPct": 43.9,
       "atrDownProbabilityPct": 56.1,
       "avgAtrChangePct": 2.0449,
-      "medianDistanceChangeAtr": -0.2783
+      "medianDistanceChangeAtr": -0.2782
     },
     {
       "date": "2026-06-02 08:00",
@@ -187,7 +187,7 @@
       "atrUpProbabilityPct": 39.73,
       "atrDownProbabilityPct": 60.27,
       "avgAtrChangePct": 0.3215,
-      "medianDistanceChangeAtr": 0.086
+      "medianDistanceChangeAtr": 0.0859
     },
     {
       "date": "2026-06-02 08:00",
@@ -319,7 +319,7 @@
       "confidence": "中",
       "probabilityEdgePct": 12.32,
       "occurrences": 146,
-      "medianDeviationRate": -5.4346,
+      "medianDeviationRate": -5.4345,
       "medianDeviationAtr": -1.2199,
       "medianPositionPct": 57.7,
       "returnCloserProbabilityPct": 43.84,
@@ -328,7 +328,7 @@
       "reversionDirectionHitPct": 47.26,
       "atrUpProbabilityPct": 39.73,
       "atrDownProbabilityPct": 60.27,
-      "medianDistanceChangeAtr": 0.086,
+      "medianDistanceChangeAtr": 0.0859,
       "avgReturnPct": -0.1062
     },
     {
@@ -346,7 +346,7 @@
       "occurrences": 66,
       "medianDeviationRate": 0.2767,
       "medianDeviationAtr": 0.0435,
-      "medianPositionPct": 62.35,
+      "medianPositionPct": 62.34,
       "returnCloserProbabilityPct": 19.7,
       "continueAwayProbabilityPct": 80.3,
       "crossBaselineProbabilityPct": 40.91,
@@ -628,7 +628,7 @@
       "reversionDirectionHitPct": 52.79,
       "atrUpProbabilityPct": 52.23,
       "atrDownProbabilityPct": 47.77,
-      "medianDistanceChangeAtr": -0.1319,
+      "medianDistanceChangeAtr": -0.1318,
       "avgReturnPct": -0.3186
     },
     {
@@ -796,7 +796,7 @@
       "occurrences": 84,
       "medianDeviationRate": -14.2831,
       "medianDeviationAtr": -2.9278,
-      "medianPositionPct": 10.97,
+      "medianPositionPct": 10.96,
       "returnCloserProbabilityPct": 54.76,
       "continueAwayProbabilityPct": 45.24,
       "crossBaselineProbabilityPct": 0.0,
@@ -878,7 +878,7 @@
       "reversionDirectionHitPct": 60.53,
       "atrUpProbabilityPct": 57.89,
       "atrDownProbabilityPct": 42.11,
-      "medianDistanceChangeAtr": -0.3344,
+      "medianDistanceChangeAtr": -0.3343,
       "avgReturnPct": -0.5788
     },
     {
@@ -928,7 +928,7 @@
       "reversionDirectionHitPct": 43.9,
       "atrUpProbabilityPct": 43.9,
       "atrDownProbabilityPct": 56.1,
-      "medianDistanceChangeAtr": -0.2783,
+      "medianDistanceChangeAtr": -0.2782,
       "avgReturnPct": -1.1732
     },
     {
@@ -978,7 +978,7 @@
       "reversionDirectionHitPct": 52.85,
       "atrUpProbabilityPct": 42.72,
       "atrDownProbabilityPct": 57.28,
-      "medianDistanceChangeAtr": 0.471,
+      "medianDistanceChangeAtr": 0.4709,
       "avgReturnPct": -0.1457
     },
     {
@@ -1003,7 +1003,7 @@
       "reversionDirectionHitPct": 55.26,
       "atrUpProbabilityPct": 72.37,
       "atrDownProbabilityPct": 27.63,
-      "medianDistanceChangeAtr": -0.6022,
+      "medianDistanceChangeAtr": -0.6021,
       "avgReturnPct": -0.9324
     },
     {
@@ -1044,9 +1044,9 @@
       "confidence": "样本偏少",
       "probabilityEdgePct": 35.0,
       "occurrences": 80,
-      "medianDeviationRate": -14.1431,
+      "medianDeviationRate": -14.143,
       "medianDeviationAtr": -2.918,
-      "medianPositionPct": 10.97,
+      "medianPositionPct": 10.96,
       "returnCloserProbabilityPct": 67.5,
       "continueAwayProbabilityPct": 32.5,
       "crossBaselineProbabilityPct": 5.0,

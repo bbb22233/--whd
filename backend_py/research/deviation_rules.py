@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable
 
 from .config import ResearchConfig
-from .feature_factory import build_indicator_snapshots, finite, js_round, safe_divide
+from .feature_factory import build_indicator_snapshots, finite, js_number_to_string, js_round, js_sum, safe_divide
 
 
 BUCKET_DEFS = [
@@ -46,7 +46,7 @@ DEVIATION_GATE_YELLOW_GREEN = "黄偏绿"
 
 
 def average(values: list[float]) -> float:
-    return sum(values) / len(values) if values else 0
+    return js_sum(values) / len(values) if values else 0
 
 
 def median(values: list[float]) -> float:
@@ -712,12 +712,15 @@ def final_weather(current_rule_rows: list[dict[str, Any]]) -> dict[str, Any]:
         action_bias = "样本偏少，偏离规则只做观察，不升级主灯号"
         gate = DEVIATION_GATE_YELLOW
 
+    short_probability = js_number_to_string(middle10["returnCloserProbabilityPct"])
+    big_probability = js_number_to_string(ma10["continueAwayProbabilityPct"])
+
     return {
         "date": middle10["date"],
         "close": middle10["close"],
         "weather": f"{middle_rule['weatherTag']} + {ma_rule['weatherTag']}",
-        "shortTerm": f"{short_bias}，10日回归概率 {middle10['returnCloserProbabilityPct']}%",
-        "bigCycle": f"{big_bias}，10日继续远离概率 {ma10['continueAwayProbabilityPct']}%",
+        "shortTerm": f"{short_bias}，10日回归概率 {short_probability}%",
+        "bigCycle": f"{big_bias}，10日继续远离概率 {big_probability}%",
         "gate": gate,
         "actionBias": action_bias,
         "ruleConfidence": f"中值{middle_confidence} / 233MA{ma_confidence}",

@@ -23,12 +23,12 @@
       "极高:90-100%"
     ],
     "metricBucketMode": "causal_prefix_percentile",
-    "generatedAt": "2026-06-02T18:05:34.357134Z",
+    "generatedAt": "2026-06-03T01:48:57.982286Z",
     "rulePrinciple": "中值乖离负责短期拉伸/回归，233MA乖离负责大周期天气过滤。规则只识别状态，不直接给交易方向。"
   },
   "finalWeather": {
     "date": "2026-06-02 12:00",
-    "close": 2.49,
+    "close": 2.48,
     "weather": "短期贴近中轴 + 大周期强势高位",
     "shortTerm": "短期仍可能继续拉伸，10日回归概率 7.02%",
     "bigCycle": "大周期偏强，10日继续远离概率 44.45%",
@@ -41,7 +41,7 @@
   "currentRuleRows": [
     {
       "date": "2026-06-02 12:00",
-      "close": 2.49,
+      "close": 2.48,
       "kind": "中值",
       "kindKey": "middle",
       "role": "短期拉伸/回归",
@@ -71,7 +71,7 @@
     },
     {
       "date": "2026-06-02 12:00",
-      "close": 2.49,
+      "close": 2.48,
       "kind": "中值",
       "kindKey": "middle",
       "role": "短期拉伸/回归",
@@ -101,7 +101,7 @@
     },
     {
       "date": "2026-06-02 12:00",
-      "close": 2.49,
+      "close": 2.48,
       "kind": "中值",
       "kindKey": "middle",
       "role": "短期拉伸/回归",
@@ -131,7 +131,7 @@
     },
     {
       "date": "2026-06-02 12:00",
-      "close": 2.49,
+      "close": 2.48,
       "kind": "中值",
       "kindKey": "middle",
       "role": "短期拉伸/回归",
@@ -161,7 +161,7 @@
     },
     {
       "date": "2026-06-02 12:00",
-      "close": 2.49,
+      "close": 2.48,
       "kind": "233MA",
       "kindKey": "ma233",
       "role": "大周期天气过滤",
@@ -191,7 +191,7 @@
     },
     {
       "date": "2026-06-02 12:00",
-      "close": 2.49,
+      "close": 2.48,
       "kind": "233MA",
       "kindKey": "ma233",
       "role": "大周期天气过滤",
@@ -221,7 +221,7 @@
     },
     {
       "date": "2026-06-02 12:00",
-      "close": 2.49,
+      "close": 2.48,
       "kind": "233MA",
       "kindKey": "ma233",
       "role": "大周期天气过滤",
@@ -251,7 +251,7 @@
     },
     {
       "date": "2026-06-02 12:00",
-      "close": 2.49,
+      "close": 2.48,
       "kind": "233MA",
       "kindKey": "ma233",
       "role": "大周期天气过滤",
@@ -303,7 +303,7 @@
       "reversionDirectionHitPct": 50.02,
       "atrUpProbabilityPct": 33.44,
       "atrDownProbabilityPct": 66.56,
-      "medianDistanceChangeAtr": 0.085,
+      "medianDistanceChangeAtr": 0.0849,
       "avgReturnPct": -0.01
     },
     {
@@ -319,7 +319,7 @@
       "confidence": "弱",
       "probabilityEdgePct": 8.16,
       "occurrences": 1298,
-      "medianDeviationRate": -3.9353,
+      "medianDeviationRate": -3.9352,
       "medianDeviationAtr": -1.5042,
       "medianPositionPct": 60.39,
       "returnCloserProbabilityPct": 45.92,
@@ -444,7 +444,7 @@
       "confidence": "中",
       "probabilityEdgePct": 14.48,
       "occurrences": 1298,
-      "medianDeviationRate": -3.9353,
+      "medianDeviationRate": -3.9352,
       "medianDeviationAtr": -1.5042,
       "medianPositionPct": 60.39,
       "returnCloserProbabilityPct": 42.76,
@@ -569,7 +569,7 @@
       "confidence": "中强",
       "probabilityEdgePct": 20.04,
       "occurrences": 1298,
-      "medianDeviationRate": -3.9353,
+      "medianDeviationRate": -3.9352,
       "medianDeviationAtr": -1.5042,
       "medianPositionPct": 60.39,
       "returnCloserProbabilityPct": 39.98,
@@ -578,7 +578,7 @@
       "reversionDirectionHitPct": 45.84,
       "atrUpProbabilityPct": 39.6,
       "atrDownProbabilityPct": 60.4,
-      "medianDistanceChangeAtr": 0.2783,
+      "medianDistanceChangeAtr": 0.2782,
       "avgReturnPct": -0.1345
     },
     {
@@ -694,7 +694,7 @@
       "confidence": "强",
       "probabilityEdgePct": 32.98,
       "occurrences": 1298,
-      "medianDeviationRate": -3.9353,
+      "medianDeviationRate": -3.9352,
       "medianDeviationAtr": -1.5042,
       "medianPositionPct": 60.39,
       "returnCloserProbabilityPct": 33.51,
@@ -745,7 +745,7 @@
       "probabilityEdgePct": 11.1,
       "occurrences": 3658,
       "medianDeviationRate": 24.6537,
-      "medianDeviationAtr": 5.0009,
+      "medianDeviationAtr": 5.0008,
       "medianPositionPct": 78.65,
       "returnCloserProbabilityPct": 55.55,
       "continueAwayProbabilityPct": 44.45,
@@ -894,7 +894,7 @@
       "confidence": "弱",
       "probabilityEdgePct": 4.2,
       "occurrences": 4094,
-      "medianDeviationRate": 3.8881,
+      "medianDeviationRate": 3.888,
       "medianDeviationAtr": 1.1751,
       "medianPositionPct": 74.65,
       "returnCloserProbabilityPct": 52.1,

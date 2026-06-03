@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
+from .feature_factory import js_sum
+
 
 DAY_MS = 24 * 60 * 60 * 1000
 HOUR_MS = 60 * 60 * 1000
@@ -247,7 +249,7 @@ def aggregate_candles(source_candles: list[dict[str, Any]], target_bar: str, gro
                 "high": max(candle["high"] for candle in sorted_bucket),
                 "low": min(candle["low"] for candle in sorted_bucket),
                 "close": sorted_bucket[-1]["close"],
-                "volume": sum(candle["volume"] for candle in sorted_bucket),
+                "volume": js_sum(candle["volume"] for candle in sorted_bucket),
                 "confirm": "1",
             }
         )

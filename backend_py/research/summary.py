@@ -4,6 +4,7 @@ import math
 from typing import Any
 
 from .config import ResearchConfig
+from .feature_factory import js_sum
 
 
 def finite_number(value: Any) -> bool:
@@ -89,7 +90,7 @@ def history_quality(config: ResearchConfig, clean_rows: Any, has_current: bool, 
 
 def quality_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     ok_rows = [row for row in rows if row.get("dataStatus") == "ok"]
-    weighted_weather_count = sum(float(row.get("periodWeight") or 0) for row in ok_rows)
+    weighted_weather_count = js_sum(float(row.get("periodWeight") or 0) for row in ok_rows)
     return {
         "weatherCount": len(ok_rows),
         "weightedWeatherCount": summary_round(weighted_weather_count, 2),
@@ -179,4 +180,3 @@ def build_summary_row(
     }
     row.update(score_columns(weather_result.get("strategyScores")))
     return row
-
