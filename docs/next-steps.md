@@ -48,9 +48,9 @@
 **完成定义**:无遗留 `TODO`(或注明"环境受限暂缺")。
 **依赖**:N2(同一次联网采数)。
 
-## N6 — 文档留痕(收尾)📄 不联网
+## N6 — 文档留痕(收尾)📄 不联网 ✅ 已完成
 **目标**:固化架构与退役标准。
-**范围**:新增 `docs/target-architecture.md`(Python 算+数据 / REST 当窗口 / 前端摆盘;Rust 暂不引入决策)、`docs/node-retirement-checklist.md`(砍 Node 前置 + 顺序)、`docs/parity-helpers.md`(jsround/jssum/jsnumber 留痕)。纯文档。
+**范围**:新增 `docs/target-architecture.md`(Python 算+数据 / REST 当窗口 / 前端摆盘;Rust 暂不引入决策)、`docs/node-retirement-checklist.md`(砍 Node 前置 + 顺序)、`docs/parity-helpers.md`(jsround/jssum/jsnumber + None 键省略留痕)。纯文档。
 **依赖**:无,随时可做。
 
 ## N7 — 冻结 golden 接管"标准答案",然后砍 Node 🔒 不联网【删 Node 的真正前提】
