@@ -67,8 +67,6 @@ def main() -> None:
     assert "python_research" in scanner_payload["scanner"]["supportedModes"]
     assert "python_data" in scanner_payload["scanner"]["supportedModes"]
     assert "python_full" in scanner_payload["scanner"]["supportedModes"]
-    assert "node_summary" in scanner_payload["scanner"]["supportedModes"]
-    assert "node_full" in scanner_payload["scanner"]["supportedModes"]
     summary_command = command_for_mode("summary")
     assert "backend_py.run_full_pipeline" in summary_command
     assert "--from-reports" in summary_command
@@ -81,8 +79,6 @@ def main() -> None:
     assert "--skip-download" in full_command
     assert "--official" in full_command
     assert full_command[-2:] == ["--bars", "1D,4H,8H"]
-    assert "legacy:multi:periods" in command_for_mode("node_summary")
-    assert "legacy:multi:periods" in command_for_mode("node_full")
     assert "backend_py.build_summary" in command_for_mode("python_summary")
     assert "backend_py.run_router_parity" in command_for_mode("python_router")
     assert "backend_py.run_research_parity" in command_for_mode("python_research")
@@ -110,41 +106,9 @@ def main() -> None:
     assert "backend_py.calibrate_router" in package_scripts["calibrate:router"]
     assert "--official" in package_scripts["calibrate:router"]
     assert "backend_py.download_macro_data" in package_scripts["download:macro"]
-    assert "scripts/download-data.mjs" in package_scripts["legacy:download"]
-    assert "scripts/clean-data.mjs" in package_scripts["legacy:clean"]
-    assert "scripts/run-multi-symbol-1d.mjs" in package_scripts["legacy:multi:periods"]
-    assert "scripts/run-multi-symbol-1d.mjs" in package_scripts["legacy:multi:1d"]
-    assert "scripts/build-feature-factory.mjs" in package_scripts["legacy:features"]
-    assert "scripts/build-deviation-rules.mjs" in package_scripts["legacy:rules:deviations"]
-    assert "scripts/build-market-weather-router.mjs" in package_scripts["legacy:weather:router"]
-    assert "scripts/backtest-strategy-router.mjs" in package_scripts["legacy:backtest:router"]
-    assert "scripts/calibrate-router.mjs" in package_scripts["legacy:calibrate:router"]
-    assert "scripts/download-macro-data.mjs" in package_scripts["legacy:download:macro"]
 
     node_scripts = {name for name, command in package_scripts.items() if command.startswith("node ")}
-    assert node_scripts == {
-        "serve",
-        "legacy:multi:1d",
-        "legacy:multi:weather",
-        "legacy:multi:periods",
-        "legacy:download:macro",
-        "legacy:download",
-        "legacy:clean",
-        "backtest:indicators",
-        "backtest:volatility",
-        "backtest:position",
-        "backtest:deviations",
-        "legacy:backtest:router",
-        "legacy:calibrate:router",
-        "legacy:rules:deviations",
-        "legacy:weather:router",
-        "legacy:features",
-        "journal:create",
-        "train:trees",
-        "validate:trees",
-        "compare:macro",
-        "train:state",
-    }
+    assert node_scripts == {"serve"}
 
     scoped_summary = command_for_mode("summary", symbols="BTC-USDT,ETH-USDT", bars="1D,4H")
     assert scoped_summary[-5:] == ["--symbols", "BTC-USDT", "ETH-USDT", "--bars", "1D,4H"]

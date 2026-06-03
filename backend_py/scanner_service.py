@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
-import shutil
 import subprocess
 import sys
 import threading
@@ -12,7 +11,7 @@ from typing import Literal
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-ScannerMode = Literal["summary", "full", "node_summary", "node_full", "python_summary", "python_router", "python_research", "python_data", "python_full"]
+ScannerMode = Literal["summary", "full", "python_summary", "python_router", "python_research", "python_data", "python_full"]
 ScannerStatus = Literal["idle", "running", "succeeded", "failed", "cancelled"]
 
 
@@ -32,13 +31,6 @@ def tail_text(value: str, limit: int = 4000) -> str:
     if len(value) <= limit:
         return value
     return value[-limit:]
-
-
-def npm_executable() -> str:
-    npm = shutil.which("npm.cmd") or shutil.which("npm")
-    if not npm:
-        raise ScannerCommandUnavailable("npm executable not found in PATH")
-    return npm
 
 
 def split_csv_values(value: str | None) -> list[str]:
@@ -73,9 +65,6 @@ def command_for_mode(mode: ScannerMode, *, symbols: str | None = None, bars: str
             "3650",
             *scope,
         ]
-    if mode == "node_summary":
-        npm = npm_executable()
-        return [npm, "run", "legacy:multi:periods", "--", "--from-reports", "--summary-only", *scanner_scope_args(symbols, bars)]
     if mode == "full":
         scope = scanner_scope_args(symbols, bars or "1D,4H,8H")
         return [
@@ -88,9 +77,6 @@ def command_for_mode(mode: ScannerMode, *, symbols: str | None = None, bars: str
             "3650",
             *scope,
         ]
-    if mode == "node_full":
-        npm = npm_executable()
-        return [npm, "run", "legacy:multi:periods"]
     if mode == "python_summary":
         scope = scanner_scope_args(symbols or "BTC-USDT", bars or "1D")
         return [
@@ -156,13 +142,11 @@ class ScannerJob:
 class ScannerSnapshot:
     active: bool
     lastJob: dict | None
-    supportedModes: list[str] = field(default_factory=lambda: ["summary", "full", "node_summary", "node_full", "python_summary", "python_router", "python_research", "python_data", "python_full"])
+    supportedModes: list[str] = field(default_factory=lambda: ["summary", "full", "python_summary", "python_router", "python_research", "python_data", "python_full"])
     modeNotes: dict[str, str] = field(
         default_factory=lambda: {
             "summary": "Rebuild production summaries from existing reports with the Python official pipeline; no download.",
             "full": "Run the Python official full pipeline from existing raw/clean inputs and write production reports.",
-            "node_summary": "Rebuild combined summaries with the legacy Node from-reports path; no download.",
-            "node_full": "Run the legacy Node multi-period scanner; may download market data.",
             "python_summary": "Run Python from-reports summary parity; defaults to BTC-USDT 1D and writes _py artifacts only.",
             "python_router": "Run Python full router parity against existing Node reports; defaults to BTC-USDT 1D and writes _py artifacts only.",
             "python_research": "Run Python feature/deviation/router/summary parity chain; defaults to BTC-USDT 1D and writes _py artifacts only.",
