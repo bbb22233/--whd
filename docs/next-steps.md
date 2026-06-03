@@ -49,21 +49,35 @@
 
 ## N6 — 文档留痕(收尾)📄 不联网
 **目标**:固化架构与退役标准。
-**范围**:新增 `docs/target-architecture.md`(Python 算+数据 / REST 当窗口 / 前端摆盘;Rust 暂不引入决策)、`docs/node-retirement-checklist.md`(砍 Node 五条前置 + 顺序)、`docs/parity-helpers.md`(jsround/jssum/jsnumber 留痕)。纯文档。
+**范围**:新增 `docs/target-architecture.md`(Python 算+数据 / REST 当窗口 / 前端摆盘;Rust 暂不引入决策)、`docs/node-retirement-checklist.md`(砍 Node 前置 + 顺序)、`docs/parity-helpers.md`(jsround/jssum/jsnumber 留痕)。纯文档。
 **依赖**:无,随时可做。
+
+## N7 — 冻结 golden 接管"标准答案",然后砍 Node 🔒 不联网【删 Node 的真正前提】
+**背景**:Node 从来不是线上服务,只是本地生成报告的脚本——**所以没有"运行时观察期"这回事**。但当前 N1 回归是**现场跑 Node 生成 golden 再比**,即 Node 仍兼着"标准答案"角色;**直接删 Node 会让 N1 回归失去比对基准**。删之前必须先把这个角色换走。
+**步骤**:
+1. **冻结 golden 快照**:钉一小批固定输入(pin 一份 `data/clean` 子集,纳入仓库或 `tests/fixtures/`)+ 对应"正确输出"快照存进 `tests/golden/`(这份输出 = 当前已对平的 Python official,等价 Node)。
+2. **改造 N1**:从"现场跑 Node 生成 golden"改成 **Python 现算 vs 冻结 golden** 比对。改完 Node 不再是回归依赖。
+3. **确认无入口再调 Node**:`package.json` 脚本、`scanner_service`、文档命令、`remaining-node-command-inventory` 全部清完/确认弃用。
+4. **删 Node**:删 `backtest/*.mjs` 与 `scripts/*.mjs` 的研究/生成代码(`app.js`、`server.mjs`、`index.html` 等前端文件**保留**)。
+5. 删完跑一遍改造后的 N1 + `smoke_test`,确认安全网仍在。
+**不该动**:`app.js`/`server.mjs`/前端;Python 研究算法。
+**完成定义**:Node 研究代码已删;改造后的 N1(Python vs 冻结 golden)`FAIL=0`;无任何脚本/入口再调 Node。
+**依赖**:① N2(1W 也对平,趁 Node 还在做完);② ④ 入口清完。**这之后即可删,无需等待期。**
 
 ---
 
-## 砍 Node 前置条件(到齐才动手删)
+## 砍 Node 前置条件(到齐才动手删 —— 无"观察期")
 | 条件 | 当前 |
 |---|---|
 | ① Python↔Node 全量逐字对平 | ✅ 1D/4H/8H(1W 待 N2) |
-| ② 对账沉淀成可复跑回归 | ⬜ N1 |
-| ③ Python 当生产稳定观察一段 | ⬜ 观察期 |
-| ④ Node 入口全迁 Python | 🟡 `remaining-node-command-inventory` 在清 |
-| ⑤ 前端全走 REST、不靠 Node | ⬜ N3 |
+| ② 对账沉淀成可复跑回归 | ✅ N1(`04bedc0`) |
+| ③ **冻结 golden 接管"标准答案"**(N1 不再依赖现场 Node) | ⬜ N7 |
+| ④ Node 入口全迁/弃用 | 🟡 `remaining-node-command-inventory` 在清 |
+| ⑤ 前端全走 REST、不靠 Node | 🟡 N3 进行中 |
 
-**顺序建议**:N1(锁战果)→ N3+N4(前端,不依赖联网)→ 放行联网时 N2+N5 → N6 收尾 → 满足五条后再砍 Node。
+> 注:原"Python 生产观察一段"已删除——Node 非线上服务,无运行时可观察;真正的门槛是 ③(用冻结快照接管回归基准)。
+
+**顺序建议**:N1✅ → N3+N4(前端,不联网)→ 放行联网时 N2+N5 → N7(冻结 golden + 删 Node)→ N6 收尾。**满足 ①–⑤ 即删,不设等待期。**
 
 ---
 
