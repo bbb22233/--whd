@@ -28,6 +28,16 @@ PAYLOAD_KEYS = ["finalWeather", "currentRuleRows", "ruleLibraryRows"]
 OPTIONAL_KEYS = {"generatedAt", "metricBucketMode", "confidenceLimited"}
 
 
+def option_value(args: list[str], name: str, default: str) -> str:
+    try:
+        index = args.index(name)
+    except ValueError:
+        return default
+    if index + 1 >= len(args) or args[index + 1].startswith("--"):
+        return default
+    return args[index + 1]
+
+
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -68,8 +78,10 @@ def main(argv: list[str] | None = None) -> None:
     args = list(argv if argv is not None else sys.argv[1:])
     config = parse_args(args)
     stem = report_stem(config)
-    node_path = REPORTS_DIR / f"{stem}_deviation_rules.json"
-    python_path = REPORTS_DIR / f"{stem}_deviation_rules_py.json"
+    node_suffix = option_value(args, "--node-suffix", "")
+    python_suffix = option_value(args, "--python-suffix", "_py")
+    node_path = REPORTS_DIR / f"{stem}_deviation_rules{node_suffix}.json"
+    python_path = REPORTS_DIR / f"{stem}_deviation_rules{python_suffix}.json"
     node_payload = load_json(node_path)
     python_payload = load_json(python_path)
     failures: list[str] = []

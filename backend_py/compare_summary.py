@@ -17,6 +17,16 @@ BAR_METADATA_IGNORE_KEYS = {"startedAt", "finishedAt", *MODE_METADATA_IGNORE_KEY
 COMBINED_METADATA_IGNORE_KEYS = {"startedAt", "finishedAt", *MODE_METADATA_IGNORE_KEYS}
 
 
+def option_value(args: list[str], name: str, default: str) -> str:
+    try:
+        index = args.index(name)
+    except ValueError:
+        return default
+    if index + 1 >= len(args) or args[index + 1].startswith("--"):
+        return default
+    return args[index + 1]
+
+
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -78,20 +88,22 @@ def main(argv: list[str] | None = None) -> None:
     args = list(argv if argv is not None else sys.argv[1:])
     parsed = parse_batch_args(args)
     bars: list[str] = parsed["bars"]
+    node_suffix = option_value(args, "--node-suffix", "")
+    python_suffix = option_value(args, "--python-suffix", "_py")
     failures: list[str] = []
 
     for bar in bars:
         compare_file(
             f"bar[{bar}]",
-            REPORTS_DIR / f"multi_{bar}_market_weather_current.json",
-            REPORTS_DIR / f"multi_{bar}_market_weather_current_py.json",
+            REPORTS_DIR / f"multi_{bar}_market_weather_current{node_suffix}.json",
+            REPORTS_DIR / f"multi_{bar}_market_weather_current{python_suffix}.json",
             failures,
         )
 
     compare_file(
         "combined",
-        REPORTS_DIR / "multi_period_market_weather_current.json",
-        REPORTS_DIR / "multi_period_market_weather_current_py.json",
+        REPORTS_DIR / f"multi_period_market_weather_current{node_suffix}.json",
+        REPORTS_DIR / f"multi_period_market_weather_current{python_suffix}.json",
         failures,
     )
 
@@ -99,7 +111,7 @@ def main(argv: list[str] | None = None) -> None:
         print(json.dumps({"status": "failed", "failureCount": len(failures), "failures": failures[:80]}, ensure_ascii=False, indent=2))
         raise SystemExit(1)
 
-    combined = load_json(REPORTS_DIR / "multi_period_market_weather_current_py.json")
+    combined = load_json(REPORTS_DIR / f"multi_period_market_weather_current{python_suffix}.json")
     print(
         json.dumps(
             {

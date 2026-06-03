@@ -2261,3 +2261,76 @@ node --check server.mjs = pass
 - `compare_summary` 忽略 `skipDownload / summaryOnly / fromReports` 三个生成模式 metadata;这些是产物出身标记,不是市场数据。summary rows 与聚合值仍严格比较。
 - `reports/` 已落回修复后的 Python official;临时 Node golden 和 `_py` 影子均未保留。
 - 1W 本次未纳入:本地 1W raw/clean 数据缺失,后续应单独执行下载 1W data -> Python official 1W -> Node golden parity -> default bars/combined summary 收口。
+
+## 45. N1 One-Button Full Parity Regression
+
+**日期:** 2026-06-02
+**范围:** `backend_py/run_parity_check.py` + compare suffix 参数;不改研究算法、不碰 `data/`。
+**状态:** ✅ 通过
+
+### 命令
+```bash
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m py_compile backend_py/run_parity_check.py backend_py/compare_feature_factory.py backend_py/compare_market_weather_router.py backend_py/compare_deviation_rules.py backend_py/compare_summary.py
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.run_parity_check --symbols BTC-USDT --bars 1D --days 3650
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.run_parity_check --symbols BTC-USDT,ETH-USDT,SOL-USDT,BNB-USDT,XRP-USDT,DOGE-USDT,ADA-USDT,LINK-USDT,AVAX-USDT,TON-USDT,TRX-USDT,DOT-USDT --bars 1D,4H,8H --days 3650
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.run_parity_check
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m py_compile backend_py/*.py backend_py/research/*.py
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.smoke_test
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check app.js
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" node --check server.mjs
+git diff --check
+```
+
+### 期望
+- 一条命令自动完成 Node `_node` golden、Python `_py` shadow、`feature/deviation/router` 全 58 x 1D/4H/8H 对账、summary 对账。
+- 对账结束或 Ctrl-C 中断时都执行 cleanup:`git restore reports` + 删除 `_node/_py` 临时产物。
+- 全量输出 `PASS=522 FAIL=0` 且 `SUMMARY=ok`。
+
+### 实际
+```
+Scoped smoke:
+symbols = BTC-USDT
+bars = 1D
+Node successCount = 1
+Node errorCount = 0
+PASS = 3
+FAIL = 0
+SUMMARY = ok
+cleanup.restoredReports = true
+cleanup.removedTempArtifacts = 18
+
+Interrupt restore:
+Ctrl-C during Node official overwrite stage
+cleanup.restoredReports = true
+cleanup.reportsStatus = ""
+reports temp suffix files after cleanup = 0
+
+Full parity regression:
+Node successCount = 174
+Node errorCount = 0
+Node copiedJsonCount = 526
+Python summary successCount = 174
+Python summary errorCount = 0
+Python summary weightedWeatherCount = 120.83
+PASS = 522
+FAIL = 0
+SUMMARY = ok
+cleanup.restoredReports = true
+cleanup.removedTempArtifacts = 2444
+cleanup.reportsStatus = ""
+
+Post-check:
+reports status = clean
+reports *_node/*_py temp suffix files = 0
+py_compile = pass
+smoke_test = pass
+git diff --check = pass
+node --check app.js = pass
+node --check server.mjs = pass
+```
+
+### 备注
+- `backend_py/run_parity_check.py` 默认 bars=`1D,4H,8H`,symbols=58 个生产币种,days=3650。
+- 回归脚本用 suffix 双路径比较:Node official 临时生成后复制为 `_node`,随即 `git restore reports`;Python 生成 `_py`;compare 只比 `_node` vs `_py`。
+- cleanup 在正常完成、异常失败、Ctrl-C 中断三种路径都会执行,避免 Node 临时 official 或 `_py` shadow 留在工作区。
+- 本次不纳入 1W,不下载数据,不修改 `data/`。
