@@ -35,10 +35,11 @@
 **完成定义**:`?instrument=ETH-USDT&bar=4H` 正常;切换更新 URL+重渲染;薄历史走 M5 占位不崩;API 关掉时 fallback 用**所选品种**文件(非 BTC);`node --check app.js` 过。
 **依赖**:M5(已完成)。
 
-## N4 — 前端 L5:概率带样本/置信 🖥️ 不联网
+## N4 — 前端 L5:概率带样本/置信 🖥️ 不联网 ✅ 已完成
 **目标**:概率旁标样本数/置信,别误读成确定性。
-**范围**:`app.js` 英雄卡 + 结论文案,复用后端已给的 `occurrences/confidence`;小样本弱化展示。只动前端。
+**范围**:`app.js` 英雄卡 + 结论文案,复用后端已给的 `topWeatherOccurrences/topWeatherSampleConfidencePct/topWeatherConfidenceGate`;小样本弱化展示。改 `app.js` + `styles.css`。
 **完成定义**:概率处显示样本/置信;小样本态有明显弱化样式。
+**实现**:`routeSampleContext()` 取路由级样本/置信/样本闸;`occ<30` 或样本闸非“通过”判小样本 → 英雄卡加 `.low-sample` 弱化 + `.sample-caveat` 警示语,结论文案附样本语境。验证:BTC 1D(occ=431/样本通过)=正常;ENA 1D(occ=20/样本不足)=弱化。`node --check app.js` 过。
 **依赖**:N3。
 
 ## N5 — 填 `verification-log` 剩余 TODO 🌐 部分需联网

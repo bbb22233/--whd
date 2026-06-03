@@ -250,22 +250,46 @@ function renderQuoteGrid(candle, previousClose, values) {
     .join("");
 }
 
+// L5: 概率语境——把后端已给的路由级样本/置信/样本闸取出来,小样本时标记弱化。
+// occ<30 或样本闸非“通过”视为小样本(对齐后端 H3 样本闸口径),前端只弱化展示、不改数值。
+function routeSampleContext(current) {
+  const occ = Number(current?.topWeatherOccurrences);
+  const conf = Number(current?.topWeatherSampleConfidencePct);
+  const gate = current?.topWeatherConfidenceGate ?? null;
+  const hasOcc = Number.isFinite(occ);
+  const lowSample = (hasOcc && occ < 30) || (gate != null && !String(gate).includes("通过"));
+  return { occ: hasOcc ? occ : null, conf: Number.isFinite(conf) ? conf : null, gate, lowSample };
+}
+
 function renderOverview(weather, candleMeta) {
   const current = weather.current;
   const metadata = weather.metadata ?? {};
+  const sample = routeSampleContext(current);
   setText("#instrument", metadata.instrument);
   setText("#bar", metadata.bar);
   setText("#gateText", current.gate);
   setText("#topRoute", `${current.topWeatherRoute} ${formatNumber(current.topWeatherScore, 2)}`);
   setText("#weatherSummary", current.weatherSummary);
+  if (sample.lowSample) {
+    const summaryNode = $("#weatherSummary");
+    if (summaryNode) {
+      summaryNode.insertAdjacentHTML(
+        "beforeend",
+        ` <span class="sample-caveat">⚠ 样本偏少(${sample.occ ?? "--"} 次)，概率仅供参考、勿当确定性</span>`,
+      );
+    }
+  }
   setText("#actionBias", current.actionBias);
 
   const gatePanel = $("#gatePanel");
-  gatePanel.className = `gate-panel ${gateClass(current.gate)}`;
+  gatePanel.className = `gate-panel ${gateClass(current.gate)}${sample.lowSample ? " low-sample" : ""}`;
 
   $("#topMeta").innerHTML = [
     makeMetaChip("日期", current.date),
     makeMetaChip("样本", `${metadata.snapshotCount} 根`),
+    makeMetaChip("路由样本", sample.occ != null ? `${formatNumber(sample.occ, 0)} 次` : "--"),
+    makeMetaChip("样本置信", sample.conf != null ? formatPct(sample.conf) : "--"),
+    makeMetaChip("样本闸", sample.gate ?? "--"),
     makeMetaChip("数据", `${candleMeta.source ?? "--"} ${candleMeta.firstDate ?? metadata.firstDate} → ${metadata.lastDate}`),
   ].join("");
 
@@ -514,8 +538,12 @@ function renderNotes(weather, features, deviations) {
   const current = weather.current;
   const values = features.current?.values ?? {};
   const deviationWeather = deviations?.finalWeather;
+  const sample = routeSampleContext(current);
+  const sampleContext = sample.occ != null
+    ? `（基于 ${formatNumber(sample.occ, 0)} 次同类样本，样本置信 ${formatPct(sample.conf)}，${sample.gate ?? "--"}${sample.lowSample ? "；样本偏少，概率仅供参考、勿当确定性" : ""}）`
+    : "";
   const notes = [
-    ["主结论", `${current.gate}，当前更像“${current.topWeatherRoute}”天气，分数 ${formatNumber(current.topWeatherScore, 2)}。`],
+    ["主结论", `${current.gate}，当前更像“${current.topWeatherRoute}”天气，分数 ${formatNumber(current.topWeatherScore, 2)}。${sampleContext}`],
     ["波动", `ATR 处在 ${formatPct(values.atrPercentile)} 分位，振幅/ATR 为 ${formatNumber(values.volatilityMultiple, 2)}，历史上 5 日后 ATR 降低概率 ${formatPct(current.fiveDayAtrDownProbabilityPct)}。`],
     ["波动超额", `波动超额 ${formatNumber(values.remainingMomentumAtr, 2)} ATR，属于 ${current.remainingMomentumState}，5 日后振幅超ATR概率 ${formatPct(current.fiveDayFutureMomentumPositivePct)}。`],
     ["乖离", `中值乖离率 ${formatSignedPct(values.middleDeviationRate)}，等于 ${formatNumber(values.middleDeviationAtr, 2)} 个 ATR；233MA 乖离率 ${formatSignedPct(values.maDeviationRate)}，等于 ${formatNumber(values.maDeviationAtr, 2)} 个 ATR。`],

@@ -255,6 +255,28 @@ textarea {
   line-height: 1.6;
 }
 
+/* L5: 小样本弱化——概率不可读成确定性 */
+.gate-panel.low-sample {
+  opacity: 0.82;
+}
+
+.gate-panel.low-sample .gate-pill {
+  filter: grayscale(0.4);
+}
+
+.sample-caveat {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(230, 180, 80, 0.16);
+  border: 1px solid rgba(230, 180, 80, 0.45);
+  color: #e6b450;
+  font-size: 13px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
 .price-panel {
   min-height: 190px;
   padding: 18px;
