@@ -10,6 +10,7 @@ from .feature_factory import (
     build_weather_labels,
     clamp,
     finite,
+    js_number_to_string,
     js_round,
     js_sum,
     route_strategies,
@@ -761,15 +762,16 @@ def apply_confidence_gate_to_signals(signals: list[dict[str, Any]], calibration_
         direct_occurrences = signal.get("occurrences")
         occurrences = int(direct_occurrences) if finite(direct_occurrences) else int(numeric((lookup.get(calibration_row_key(signal.get("routeKey"), signal.get("bestHorizon"))) or {}).get("occurrences")))
         sample_confidence_pct = numeric(signal.get("sampleConfidencePct"))
+        sample_confidence_label = js_number_to_string(js_round(sample_confidence_pct, 2))
         weak_sample = occurrences < MIN_CALIBRATION_OCCURRENCES or sample_confidence_pct < MIN_CALIBRATION_CONFIDENCE_PCT
         raw_light = signal.get("light")
         light = LIGHT_YELLOW if weak_sample and raw_light == LIGHT_GREEN else raw_light
         if occurrences < MIN_CALIBRATION_OCCURRENCES and sample_confidence_pct < MIN_CALIBRATION_CONFIDENCE_PCT:
-            reason = f"occurrences {occurrences} < {MIN_CALIBRATION_OCCURRENCES}, sampleConfidencePct {js_round(sample_confidence_pct, 2)} < {MIN_CALIBRATION_CONFIDENCE_PCT}"
+            reason = f"occurrences {occurrences} < {MIN_CALIBRATION_OCCURRENCES}, sampleConfidencePct {sample_confidence_label} < {MIN_CALIBRATION_CONFIDENCE_PCT}"
         elif occurrences < MIN_CALIBRATION_OCCURRENCES:
             reason = f"occurrences {occurrences} < {MIN_CALIBRATION_OCCURRENCES}"
         elif sample_confidence_pct < MIN_CALIBRATION_CONFIDENCE_PCT:
-            reason = f"sampleConfidencePct {js_round(sample_confidence_pct, 2)} < {MIN_CALIBRATION_CONFIDENCE_PCT}"
+            reason = f"sampleConfidencePct {sample_confidence_label} < {MIN_CALIBRATION_CONFIDENCE_PCT}"
         else:
             reason = ""
         result.append(

@@ -2401,3 +2401,78 @@ NO-SUCH 1D -> #gateText = 样本不足, #gatePanel = gate-panel gate-neutral
 - `kindKey === "ma233"` 保持不变,M4 未回退。
 - `renderInsufficient` 保持为 M5 灰灯入口;N3 只把无 current / 无报告路径接到该入口。
 - `/api/market/symbols` 失败时使用内置 58 品种列表,URL 参数行为仍可用。
+
+## 47. N2 Weekly 1W Reconciliation
+
+**日期:** 2026-06-03
+**范围:** 1W raw/clean 下载清洗、Python official 1D/4H/8H/1W 重生成、全量 Node↔Python parity 回归。
+**状态:** ✅ 通过
+
+### 命令
+```bash
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.run_data_pipeline --symbols "$SYMBOLS" --bars 1W --days 3650
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.run_full_pipeline --official --skip-download --bars 1D,4H,8H,1W --days 3650
+PATH="/Users/guanlan/.local/bin:/Users/guanlan/.local/opt/node-v24.16.0-darwin-arm64/bin:$PATH" uv run python -m backend_py.run_parity_check --bars 1D,4H,8H,1W --days 3650
+```
+
+### 期望
+- 1W raw/clean 覆盖 58/58 默认品种。
+- Python official 纳入 1W,同时保持 1D/4H/8H official 为修复后的 Python 产物。
+- N1 一键回归扩展到 `1D,4H,8H,1W`,全 58 品种 `FAIL=0` 且 summary `status ok`。
+- 1W 薄历史品种走 `insufficient_history`,Node 与 Python 结构逐字一致。
+
+### 实际
+```
+1W data coverage:
+raw json = 58/58
+clean json = 58/58
+clean csv = 58/58
+rawRows range = 38..452
+cleanRows range = 37..451
+truncated = 58/58
+cleanRows < 233 = 28
+
+Python official:
+successCount = 232
+errorCount = 0
+weatherCount = 204
+weightedWeatherCount = 124.89
+insufficientHistoryCount = 28
+
+1W official distribution:
+successCount = 58
+weatherCount = 30
+weightedWeatherCount = 4.06
+averagePeriodWeight = 0.1353
+lowWeightCount = 30
+insufficientHistoryCount = 28
+dataStatus = ok:30, insufficient_history:28
+historyQuality = weak_display_only:30, insufficient:28
+
+Full parity regression:
+bars = 1D,4H,8H,1W
+symbols = 58
+Node successCount = 232
+Node errorCount = 0
+Node copiedJsonCount = 701
+Python summary successCount = 232
+Python summary errorCount = 0
+Python summary weightedWeatherCount = 124.89
+PASS = 696
+FAIL = 0
+SUMMARY = ok
+cleanup.restoredReports = true
+cleanup.removedTempArtifacts = 3258
+cleanup.reportsStatus = ""
+reports *_node/*_py temp suffix files = 0
+```
+
+### 关键修复
+- `confidenceGateReason` 里的 `sampleConfidencePct` 改走 `js_number_to_string(js_round(...))`,修复 1W 薄历史样本闸整数概率显示为 `30.0` 而 Node 为 `30` 的漏网点。
+- `build_summary_row` 在 `current` 为空时省略 Node `undefined` 会省略的 weather-current 键,不做全局删 `None`;BNB-USDT 1W insufficient 行与 Node key 集合完全相等,BTC-USDT 1D 足历史行无反向少键。
+
+### 备注
+- 28 个 1W `insufficient_history` 品种:BNB-USDT, TON-USDT, OP-USDT, ARB-USDT, SUI-USDT, APT-USDT, INJ-USDT, WLD-USDT, AR-USDT, LDO-USDT, PENDLE-USDT, JUP-USDT, PYTH-USDT, TIA-USDT, ONDO-USDT, FET-USDT, PEPE-USDT, BONK-USDT, FLOKI-USDT, WIF-USDT, ORDI-USDT, SATS-USDT, NOT-USDT, ENA-USDT, W-USDT, STRK-USDT, ZK-USDT, ZRO-USDT。
+- 58 个 1W 品种全部 `truncated=true`,原因是 OKX 周线历史不足 3650 天;这是 H4 数据质量标记的预期结果。
+- `data/` 仍未进入 git status;1W raw/clean 数据由本地忽略规则保留,未混入本次提交。
+- 修复前的 `n2-python-official-1w-reports` stash 已清理;正式名 reports 为修复后 Python official。

@@ -8,14 +8,23 @@
     "lastDate": null,
     "snapshotCount": 0,
     "observationRows": 0,
+    "routerCalibrationRows": 0,
+    "routerCalibrationObservationRows": 0,
+    "gateSource": "score_fallback",
+    "calibrationConfidenceGate": {
+      "minOccurrences": 30,
+      "minSampleConfidencePct": 40,
+      "effect": "green_signals_below_threshold_are_downgraded_to_yellow"
+    },
+    "currentCalibrationSignals": [],
     "horizons": [
       1,
       3,
       5,
       10
     ],
-    "generatedAt": "2026-05-31T05:21:29.898Z",
-    "routerPrinciple": "ATR/振幅/余动能负责波动天气，中值乖离负责短期拉伸，233MA乖离负责大周期过滤。输出是策略适配天气，不是买卖信号。"
+    "generatedAt": "2026-06-03T07:44:15.757983Z",
+    "routerPrinciple": "ATR/振幅/波动超额负责波动天气，中值乖离负责短期拉伸，233MA乖离负责大周期过滤。输出是策略适配天气，不是买卖信号。"
   },
   "current": null,
   "strategyScores": [],
