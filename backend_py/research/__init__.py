@@ -1,2 +1,1 @@
-"""Python research modules that shadow the current Node research pipeline."""
-
+"""Python research modules for the official market-weather pipeline."""

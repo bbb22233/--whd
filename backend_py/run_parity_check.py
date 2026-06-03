@@ -5,29 +5,23 @@ import contextlib
 import io
 import json
 import os
-import shutil
 import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
-from backend_py.build_deviation_rules import main as build_deviation_rules
-from backend_py.build_feature_factory import main as build_feature_factory
-from backend_py.build_market_weather_router import main as build_market_weather_router
-from backend_py.build_summary import DEFAULT_SYMBOLS
 from backend_py.compare_deviation_rules import main as compare_deviation_rules
 from backend_py.compare_feature_factory import main as compare_feature_factory
 from backend_py.compare_market_weather_router import main as compare_market_weather_router
 from backend_py.compare_summary import main as compare_summary
-from backend_py.reports_reader import DATA_CLEAN_DIR, PROJECT_ROOT, REPORTS_DIR
+from backend_py.reports_reader import PROJECT_ROOT, REPORTS_DIR
 from backend_py.research.config import ResearchConfig, file_stem, parse_args as parse_research_args, report_stem
 from backend_py.research.summary import build_summary_row, quality_summary
 
 
 CliMain = Callable[[list[str] | None], None]
 REPORT_KINDS = ("feature_factory", "deviation_rules", "market_weather_router")
-DEFAULT_BARS = ["1D", "4H", "8H"]
 GOLDEN_SYMBOLS = ["BTC-USDT", "SOL-USDT", "DOGE-USDT", "ENA-USDT"]
 GOLDEN_BARS = ["1D", "4H", "8H"]
 FIXTURE_CLEAN_DIR = PROJECT_ROOT / "tests" / "fixtures" / "data" / "clean"
@@ -39,31 +33,23 @@ def split_csv_values(values: list[str] | None) -> list[str]:
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run full Node-vs-Python research parity regression.")
-    parser.add_argument("--symbols", nargs="*", help="Symbols to check. Defaults to the full production list.")
-    parser.add_argument("--bars", nargs="*", default=[",".join(DEFAULT_BARS)], help="Bars to check. Defaults to 1D,4H,8H.")
+    parser = argparse.ArgumentParser(description="Run frozen-golden Python research parity regression.")
+    parser.add_argument("--symbols", nargs="*", help="Symbols to check. Defaults to the frozen fixture set.")
+    parser.add_argument("--bars", nargs="*", default=[",".join(GOLDEN_BARS)], help="Bars to check. Defaults to 1D,4H,8H.")
     parser.add_argument("--days", type=int, default=3650)
     parser.add_argument("--node-suffix", default="_node")
     parser.add_argument("--python-suffix", default="_py")
-    parser.add_argument("--golden", action="store_true", help="Compare Python output against frozen tests/golden fixtures instead of live Node.")
+    parser.add_argument("--golden", action="store_true", help="Compatibility flag; frozen golden mode is always used.")
     parsed = parser.parse_args(argv)
-    parsed.symbols = split_csv_values(parsed.symbols) or (GOLDEN_SYMBOLS if parsed.golden else DEFAULT_SYMBOLS)
-    parsed.bars = split_csv_values(parsed.bars) or (GOLDEN_BARS if parsed.golden else DEFAULT_BARS)
+    parsed.symbols = split_csv_values(parsed.symbols) or GOLDEN_SYMBOLS
+    parsed.bars = split_csv_values(parsed.bars) or GOLDEN_BARS
     if parsed.python_suffix != "_py":
         parser.error("current Python parity builders write _py artifacts; keep --python-suffix _py")
     return parsed
 
 
-def parity_env() -> dict[str, str]:
-    env = os.environ.copy()
-    node = shutil.which("node")
-    path_parts = [str(Path(node).parent) if node else "", env.get("PATH", "")]
-    env["PATH"] = ":".join(part for part in path_parts if part)
-    return env
-
-
 def run_subprocess(command: list[str], label: str, *, env: dict[str, str] | None = None) -> str:
-    result = subprocess.run(command, cwd=PROJECT_ROOT, env=env or parity_env(), text=True, capture_output=True, check=False)
+    result = subprocess.run(command, cwd=PROJECT_ROOT, env=env or os.environ.copy(), text=True, capture_output=True, check=False)
     if result.returncode:
         tail = "\n".join((result.stdout + "\n" + result.stderr).splitlines()[-80:])
         raise RuntimeError(f"{label} failed with exitCode={result.returncode}\n{tail}")
@@ -111,22 +97,6 @@ def copy_json(source: Path, target: Path) -> None:
     target.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
 
 
-def copy_node_golden(symbols: list[str], bars: list[str], days: int, suffix: str) -> int:
-    copied = 0
-    for bar in bars:
-        for symbol in symbols:
-            config = parse_research_args(["--instrument", symbol, "--bar", bar, "--days", str(days)])
-            report_name = report_stem(config)
-            for kind in REPORT_KINDS:
-                copy_json(report_json_path(report_name, kind), report_json_path(report_name, kind, suffix))
-                copied += 1
-        copy_json(summary_json_path(f"multi_{bar}_market_weather_current"), summary_json_path(f"multi_{bar}_market_weather_current", suffix))
-        copied += 1
-    copy_json(summary_json_path("multi_period_market_weather_current"), summary_json_path("multi_period_market_weather_current", suffix))
-    copied += 1
-    return copied
-
-
 def stage_frozen_golden(symbols: list[str], bars: list[str], days: int, suffix: str) -> dict[str, Any]:
     copied = 0
     missing: list[str] = []
@@ -145,21 +115,6 @@ def stage_frozen_golden(symbols: list[str], bars: list[str], days: int, suffix: 
     if missing:
         raise FileNotFoundError("missing frozen golden files:\n" + "\n".join(missing[:20]))
     return {"successCount": len(symbols) * len(bars), "errorCount": 0, "copiedJsonCount": copied, "source": str(GOLDEN_DIR)}
-
-
-def run_node_golden(symbols: list[str], bars: list[str], days: int, node_suffix: str) -> dict[str, Any]:
-    output = run_subprocess(
-        ["node", "scripts/run-multi-symbol-1d.mjs", "--skip-download", "--symbols", ",".join(symbols), "--bars", ",".join(bars), "--days", str(days)],
-        "node golden generation",
-    )
-    marker = '{\n  "step": "multi-symbol-weather-summary"'
-    index = output.rfind(marker)
-    if index < 0:
-        raise RuntimeError("Node golden summary was not found in output")
-    summary = json.loads(output[index:])
-    copied = copy_node_golden(symbols, bars, days, node_suffix)
-    git_restore_reports()
-    return {"successCount": summary.get("successCount"), "errorCount": summary.get("errorCount"), "copiedJsonCount": copied}
 
 
 def run_cli(label: str, fn: CliMain, args: list[str], *, expect_ok: bool = True) -> dict[str, Any]:
@@ -186,37 +141,11 @@ def compare_args(symbol: str, bar: str, days: int, node_suffix: str, python_suff
     return [*scoped_args(symbol, bar, days), "--node-suffix", node_suffix, "--python-suffix", python_suffix]
 
 
-def build_python_shadows(symbols: list[str], bars: list[str], days: int, node_suffix: str, python_suffix: str) -> tuple[int, int, list[dict[str, Any]]]:
-    passes = 0
-    failures = 0
-    failure_details: list[dict[str, Any]] = []
-    for bar in bars:
-        for symbol in symbols:
-            args = scoped_args(symbol, bar, days)
-            for label, build_fn, compare_fn in [
-                ("feature", build_feature_factory, compare_feature_factory),
-                ("deviation", build_deviation_rules, compare_deviation_rules),
-                ("router", build_market_weather_router, compare_market_weather_router),
-            ]:
-                build_result = run_cli(f"{label}_build", build_fn, args)
-                if build_result["status"] != "ok":
-                    failures += 1
-                    failure_details.append({"instrument": symbol, "bar": bar, **build_result})
-                    continue
-                compare_result = run_cli(f"{label}_compare", compare_fn, compare_args(symbol, bar, days, node_suffix, python_suffix))
-                if compare_result["status"] == "ok":
-                    passes += 1
-                else:
-                    failures += 1
-                    failure_details.append({"instrument": symbol, "bar": bar, **compare_result})
-    return passes, failures, failure_details
-
-
 def build_python_shadows_from_fixture(symbols: list[str], bars: list[str], days: int, node_suffix: str, python_suffix: str) -> tuple[int, int, list[dict[str, Any]]]:
     passes = 0
     failures = 0
     failure_details: list[dict[str, Any]] = []
-    env = parity_env()
+    env = os.environ.copy()
     env["RESEARCH_DATA_CLEAN_DIR"] = str(FIXTURE_CLEAN_DIR)
     builders = [
         ("feature", "backend_py.build_feature_factory", compare_feature_factory),
@@ -250,7 +179,7 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(f"{json.dumps(payload, ensure_ascii=False, indent=2)}\n", encoding="utf-8")
 
 
-def build_summary_from_suffix(symbols: list[str], bars: list[str], days: int, suffix: str, *, clean_dir: Path = DATA_CLEAN_DIR) -> dict[str, Any]:
+def build_summary_from_suffix(symbols: list[str], bars: list[str], days: int, suffix: str, *, clean_dir: Path = FIXTURE_CLEAN_DIR) -> dict[str, Any]:
     started_at = datetime.now(timezone.utc)
     all_rows: list[dict[str, Any]] = []
     all_errors: list[dict[str, Any]] = []
@@ -328,15 +257,10 @@ def build_summary_from_suffix(symbols: list[str], bars: list[str], days: int, su
 def run_check(parsed: argparse.Namespace) -> dict[str, Any]:
     remove_suffix_artifacts(parsed.node_suffix, parsed.python_suffix)
     require_clean_reports()
-    clean_dir = FIXTURE_CLEAN_DIR if parsed.golden else DATA_CLEAN_DIR
-    if parsed.golden:
-        node = stage_frozen_golden(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix)
-        build_summary_from_suffix(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix, clean_dir=clean_dir)
-        passes, failures, failure_details = build_python_shadows_from_fixture(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix, parsed.python_suffix)
-    else:
-        node = run_node_golden(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix)
-        passes, failures, failure_details = build_python_shadows(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix, parsed.python_suffix)
-    python_summary = build_summary_from_suffix(parsed.symbols, parsed.bars, parsed.days, parsed.python_suffix, clean_dir=clean_dir)
+    baseline = stage_frozen_golden(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix)
+    build_summary_from_suffix(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix, clean_dir=FIXTURE_CLEAN_DIR)
+    passes, failures, failure_details = build_python_shadows_from_fixture(parsed.symbols, parsed.bars, parsed.days, parsed.node_suffix, parsed.python_suffix)
+    python_summary = build_summary_from_suffix(parsed.symbols, parsed.bars, parsed.days, parsed.python_suffix, clean_dir=FIXTURE_CLEAN_DIR)
     summary_result = run_cli(
         "summary_compare",
         compare_summary,
@@ -346,10 +270,10 @@ def run_check(parsed: argparse.Namespace) -> dict[str, Any]:
         failure_details.append(summary_result)
     return {
         "step": "python-official-parity-regression",
-        "mode": "frozen-golden" if parsed.golden else "live-node",
+        "mode": "frozen-golden",
         "symbols": parsed.symbols,
         "bars": parsed.bars,
-        "node": node,
+        "baseline": baseline,
         "pythonSummary": python_summary,
         "PASS": passes,
         "FAIL": failures,

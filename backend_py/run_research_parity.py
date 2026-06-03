@@ -116,10 +116,10 @@ def deviation_golden_is_current(config: ResearchConfig) -> tuple[bool, str]:
     deviation_last = (deviation or {}).get("metadata", {}).get("lastDate")
     router_last = (router or {}).get("metadata", {}).get("lastDate")
     if not deviation or not router:
-        return False, "missing_node_golden"
+        return False, "missing_official_golden"
     if deviation_last != router_last:
-        return False, f"stale_node_golden deviationLastDate={deviation_last} routerLastDate={router_last}"
-    return True, "node_golden_current"
+        return False, f"stale_official_golden deviationLastDate={deviation_last} routerLastDate={router_last}"
+    return True, "official_golden_current"
 
 
 def list_scope(value: Any) -> list[str]:
@@ -131,15 +131,15 @@ def list_scope(value: Any) -> list[str]:
 def summary_golden_matches_scope(symbols: list[str], bars: list[str]) -> tuple[bool, str]:
     combined = load_json_if_exists(REPORTS_DIR / "multi_period_market_weather_current.json")
     if not combined:
-        return False, "missing_node_summary_golden"
+        return False, "missing_official_summary_golden"
     metadata = combined.get("metadata", {})
-    node_symbols = list_scope(metadata.get("symbols"))
-    node_bars = list_scope(metadata.get("bars"))
-    if node_symbols != symbols:
-        return False, f"scope_mismatch nodeSymbols={len(node_symbols)} requestedSymbols={len(symbols)}"
-    if node_bars != bars:
-        return False, f"scope_mismatch nodeBars={','.join(node_bars)} requestedBars={','.join(bars)}"
-    return True, "node_summary_scope_current"
+    official_symbols = list_scope(metadata.get("symbols"))
+    official_bars = list_scope(metadata.get("bars"))
+    if official_symbols != symbols:
+        return False, f"scope_mismatch officialSymbols={len(official_symbols)} requestedSymbols={len(symbols)}"
+    if official_bars != bars:
+        return False, f"scope_mismatch officialBars={','.join(official_bars)} requestedBars={','.join(bars)}"
+    return True, "official_summary_scope_current"
 
 
 def main(argv: list[str] | None = None) -> None:

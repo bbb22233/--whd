@@ -2476,3 +2476,66 @@ reports *_node/*_py temp suffix files = 0
 - 58 个 1W 品种全部 `truncated=true`,原因是 OKX 周线历史不足 3650 天;这是 H4 数据质量标记的预期结果。
 - `data/` 仍未进入 git status;1W raw/clean 数据由本地忽略规则保留,未混入本次提交。
 - 修复前的 `n2-python-official-1w-reports` stash 已清理;正式名 reports 为修复后 Python official。
+
+## 48. N7 Frozen Golden Cutover And Node Research Retirement
+
+**日期:** 2026-06-03
+**范围:** 冻结 fixture/golden 接管 parity 标准答案,移除 legacy Node research/package entrypoints,删除 `backtest/*.mjs` 与 `scripts/*.mjs`。
+**状态:** ✅ 通过
+
+### 命令
+```bash
+PATH="/Users/guanlan/.local/bin:$PATH" uv run python -m backend_py.freeze_golden
+PATH="/Users/guanlan/.local/bin:$PATH" uv run python -m backend_py.run_parity_check --golden
+PATH="/Users/guanlan/.local/bin:$PATH" uv run python -m backend_py.run_parity_check
+PATH="/Users/guanlan/.local/bin:$PATH" uv run python -m backend_py.run_parity_check --golden
+PATH="/Users/guanlan/.local/bin:$PATH" uv run python -m backend_py.run_parity_check --golden
+PATH="/Users/guanlan/.local/bin:$PATH" uv run python -m backend_py.run_parity_check
+PATH="/Users/guanlan/.local/bin:$PATH" uv run python -m backend_py.smoke_test
+node --check app.js
+python3 -m json.tool package.json >/dev/null
+```
+
+### 实际
+```
+Frozen fixture:
+symbols = BTC-USDT,SOL-USDT,DOGE-USDT,ENA-USDT
+bars = 1D,4H,8H
+tests/fixtures/data/clean *_clean.json = 12
+tests/golden *.json = 36
+
+Pre-delete dual track:
+live Node parity PASS=522 FAIL=0 SUMMARY=ok
+frozen golden parity PASS=36 FAIL=0 SUMMARY=ok
+
+Post-delete frozen golden:
+baseline successCount = 12
+baseline errorCount = 0
+baseline copiedJsonCount = 36
+pythonSummary successCount = 12
+pythonSummary errorCount = 0
+PASS = 36
+FAIL = 0
+SUMMARY = ok
+default command without --golden = PASS=36 FAIL=0 SUMMARY=ok
+cleanup.restoredReports = true
+cleanup.reportsStatus = ""
+
+Smoke:
+health = ok
+scannerMode = python_orchestrator
+cleanCandlesStatus = ok
+
+Package Node scripts:
+serve = node server.mjs
+```
+
+### 删除与保留
+- 删除:`backtest/*.mjs` 全部研究算法实现;`scripts/*.mjs` 全部研究/生成入口。
+- 保留:`app.js`、`server.mjs`、`index.html`、`styles.css`;Node 只作为静态前端服务入口 `serve`。
+- `backend_py.run_parity_check` 默认使用 `tests/fixtures/data/clean` + `tests/golden`;`--golden` 保留为兼容标志,不再现场运行 Node research code。
+- `package.json` 中 `node ` 开头的 script 只剩 `serve`。
+
+### 备注
+- 删除后的残留 `.mjs` 文本引用仅在历史规格/日志和删除清单中出现,没有真实 package/API/scanner 入口指向被删文件。
+- G1-B 本地未提交研究脚本/报告未纳入 N7 提交。

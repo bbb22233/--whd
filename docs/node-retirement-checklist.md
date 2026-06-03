@@ -14,8 +14,8 @@
 |---|---|---|
 | ① | Python↔Node 全量逐字对平 `FAIL=0` | ✅ 1D/4H/8H(/1W 视 N2 联网补齐) |
 | ② | 对账沉淀成可复跑回归 | ✅ N1 `run_parity_check.py`(`04bedc0`) |
-| ③ | **冻结 golden 接管"标准答案"**(N1 不再依赖现场 Node) | ⬜ N7 步骤 1–2 |
-| ④ | Node 入口全迁/弃用 | 🟡 `remaining-node-command-inventory.md` 在清 |
+| ③ | **冻结 golden 接管"标准答案"**(N1 不再依赖现场 Node) | ✅ N7 frozen fixture/golden |
+| ④ | Node 入口全迁/弃用 | ✅ legacy entrypoints removed; only `serve` remains |
 | ⑤ | 前端全走 REST、不靠 Node | ✅ N3(API-down fallback 用所选品种静态文件) |
 
 > ③ 是真正的拦路虎:当前 N1 是**现场跑 Node 生成 golden 再比**,即 Node 仍兼着"标准答案"。直接删 Node 会让 N1 失去比对基准。
@@ -28,11 +28,11 @@
 5. **回归兜底**:删完跑改造后的 N1 + `smoke_test`,确认安全网仍在。
 
 ## 删除前自检清单
-- [ ] N1 已改为"Python vs 冻结 golden",且 `FAIL=0`(不再 import/调用任何 `.mjs`)
-- [ ] `grep -rn "\.mjs" package.json scripts/ backend_py/ docs/` 无残留指向待删文件的入口
-- [ ] `scanner_service` / 任何 API 不再 spawn Node 研究脚本
-- [ ] `remaining-node-command-inventory.md` 里待删项已确认无人依赖(legacy 回退已不需要)
-- [ ] 前端冒烟:`node --check app.js`,页面正常渲染(前端 Node 仍保留)
+- [x] N1 已改为"Python vs 冻结 golden",且 `FAIL=0`(不再 import/调用任何 `.mjs`)
+- [x] `grep -rn "\.mjs" package.json scripts/ backend_py/ docs/` 无残留指向待删文件的入口;剩余为历史规格/日志引用
+- [x] `scanner_service` / 任何 API 不再 spawn Node 研究脚本
+- [x] `remaining-node-command-inventory.md` 里待删项已确认无人依赖(legacy 回退已不需要)
+- [x] 前端冒烟:`node --check app.js`,页面正常渲染(前端 Node 仍保留)
 
 ## 完成定义
 - Node **研究代码已删**;改造后的 N1(Python vs 冻结 golden)`FAIL=0`;无任何脚本/入口再调被删的 Node。

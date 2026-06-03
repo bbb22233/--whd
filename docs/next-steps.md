@@ -53,7 +53,7 @@
 **范围**:新增 `docs/target-architecture.md`(Python 算+数据 / REST 当窗口 / 前端摆盘;Rust 暂不引入决策)、`docs/node-retirement-checklist.md`(砍 Node 前置 + 顺序)、`docs/parity-helpers.md`(jsround/jssum/jsnumber + None 键省略留痕)。纯文档。
 **依赖**:无,随时可做。
 
-## N7 — 冻结 golden 接管"标准答案",然后砍 Node 🔒 不联网【删 Node 的真正前提】📋 施工方案见 `docs/n7-golden-cutover-spec.md`
+## N7 — 冻结 golden 接管"标准答案",然后砍 Node 🔒 不联网 ✅ 已完成
 > ⚠️ **必须在有 `data/clean` 的环境执行**(本机 Mac,或网络放行 OKX 后先下载)。Web 一次性容器无源数据 + OKX 403,做不了;细节见 `node-retirement-checklist.md` 环境约束节。
 **背景**:Node 从来不是线上服务,只是本地生成报告的脚本——**所以没有"运行时观察期"这回事**。但当前 N1 回归是**现场跑 Node 生成 golden 再比**,即 Node 仍兼着"标准答案"角色;**直接删 Node 会让 N1 回归失去比对基准**。删之前必须先把这个角色换走。
 **步骤**:
@@ -64,6 +64,7 @@
 5. 删完跑一遍改造后的 N1 + `smoke_test`,确认安全网仍在。
 **不该动**:`app.js`/`server.mjs`/前端;Python 研究算法。
 **完成定义**:Node 研究代码已删;改造后的 N1(Python vs 冻结 golden)`FAIL=0`;无任何脚本/入口再调 Node。
+**实现**:`tests/fixtures/data/clean` + `tests/golden` 固化 4 品种 × 3 周期;`backend_py.run_parity_check` 默认使用 frozen golden,`--golden` 保留为兼容标志;`backtest/*.mjs` 与 `scripts/*.mjs` 已删除,前端 `app.js/server.mjs` 保留。
 **依赖**:① N2(1W 也对平,趁 Node 还在做完);② ④ 入口清完。**这之后即可删,无需等待期。**
 
 ---
@@ -71,10 +72,10 @@
 ## 砍 Node 前置条件(到齐才动手删 —— 无"观察期")
 | 条件 | 当前 |
 |---|---|
-| ① Python↔Node 全量逐字对平 | ✅ 1D/4H/8H(1W 待 N2) |
-| ② 对账沉淀成可复跑回归 | ✅ N1(`04bedc0`) |
-| ③ **冻结 golden 接管"标准答案"**(N1 不再依赖现场 Node) | ⬜ N7 |
-| ④ Node 入口全迁/弃用 | 🟡 `remaining-node-command-inventory` 在清 |
+| ① Python↔Node 全量逐字对平 | ✅ 1D/4H/8H/1W |
+| ② 对账沉淀成可复跑回归 | ✅ N1(`04bedc0`) + frozen golden |
+| ③ **冻结 golden 接管"标准答案"**(N1 不再依赖现场 Node) | ✅ N7 |
+| ④ Node 入口全迁/弃用 | ✅ legacy entrypoints removed; only `serve` remains |
 | ⑤ 前端全走 REST、不靠 Node | ✅ N3(7c7fd52,API-down fallback 用所选品种) |
 
 > 注:原"Python 生产观察一段"已删除——Node 非线上服务,无运行时可观察;真正的门槛是 ③(用冻结快照接管回归基准)。

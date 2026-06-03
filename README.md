@@ -17,19 +17,15 @@ npm run clean -- --instrument BTC-USDT --days 3650
 npm run weather:router -- --instrument BTC-USDT --days 3650
 ```
 
-`download` / `clean` 现在调用 Python data pipeline。旧 Node 数据入口保留为
-`legacy:download` / `legacy:clean`,只作为回退或对照使用。
-`features` / `rules:deviations` / `weather:router` 也已切到 Python official
-单品种研究入口;旧 Node 版本保留为对应的 `legacy:*` 命令。
-`backtest:router` / `calibrate:router` 也已切到 Python official router
-研究入口;旧 Node 版本保留为对应的 `legacy:*` 命令。
-`download:macro` 已切到 Python macro data pipeline;旧 Node 版本保留为
-`legacy:download:macro`。
+`download` / `clean` 现在调用 Python data pipeline。
+`features` / `rules:deviations` / `weather:router` / `backtest:router` /
+`calibrate:router` / `download:macro` 均调用 Python official pipeline。
+Node 研究/生成代码已退役;`package.json` 中只保留 `serve` 作为静态前端服务入口。
 
 ## Python API
 
 Python API 是当前前端数据源与扫描入口。`summary` / `full` / `download` /
-`clean` 主路径已切到 Python,旧 Node 入口以 `legacy:*` 名称保留。
+`clean` 主路径已切到 Python。
 剩余 Node 命令分类见 `docs/remaining-node-command-inventory.md`。
 
 ```bash
@@ -41,6 +37,7 @@ uv run uvicorn backend_py.main:app --host 127.0.0.1 --port 8000
 
 ```bash
 uv run python -m backend_py.smoke_test
+uv run python -m backend_py.run_parity_check --golden
 curl -fsS http://127.0.0.1:8000/health
 curl -fsS "http://127.0.0.1:8000/api/dashboard/current?instrument=BTC-USDT&bar=1D"
 ```
@@ -57,7 +54,6 @@ reports/*_market_weather_router.json              完整天气路由结果
 ## 位置指标研究
 
 ```bash
-npm run backtest:deviations -- --instrument BTC-USDT --days 3650
 npm run rules:deviations -- --instrument BTC-USDT --days 3650
 ```
 
@@ -72,19 +68,7 @@ reports/*_deviation_rule_library.csv     位置规则库
 
 ## 神经网络与决策树
 
-```bash
-npm run train:state -- --instrument BTC-USDT --days 3650
-npm run train:trees -- --instrument BTC-USDT --days 3650
-npm run validate:trees -- --instrument BTC-USDT --days 3650 --train-to 2023-12-31 --validate-from 2024-01-01
-```
-
-宏观对比：
-
-```bash
-npm run download:macro -- --instrument BTC-USDT --days 3650
-npm run train:trees -- --instrument BTC-USDT --days 3650 --macro
-npm run compare:macro -- --instrument BTC-USDT --days 3650 --train-to 2023-12-31 --validate-from 2024-01-01
-```
+旧 Node 训练/验证入口已退役。后续若恢复模型训练或宏观对比,应新增 Python 研究入口并用冻结 golden / 专项回测验证。
 
 ## 数据与归档
 
