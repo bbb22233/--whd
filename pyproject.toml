@@ -8,5 +8,11 @@ dependencies = [
   "uvicorn[standard]>=0.30,<1",
 ]
 
+[project.optional-dependencies]
+# Telegram bot (optional): Claude-powered conversational interface over the radar.
+bot = [
+  "anthropic>=0.40",
+]
+
 [tool.uv]
 package = false
