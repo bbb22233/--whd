@@ -130,13 +130,18 @@ function Dashboard({ payload }) {
   const { candle, prev } = currentCandle(candles, weather.current.date);
   return (
     <main className="workspace">
-      <div className="area-gate"><GatePanel current={weather.current} /></div>
-      <PricePanel candle={candle} prevClose={prev?.close} candles={candles} values={values} />
-      <div className="area-left">
+      {/* 左栏:灯号状态 */}
+      <div className="col-left">
+        <GatePanel current={weather.current} />
+      </div>
+      {/* 中栏:价格大图 + 主读数 + 组件状态带 + 指标 */}
+      <div className="col-center">
+        <PricePanel candle={candle} prevClose={prev?.close} candles={candles} values={values} />
         <ComponentGrid current={weather.current} deviations={deviations} />
         <MetricsPanel values={values} />
       </div>
-      <div className="area-right">
+      {/* 右栏:概率 + 乖离 + 读法 */}
+      <div className="col-right">
         <ProbabilityTable rows={weather.currentComponentRows ?? []} />
         <DeviationTable rows={deviations?.currentRuleRows ?? []} />
         <NotesPanel weather={weather} features={features} deviations={deviations} />

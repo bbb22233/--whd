@@ -95,19 +95,20 @@ body {
 }
 .icon-btn:hover { background: var(--bg-hover); color: var(--text); border-color: var(--accent-dim); }
 
-/* ---------- 工作区 ---------- */
+/* ---------- 工作区:三栏指挥中心 ---------- */
 .workspace {
   flex: 1; padding: 18px;
   display: grid; gap: 16px;
-  grid-template-columns: 360px 1fr;
-  grid-template-areas: "gate price" "left right";
+  grid-template-columns: 320px minmax(0, 1fr) 460px;
+  grid-template-areas: "left center right";
   align-items: start;
-  max-width: 1680px; width: 100%; margin: 0 auto;
+  max-width: 1840px; width: 100%; margin: 0 auto;
 }
-@media (max-width: 1040px) { .workspace { grid-template-columns: 1fr; grid-template-areas: "gate" "price" "left" "right"; } }
-.area-gate { grid-area: gate; } .area-price { grid-area: price; }
-.area-left { grid-area: left; display: flex; flex-direction: column; gap: 16px; }
-.area-right { grid-area: right; display: flex; flex-direction: column; gap: 16px; }
+@media (max-width: 1340px) { .workspace { grid-template-columns: 300px minmax(0, 1fr); grid-template-areas: "left center" "right right"; } }
+@media (max-width: 880px) { .workspace { grid-template-columns: 1fr; grid-template-areas: "left" "center" "right"; } }
+.col-left { grid-area: left; display: flex; flex-direction: column; gap: 16px; }
+.col-center { grid-area: center; display: flex; flex-direction: column; gap: 16px; }
+.col-right { grid-area: right; display: flex; flex-direction: column; gap: 16px; }
 
 /* ---------- 面板(卡片化) ---------- */
 .panel {
@@ -178,7 +179,7 @@ body {
 .qcell .v { font-family: var(--font-mono); font-size: 15px; font-weight: 500; margin-top: 3px; }
 
 /* ---------- 状态卡 ---------- */
-.comp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.comp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
 @media (max-width: 620px) { .comp-grid { grid-template-columns: repeat(2, 1fr); } }
 .comp-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 13px 14px; }
 .comp-card .ct { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }

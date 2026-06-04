@@ -14,7 +14,7 @@ export default function PricePanel({ candle, prevClose, candles, values }) {
     ["量", fmtNum(candle?.volume, 0)],
   ];
   return (
-    <section className="panel area-price">
+    <section className="panel">
       <div className="panel-head">
         <h2>盘口快照</h2>
         <span className="note">{candle?.date ?? "--"}</span>
