@@ -1,0 +1,12 @@
+# 数据刷新(oneshot):下载 OKX + 生成 official 报告。配合 whd-refresh.timer 定时跑。
+# 放 /etc/systemd/system/whd-refresh.service。需要服务器能联网 OKX。
+[Unit]
+Description=WHD data refresh (OKX download + official reports)
+After=network.target
+
+[Service]
+Type=oneshot
+User=whd
+WorkingDirectory=/srv/whd
+ExecStart=/usr/bin/env bash -lc 'uv run python -m backend_py.run_data_pipeline --download-only --days 3650 && uv run python -m backend_py.run_full_pipeline --skip-download --official --days 3650 --bars "1D,4H,8H,1W"'
+TimeoutStartSec=3600

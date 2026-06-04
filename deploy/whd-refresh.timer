@@ -1,0 +1,11 @@
+# 每天 00:30 刷新数据。放 /etc/systemd/system/whd-refresh.timer
+# 启用:systemctl enable --now whd-refresh.timer
+[Unit]
+Description=Run WHD data refresh daily
+
+[Timer]
+OnCalendar=*-*-* 00:30:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

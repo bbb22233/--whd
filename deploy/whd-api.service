@@ -1,0 +1,18 @@
+# FastAPI 后端(market weather API)。放 /etc/systemd/system/whd-api.service
+# 改 WorkingDirectory / User / ALLOWED_ORIGINS / uv 路径为你的实际值。
+[Unit]
+Description=WHD Market Weather API (FastAPI/uvicorn)
+After=network.target
+
+[Service]
+Type=simple
+User=whd
+WorkingDirectory=/srv/whd
+# 仅绑 127.0.0.1,只让 Caddy 反代对外(应用本身不暴露公网)
+ExecStart=/usr/bin/env uv run uvicorn backend_py.main:app --host 127.0.0.1 --port 8000
+Environment=ALLOWED_ORIGINS=https://your-domain.com
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

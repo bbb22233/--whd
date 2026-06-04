@@ -1,0 +1,43 @@
+# 档3 公网反代(Caddy v2)。把 your-domain.com 换成你的域名,Caddy 会自动签 TLS。
+# 设计:同源 —— /api/* 转 FastAPI(8000),其余转前端静态(4177)。
+# 安全:公网展示站只读,直接 403 掉 scanner 写端点(无攻击面)。
+#
+# 用法:
+#   1) 安装 caddy,把本文件放到 /etc/caddy/Caddyfile
+#   2) 改 your-domain.com 为真实域名,DNS 指向本机
+#   3) 取消 index.html 里 `window.__API_BASE__ = ""` 那行注释(让前端走同源 /api/...)
+#   4) systemctl reload caddy
+
+your-domain.com {
+	encode gzip
+
+	# 公网只读:禁止任何状态变更/重活端点(scanner 下载/重算/写盘)
+	@scanner_write {
+		method POST
+		path /api/scanner/*
+	}
+	respond @scanner_write "Forbidden on public deployment" 403
+
+	# API 同源转发
+	handle /api/* {
+		reverse_proxy 127.0.0.1:8000
+	}
+
+	# 健康探针(可选,给监控用)
+	handle /health {
+		reverse_proxy 127.0.0.1:8000
+	}
+
+	# 其余 → 前端静态
+	handle {
+		reverse_proxy 127.0.0.1:4177
+	}
+}
+
+# 若只想内网/无域名,用 :80 或自定义端口(无自动 TLS):
+# :8080 {
+# 	@scanner_write { method POST; path /api/scanner/* }
+# 	respond @scanner_write 403
+# 	handle /api/* { reverse_proxy 127.0.0.1:8000 }
+# 	handle { reverse_proxy 127.0.0.1:4177 }
+# }
