@@ -21,8 +21,11 @@ uv sync                      # 装 Python 依赖
 uv run python -m backend_py.run_data_pipeline --download-only --days 3650
 uv run python -m backend_py.run_full_pipeline --skip-download --official --days 3650 --bars "1D,4H,8H,1W"
 
-# 1) 前端走同源:取消 index.html 里这行注释
-#    <script>window.__API_BASE__ = "";</script>
+# 0b) 构建 React 前端(web/)→ 产出 web/dist;server.mjs 会自动优先服务它
+cd web && npm ci && npm run build && cd ..
+
+# 1) 前端走同源(React 应用默认就是同源 /api;如需显式指定,在 web/index.html
+#    取消 `window.__API_BASE__ = ""` 注释后重新 build)
 
 # 2) 装 systemd unit + 启动
 sudo cp deploy/whd-*.service deploy/whd-refresh.timer /etc/systemd/system/
