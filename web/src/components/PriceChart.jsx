@@ -7,7 +7,7 @@ export default function PriceChart({ candles }) {
   const up = rows[rows.length - 1].close >= rows[0].close;
   const stroke = up ? "var(--up)" : "var(--down)";
   return (
-    <div style={{ height: 120, marginTop: 10 }}>
+    <div style={{ height: 168, marginTop: 16 }}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={rows} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
           <XAxis dataKey="date" hide />

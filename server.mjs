@@ -24,6 +24,7 @@ const mimeTypes = new Map([
   [".svg", "image/svg+xml"],
   [".ico", "image/x-icon"],
   [".woff2", "font/woff2"],
+  [".woff", "font/woff"],
 ]);
 
 function resolveRequestPath(requestUrl) {
