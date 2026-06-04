@@ -23,7 +23,7 @@ from backend_py.research.summary import build_summary_row, quality_summary
 CliMain = Callable[[list[str] | None], None]
 REPORT_KINDS = ("feature_factory", "deviation_rules", "market_weather_router")
 GOLDEN_SYMBOLS = ["BTC-USDT", "SOL-USDT", "DOGE-USDT", "ENA-USDT"]
-GOLDEN_BARS = ["1D", "4H", "8H"]
+GOLDEN_BARS = ["1D", "4H", "8H", "1W"]
 FIXTURE_CLEAN_DIR = PROJECT_ROOT / "tests" / "fixtures" / "data" / "clean"
 GOLDEN_DIR = PROJECT_ROOT / "tests" / "golden"
 
@@ -35,7 +35,7 @@ def split_csv_values(values: list[str] | None) -> list[str]:
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run frozen-golden Python research parity regression.")
     parser.add_argument("--symbols", nargs="*", help="Symbols to check. Defaults to the frozen fixture set.")
-    parser.add_argument("--bars", nargs="*", default=[",".join(GOLDEN_BARS)], help="Bars to check. Defaults to 1D,4H,8H.")
+    parser.add_argument("--bars", nargs="*", default=[",".join(GOLDEN_BARS)], help="Bars to check. Defaults to 1D,4H,8H,1W.")
     parser.add_argument("--days", type=int, default=3650)
     parser.add_argument("--node-suffix", default="_node")
     parser.add_argument("--python-suffix", default="_py")

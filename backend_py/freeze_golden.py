@@ -15,7 +15,7 @@ from backend_py.research.config import file_stem, parse_args as parse_research_a
 
 
 FIXTURE_SYMBOLS = ["BTC-USDT", "SOL-USDT", "DOGE-USDT", "ENA-USDT"]
-FIXTURE_BARS = ["1D", "4H", "8H"]
+FIXTURE_BARS = ["1D", "4H", "8H", "1W"]
 DAYS = 3650
 REPORT_KINDS: tuple[tuple[str, Callable[[list[str] | None], None]], ...] = (
     ("feature_factory", build_feature_factory),
