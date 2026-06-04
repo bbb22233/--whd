@@ -9,6 +9,21 @@ export function fmtNum(value, digits = 2) {
   });
 }
 
+// 价格自适应精度:亚美元/低价币种用更多小数位,避免 DOGE 0.10 把开/高/低抹平。
+export function fmtPrice(value) {
+  if (!isNum(value)) return "--";
+  const n = Math.abs(Number(value));
+  let d = 2;
+  if (n === 0) d = 2;
+  else if (n < 0.0001) d = 8;
+  else if (n < 0.01) d = 6;
+  else if (n < 1) d = 5;
+  else if (n < 100) d = 4;
+  else if (n < 10000) d = 2;
+  else d = 2;
+  return Number(value).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+
 export function fmtPct(value, digits = 2) {
   if (!isNum(value)) return "--";
   return `${Number(value).toFixed(digits)}%`;

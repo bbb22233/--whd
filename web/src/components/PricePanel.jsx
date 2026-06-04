@@ -1,4 +1,4 @@
-import { fmtNum, fmtSignedPct, dirClass } from "../lib/format.js";
+import { fmtNum, fmtPrice, fmtSignedPct, dirClass } from "../lib/format.js";
 import FlashCell from "./FlashCell.jsx";
 import PriceChart from "./PriceChart.jsx";
 
@@ -6,9 +6,9 @@ export default function PricePanel({ candle, prevClose, candles, values }) {
   const daily = candle && prevClose ? (candle.close / prevClose - 1) * 100 : null;
   const intraday = candle ? (candle.close / candle.open - 1) * 100 : null;
   const cells = [
-    ["开", fmtNum(candle?.open)],
-    ["高", fmtNum(candle?.high)],
-    ["低", fmtNum(candle?.low)],
+    ["开", fmtPrice(candle?.open)],
+    ["高", fmtPrice(candle?.high)],
+    ["低", fmtPrice(candle?.low)],
     ["日内", fmtSignedPct(intraday)],
     ["振幅", values?.rangePct != null ? `${fmtNum(values.rangePct)}%` : "--"],
     ["量", fmtNum(candle?.volume, 0)],
@@ -21,7 +21,7 @@ export default function PricePanel({ candle, prevClose, candles, values }) {
       </div>
       <div className="panel-body">
         <div className="price-main">
-          <FlashCell value={candle?.close} className="last mono">{fmtNum(candle?.close)}</FlashCell>
+          <FlashCell value={candle?.close} className="last mono">{fmtPrice(candle?.close)}</FlashCell>
           <span className={`change ${dirClass(daily)}`}>{fmtSignedPct(daily)}</span>
         </div>
         <div className="quote-grid">
