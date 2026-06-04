@@ -1,7 +1,7 @@
 # 前端重塑:React 数据密集型监控终端(frontend-craft)
 
 > 依据技能 `skills/frontend-craft/`(第五章 industrial/量化终端 + 第三章 AI 信任校准 + 第二章设计思维)。
-> 旧原生前端(`app.js`/`index.html`/`styles.css`)保留为 legacy;新栈在 `web/`。
+> 旧原生前端(`app.js`/`index.html`/`styles.css`)已删除;前端主线只保留 `web/`。
 
 ## 设计
 
@@ -49,7 +49,7 @@
 ```bash
 # 开发(配合 FastAPI:8000,vite 代理 /api)
 cd web && npm install && npm run dev        # http://127.0.0.1:5173
-# 生产构建 → web/dist,由 server.mjs 自动优先服务
+# 生产构建 → web/dist,由 server.mjs 服务
 npm run build && cd .. && node server.mjs   # http://127.0.0.1:4177
 ```
 
@@ -59,5 +59,5 @@ npm run build && cd .. && node server.mjs   # http://127.0.0.1:4177
 - ⚠️ **未出可视化截图**:本容器无无头浏览器,无法渲染验证视觉。需在浏览器打开 `npm run dev` 或 `node server.mjs` 实看。
 
 ## 边界
-- 旧 legacy 前端(根目录 `app.js`/`index.html`/`styles.css`)暂保留;`server.mjs` 自动优先 `web/dist`,确认新版无碍后可删 legacy(单独一步)。
+- 旧 legacy 前端(根目录 `app.js`/`index.html`/`styles.css`)已删除;`server.mjs` 不再回退旧版,缺少 `web/dist` 时会提示先构建。
 - `web/node_modules`、`web/dist` 已 gitignore(构建产物)。

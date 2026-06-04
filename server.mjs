@@ -8,9 +8,10 @@ const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT ?? 4177);
 const host = process.env.HOST ?? "127.0.0.1";   // 档2/3 内网/反代时设 HOST=0.0.0.0
 
-// 前端根:优先 React 构建产物 web/dist(`cd web && npm run build`),否则回退旧 legacy 根。
+// 前端根:只服务 React 构建产物 web/dist(`cd web && npm run build`)。
 const webDist = path.join(root, "web", "dist");
-const appRoot = existsSync(path.join(webDist, "index.html")) ? webDist : root;
+const hasWebBuild = existsSync(path.join(webDist, "index.html"));
+const appRoot = webDist;
 // 数据回退(/reports、/data)始终从仓库根目录提供,不在 web/dist 里。
 const DATA_PREFIXES = ["reports/", "data/"];
 
@@ -33,7 +34,7 @@ function resolveRequestPath(requestUrl) {
   const relativePath = requestPath === "/" ? "index.html" : requestPath.replace(/^\/+/, "");
   // 拒绝 dotfile / 隐藏段(.git、.env 等)
   if (relativePath.split("/").some((segment) => segment.startsWith("."))) return null;
-  // /reports、/data 从仓库根;其余从前端根(web/dist 或 legacy)
+  // /reports、/data 从仓库根;其余从 React 构建产物 web/dist
   const base = DATA_PREFIXES.some((p) => relativePath.startsWith(p)) ? root : appRoot;
   const filePath = path.resolve(base, relativePath);
   const relative = path.relative(base, filePath);
@@ -46,6 +47,14 @@ function resolveRequestPath(requestUrl) {
 const server = createServer(async (request, response) => {
   try {
     const filePath = resolveRequestPath(request.url ?? "/");
+    const url = new URL(request.url ?? "/", "http://localhost");
+    const isDataRequest = DATA_PREFIXES.some((p) => url.pathname.replace(/^\/+/, "").startsWith(p));
+    if (!hasWebBuild && !isDataRequest) {
+      response.writeHead(503, { "content-type": "text/plain; charset=utf-8" });
+      response.end("React web build is missing. Run: cd web && npm run build");
+      return;
+    }
+
     if (!filePath) {
       response.writeHead(403, { "content-type": "text/plain; charset=utf-8" });
       response.end("Forbidden");
