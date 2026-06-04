@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from .reports_reader import ReportNotFound, ReportsReader, normalize_bar, normalize_instrument
 from .scanner_service import ScannerAlreadyRunning, ScannerCommandUnavailable, ScannerMode, ScannerService
 
+
+ALLOWED_ORIGINS = ["http://127.0.0.1:4177", "http://localhost:4177"]
 
 app = FastAPI(
     title="Quant Monitor Python Backend",
@@ -17,11 +19,22 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:4177", "http://localhost:4177"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=False,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
+
+
+def require_trusted_origin(request: Request) -> None:
+    """M1: reject cross-origin state-changing calls (CSRF guard).
+
+    Browsers always attach an Origin header on cross-origin requests; if present it
+    must be in the allowlist. Non-browser local clients (curl, no Origin) still work.
+    """
+    origin = request.headers.get("origin")
+    if origin is not None and origin not in ALLOWED_ORIGINS:
+        raise HTTPException(status_code=403, detail="Cross-origin request rejected")
 
 reader = ReportsReader()
 scanner = ScannerService()
@@ -187,12 +200,16 @@ def scanner_status() -> dict[str, Any]:
 
 @app.post("/api/scanner/run")
 def scanner_run(
+    request: Request,
     mode: ScannerMode = Query(default="summary"),
     symbols: str | None = Query(default=None, description="Comma-separated symbols for summary modes, e.g. BTC-USDT,ETH-USDT"),
     bars: str | None = Query(default=None, description="Comma-separated bars for summary modes, e.g. 1D,4H"),
 ) -> dict[str, Any]:
+    require_trusted_origin(request)
     try:
         return {"started": True, "job": scanner.start(mode=mode, symbols=symbols, bars=bars)}
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
     except ScannerAlreadyRunning as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
     except ScannerCommandUnavailable as error:
@@ -200,7 +217,8 @@ def scanner_run(
 
 
 @app.post("/api/scanner/cancel")
-def scanner_cancel() -> dict[str, Any]:
+def scanner_cancel(request: Request) -> dict[str, Any]:
+    require_trusted_origin(request)
     return scanner.cancel()
 
 

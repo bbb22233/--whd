@@ -19,9 +19,13 @@ function resolveRequestPath(requestUrl) {
   const url = new URL(requestUrl, "http://localhost");
   const requestPath = decodeURIComponent(url.pathname);
   const relativePath = requestPath === "/" ? "index.html" : requestPath.replace(/^\/+/, "");
+  // M3: reject dotfiles / hidden segments (e.g. .git, .env) up front.
+  if (relativePath.split("/").some((segment) => segment.startsWith("."))) return null;
   const filePath = path.resolve(root, relativePath);
   const relative = path.relative(root, filePath);
   if (relative.startsWith("..") || path.isAbsolute(relative)) return null;
+  // M3: allowlist by known extension; everything else (source, configs, no-ext) is 403.
+  if (!mimeTypes.has(path.extname(filePath).toLowerCase())) return null;
   return filePath;
 }
 

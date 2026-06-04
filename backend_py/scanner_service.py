@@ -9,6 +9,8 @@ import uuid
 from pathlib import Path
 from typing import Literal
 
+from .reports_reader import BAR_RE, SYMBOL_RE, normalize_bar, normalize_instrument
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ScannerMode = Literal["summary", "full", "python_summary", "python_router", "python_research", "python_data", "python_full"]
@@ -40,9 +42,21 @@ def split_csv_values(value: str | None) -> list[str]:
 
 
 def scanner_scope_args(symbols: str | None = None, bars: str | None = None) -> list[str]:
+    # M2: validate + normalize before building argv, so a value like "--days" or
+    # "--official" can never be smuggled in as a downstream CLI flag (argument injection).
     args: list[str] = []
-    symbol_values = split_csv_values(symbols)
-    bar_values = split_csv_values(bars)
+    symbol_values: list[str] = []
+    for raw in split_csv_values(symbols):
+        norm = normalize_instrument(raw)
+        if not norm or not SYMBOL_RE.fullmatch(norm):
+            raise ValueError(f"Invalid symbol: {raw!r}")
+        symbol_values.append(norm)
+    bar_values: list[str] = []
+    for raw in split_csv_values(bars):
+        norm = normalize_bar(raw)
+        if not norm or not BAR_RE.fullmatch(norm):
+            raise ValueError(f"Invalid bar: {raw!r}")
+        bar_values.append(norm)
     if symbol_values:
         args.extend(["--symbols", *symbol_values])
     if bar_values:

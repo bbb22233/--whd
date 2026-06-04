@@ -204,8 +204,16 @@ function setText(selector, text) {
   if (node) node.textContent = text ?? "--";
 }
 
+// L2: defense-in-depth — escape any backend-derived string before it lands in innerHTML.
+function escapeHtml(value) {
+  return String(value ?? "").replace(
+    /[&<>"']/g,
+    (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char],
+  );
+}
+
 function makeMetaChip(label, value) {
-  return `<span class="meta-chip">${label}: <strong>${value}</strong></span>`;
+  return `<span class="meta-chip">${escapeHtml(label)}: <strong>${escapeHtml(value)}</strong></span>`;
 }
 
 function getCurrentCandle(candlesPayload, date) {
@@ -360,9 +368,9 @@ function renderComponentGrid(weather, deviations) {
     .map(
       (card) => `
         <article class="component-card">
-          <div class="component-title">${card.title}</div>
-          <div class="component-state">${card.state}</div>
-          <div class="component-kv"><span>${card.main}</span><strong>${card.sub}</strong></div>
+          <div class="component-title">${escapeHtml(card.title)}</div>
+          <div class="component-state">${escapeHtml(card.state)}</div>
+          <div class="component-kv"><span>${escapeHtml(card.main)}</span><strong>${escapeHtml(card.sub)}</strong></div>
         </article>
       `,
     )
@@ -377,7 +385,7 @@ function renderScores(scores) {
       const color = index === 0 ? "var(--orange)" : index === 1 ? "var(--blue)" : "var(--cyan)";
       return `
         <div class="score-row">
-          <div class="score-name">${row.label}</div>
+          <div class="score-name">${escapeHtml(row.label)}</div>
           <div class="score-track"><div class="score-fill" style="width:${width}%; background:${color}"></div></div>
           <div class="score-value">${formatNumber(row.score, 2)}</div>
         </div>
@@ -480,8 +488,8 @@ function renderComponentTable(rows) {
         .map(
           (row) => `
             <tr>
-              <td>${row.component}</td>
-              <td>${row.state}</td>
+              <td>${escapeHtml(row.component)}</td>
+              <td>${escapeHtml(row.state)}</td>
               <td>${formatPct(row.currentConfidencePct)}</td>
               <td>${formatNumber(row.occurrences, 0)}</td>
               <td>${formatPct(row.atrUpProbabilityPct)}</td>
@@ -517,15 +525,15 @@ function renderDeviationTable(rows) {
         .map(
           (row) => `
             <tr>
-              <td>${row.kind}</td>
-              <td>${row.horizon}日</td>
-              <td>${row.state}</td>
+              <td>${escapeHtml(row.kind)}</td>
+              <td>${escapeHtml(row.horizon)}日</td>
+              <td>${escapeHtml(row.state)}</td>
               <td class="${signedClass(row.deviationRate)}">${formatSignedPct(row.deviationRate)}</td>
               <td class="${signedClass(row.deviationAtr)}">${formatNumber(row.deviationAtr, 2)}</td>
               <td>${formatPct(row.positionPct)}</td>
               <td>${formatPct(row.returnCloserProbabilityPct)}</td>
               <td>${formatPct(row.continueAwayProbabilityPct)}</td>
-              <td>${row.confidence}</td>
+              <td>${escapeHtml(row.confidence)}</td>
             </tr>
           `,
         )
@@ -551,7 +559,7 @@ function renderNotes(weather, features, deviations) {
   ];
 
   $("#noteList").innerHTML = notes
-    .map(([title, text]) => `<div class="note-item"><strong>${title}</strong> ${text}</div>`)
+    .map(([title, text]) => `<div class="note-item"><strong>${escapeHtml(title)}</strong> ${escapeHtml(text)}</div>`)
     .join("");
 }
 
