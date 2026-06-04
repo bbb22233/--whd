@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException, Query, Request
@@ -9,7 +10,12 @@ from .reports_reader import ReportNotFound, ReportsReader, normalize_bar, normal
 from .scanner_service import ScannerAlreadyRunning, ScannerCommandUnavailable, ScannerMode, ScannerService
 
 
-ALLOWED_ORIGINS = ["http://127.0.0.1:4177", "http://localhost:4177"]
+# 默认本地(档1);档2/3 用环境变量 ALLOWED_ORIGINS="https://your-domain" 覆盖(逗号分隔)。
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("ALLOWED_ORIGINS", "http://127.0.0.1:4177,http://localhost:4177").split(",")
+    if origin.strip()
+]
 
 app = FastAPI(
     title="Quant Monitor Python Backend",

@@ -1,4 +1,8 @@
-const API_BASE = "http://127.0.0.1:8000";
+// 默认本地直连(档1);反代/内网部署时在 index.html 注入 window.__API_BASE__(空串="" 表示同源)。
+const API_BASE =
+  typeof window !== "undefined" && typeof window.__API_BASE__ === "string"
+    ? window.__API_BASE__
+    : "http://127.0.0.1:8000";
 const DEFAULT_INSTRUMENT = "BTC-USDT";
 const DEFAULT_BAR = "1D";
 const SUPPORTED_BARS = ["1D", "4H", "8H", "1W"];

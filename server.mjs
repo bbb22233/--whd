@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT ?? 4177);
+const host = process.env.HOST ?? "127.0.0.1";   // 档2/3 内网/反代时设 HOST=0.0.0.0
 
 const mimeTypes = new Map([
   [".html", "text/html; charset=utf-8"],
@@ -59,6 +60,6 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(port, "127.0.0.1", () => {
-  console.log(`Market weather terminal: http://127.0.0.1:${port}`);
+server.listen(port, host, () => {
+  console.log(`Market weather terminal: http://${host}:${port}`);
 });
