@@ -12,11 +12,17 @@ Capabilities
 雷达只描述"当下是什么环境/状态",**绝不给买卖信号、绝不预测涨跌**(见 docs/gate1-conclusion.md)。
 机器人的"智能"是会聊、会解释、会盯盘——不是会喊单。
 
-运行(需联网 api.telegram.org + Anthropic)
-------------------------------------------
-    uv pip install -e ".[bot]"          # 装 anthropic
+智能内核可插拔(BOT_LLM_PROVIDER)
+----------------------------------
+    claude(默认): export ANTHROPIC_API_KEY=...   # 最智能
+    deepseek:     export BOT_LLM_PROVIDER=deepseek; export DEEPSEEK_API_KEY=...   # 更便宜,OpenAI 兼容
+    openai 兼容:  export BOT_LLM_PROVIDER=openai; export OPENAI_API_KEY=...; export OPENAI_BASE_URL=...; export OPENAI_MODEL=...
+
+运行(需联网 api.telegram.org + 所选模型 API)
+---------------------------------------------
+    uv pip install -e ".[bot]"          # 装 anthropic + openai
     export TELEGRAM_BOT_TOKEN=...        # @BotFather 申请
-    export ANTHROPIC_API_KEY=...         # Anthropic 控制台
+    export ANTHROPIC_API_KEY=...         # 或按上面切到 deepseek/openai
     uv run python -m backend_py.telegram_bot
 
 机密只走环境变量,绝不提交。状态存 data/telegram_state.json(data/ 已 gitignore)。
@@ -41,7 +47,16 @@ from .reports_reader import PROJECT_ROOT, ReportNotFound, ReportsReader, normali
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("telegram_bot")
 
+# 智能内核可插拔:BOT_LLM_PROVIDER = claude(默认) | deepseek | openai
+# - claude:   anthropic SDK,默认模型 claude-opus-4-8
+# - deepseek: OpenAI 兼容,base https://api.deepseek.com,默认 deepseek-chat,key DEEPSEEK_API_KEY
+# - openai:   任意 OpenAI 兼容端点,用 OPENAI_BASE_URL / OPENAI_MODEL / OPENAI_API_KEY
+PROVIDER = os.environ.get("BOT_LLM_PROVIDER", "claude").strip().lower()
 MODEL = "claude-opus-4-8"
+DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+DEEPSEEK_BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+OPENAI_BASE_URL = os.environ.get("OPENAI_BASE_URL")  # 必填(自定义兼容端点)
 DEFAULT_BAR = "1D"
 SUPPORTED_BARS = {"1D", "4H", "8H", "1W"}
 STATE_PATH = PROJECT_ROOT / "data" / "telegram_state.json"
@@ -197,35 +212,36 @@ TOOL_DISPATCH = {
 
 
 # --------------------------------------------------------------------------- #
-# Claude 对话(手动 agentic loop + prompt caching)
+# 智能内核(可插拔:Claude / DeepSeek / 任意 OpenAI 兼容端点)
+# 工具循环逻辑两边一致;只有"调模型 + 消息格式"不同。
 # --------------------------------------------------------------------------- #
-_anthropic_client = None
+_llm_client = None
+NO_RESULT = "(没拿到结果,换个问法试试,或用 /help 看命令)"
 
 
-def _client():
-    global _anthropic_client
-    if _anthropic_client is None:
-        import anthropic  # 延迟导入:未装 .[bot] 时其余命令仍可用
+def _dispatch_tool(name: str, args: dict[str, Any]) -> str:
+    fn = TOOL_DISPATCH.get(name)
+    try:
+        payload = fn(**args) if fn else {"error": f"unknown tool {name}"}
+        return json.dumps(payload, ensure_ascii=False)
+    except Exception as error:  # noqa: BLE001 - report tool failure to the model
+        return json.dumps({"error": str(error)}, ensure_ascii=False)
 
-        _anthropic_client = anthropic.Anthropic()
-    return _anthropic_client
 
+# ---- Claude(anthropic SDK,手动 agentic loop + prompt caching) ---------- #
+def _ask_claude(history: list[dict[str, Any]]) -> str:
+    global _llm_client
+    if _llm_client is None:
+        import anthropic  # 延迟导入
 
-def ask_claude(history: list[dict[str, Any]]) -> str:
-    """history: [{role, content}, ...](最后一条为 user)。返回助手文本。"""
-    client = _client()
-    # 缓存稳定前缀(tools 先渲染,system 打断点即缓存 tools+system)
+        _llm_client = anthropic.Anthropic()
     system = [{"type": "text", "text": SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}]
     messages = list(history)
     final = None
-    for _ in range(6):  # 防失控:最多 6 轮工具往返
-        response = client.messages.create(
-            model=MODEL,
-            max_tokens=2000,
-            thinking={"type": "adaptive"},
-            system=system,
-            tools=TOOLS,
-            messages=messages,
+    for _ in range(6):
+        response = _llm_client.messages.create(
+            model=MODEL, max_tokens=2000, thinking={"type": "adaptive"},
+            system=system, tools=TOOLS, messages=messages,
         )
         final = response
         if response.stop_reason != "tool_use":
@@ -234,17 +250,67 @@ def ask_claude(history: list[dict[str, Any]]) -> str:
         results = []
         for block in response.content:
             if block.type == "tool_use":
-                fn = TOOL_DISPATCH.get(block.name)
-                try:
-                    payload = fn(**block.input) if fn else {"error": f"unknown tool {block.name}"}
-                    results.append({"type": "tool_result", "tool_use_id": block.id,
-                                    "content": json.dumps(payload, ensure_ascii=False)})
-                except Exception as error:  # noqa: BLE001 - report tool failure to the model
-                    results.append({"type": "tool_result", "tool_use_id": block.id,
-                                    "content": f"tool error: {error}", "is_error": True})
+                results.append({"type": "tool_result", "tool_use_id": block.id,
+                                "content": _dispatch_tool(block.name, block.input)})
         messages.append({"role": "user", "content": results})
     text = "".join(b.text for b in (final.content if final else []) if b.type == "text").strip()
-    return text or "(没拿到结果,换个问法试试,或用 /help 看命令)"
+    return text or NO_RESULT
+
+
+# ---- DeepSeek / OpenAI 兼容(openai SDK,function calling) -------------- #
+def _openai_tools() -> list[dict[str, Any]]:
+    return [{"type": "function", "function": {"name": t["name"], "description": t["description"],
+                                              "parameters": t["input_schema"]}} for t in TOOLS]
+
+
+def _openai_config() -> tuple[str, str | None, str, str]:
+    """返回 (api_key, base_url, model, env_key_name)。"""
+    if PROVIDER == "deepseek":
+        return os.environ.get("DEEPSEEK_API_KEY", ""), DEEPSEEK_BASE_URL, DEEPSEEK_MODEL, "DEEPSEEK_API_KEY"
+    return os.environ.get("OPENAI_API_KEY", ""), OPENAI_BASE_URL, OPENAI_MODEL, "OPENAI_API_KEY"
+
+
+def _ask_openai_compatible(history: list[dict[str, Any]]) -> str:
+    global _llm_client
+    api_key, base_url, model, env_name = _openai_config()
+    if not api_key:
+        raise RuntimeError(f"missing {env_name}")
+    if _llm_client is None:
+        from openai import OpenAI  # 延迟导入
+
+        _llm_client = OpenAI(api_key=api_key, base_url=base_url)
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}, *history]
+    tools = _openai_tools()
+    final_text = ""
+    for _ in range(6):
+        resp = _llm_client.chat.completions.create(
+            model=model, messages=messages, tools=tools, tool_choice="auto", max_tokens=2000,
+        )
+        msg = resp.choices[0].message
+        if not msg.tool_calls:
+            final_text = (msg.content or "").strip()
+            break
+        messages.append({
+            "role": "assistant", "content": msg.content or "",
+            "tool_calls": [{"id": tc.id, "type": "function",
+                            "function": {"name": tc.function.name, "arguments": tc.function.arguments}}
+                           for tc in msg.tool_calls],
+        })
+        for tc in msg.tool_calls:
+            try:
+                args = json.loads(tc.function.arguments or "{}")
+            except json.JSONDecodeError:
+                args = {}
+            messages.append({"role": "tool", "tool_call_id": tc.id,
+                             "content": _dispatch_tool(tc.function.name, args)})
+    return final_text or NO_RESULT
+
+
+def ask_llm(history: list[dict[str, Any]]) -> str:
+    """history: [{role, content}, ...](最后一条为 user)。按 PROVIDER 路由。"""
+    if PROVIDER == "claude":
+        return _ask_claude(history)
+    return _ask_openai_compatible(history)
 
 
 # --------------------------------------------------------------------------- #
@@ -402,12 +468,12 @@ def handle_message(chat_id: str, text: str, histories: dict[str, list]) -> None:
     history = histories.setdefault(chat_id, [])
     history.append({"role": "user", "content": text})
     try:
-        reply = ask_claude(history)
+        reply = ask_llm(history)
     except Exception as error:  # noqa: BLE001 - surface LLM/config errors to the user
-        log.exception("ask_claude failed")
+        log.exception("ask_llm failed")
         msg = str(error)
-        if "ANTHROPIC_API_KEY" in msg or "api_key" in msg.lower():
-            reply = "智能问答需要配置 ANTHROPIC_API_KEY。命令(/weather /overview 等)仍可用。"
+        if "API_KEY" in msg.upper() or "api_key" in msg.lower():
+            reply = f"智能问答需要配置模型 API key(当前 provider={PROVIDER})。命令(/weather /overview 等)仍可用。"
         else:
             reply = f"出错了:{msg[:200]}"
         history.pop()  # 失败不污染上下文
@@ -483,8 +549,10 @@ def broadcast_loop() -> None:
 def main() -> None:
     if not os.environ.get("TELEGRAM_BOT_TOKEN"):
         raise SystemExit("缺少 TELEGRAM_BOT_TOKEN(@BotFather 申请),见模块文档。")
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        log.warning("未设 ANTHROPIC_API_KEY:命令可用,但自然语言问答会提示配置。")
+    key_env = {"claude": "ANTHROPIC_API_KEY", "deepseek": "DEEPSEEK_API_KEY"}.get(PROVIDER, "OPENAI_API_KEY")
+    if not os.environ.get(key_env):
+        log.warning("未设 %s(provider=%s):命令可用,但自然语言问答会提示配置。", key_env, PROVIDER)
+    log.info("LLM provider=%s", PROVIDER)
 
     histories: dict[str, list] = {}
     threading.Thread(target=alert_loop, daemon=True).start()

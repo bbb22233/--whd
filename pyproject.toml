@@ -9,9 +9,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Telegram bot (optional): Claude-powered conversational interface over the radar.
+# Telegram bot (optional): conversational interface over the radar.
+# Pluggable LLM core via BOT_LLM_PROVIDER: claude (anthropic) | deepseek/openai (openai-compatible).
 bot = [
   "anthropic>=0.40",
+  "openai>=1.40",
 ]
 
 [tool.uv]
