@@ -17,6 +17,10 @@ bot = [
   "openai>=1.40",
   "discord.py>=2.4",
 ]
+# Real-time monitor (optional): OKX WebSocket incremental ingest.
+live = [
+  "websockets>=12",
+]
 
 [tool.uv]
 package = false

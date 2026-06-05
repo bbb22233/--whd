@@ -1065,6 +1065,9 @@ bot = [
     { name = "discord-py" },
     { name = "openai" },
 ]
+live = [
+    { name = "websockets" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -1073,8 +1076,9 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.115,<1" },
     { name = "openai", marker = "extra == 'bot'", specifier = ">=1.40" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.30,<1" },
+    { name = "websockets", marker = "extra == 'live'", specifier = ">=12" },
 ]
-provides-extras = ["bot"]
+provides-extras = ["bot", "live"]
 
 [[package]]
 name = "sniffio"

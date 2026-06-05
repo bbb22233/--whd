@@ -1,0 +1,20 @@
+# 实时监控:OKX WebSocket 增量接入(历史只回填一次,之后只接新收盘bar)。
+# 放 /etc/systemd/system/whd-ws.service。需服务器能联网 OKX WS。
+# 推荐用这个做实时监控(替代 whd-live.service 的"每轮重下全量")。
+# 前置:先回填一次历史(whd-refresh.service 或手动 run_full_pipeline),让 data/raw 存在。
+[Unit]
+Description=WHD realtime monitor (OKX WebSocket incremental ingest)
+After=network.target
+
+[Service]
+Type=simple
+User=whd
+WorkingDirectory=/srv/whd
+Environment=WS_MONITOR_SYMBOLS=BTC-USDT,ETH-USDT
+Environment=WS_MONITOR_BARS=1D,4H,8H
+ExecStart=/usr/bin/env uv run python -m backend_py.ws_monitor
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
