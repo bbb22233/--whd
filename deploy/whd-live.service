@@ -1,0 +1,20 @@
+# 常驻刷新服务:定时拉最新K线+重算报告,让监控/灯号提醒真正生效。
+# 放 /etc/systemd/system/whd-live.service。需服务器能联网 OKX。
+# 比 whd-refresh.timer(每日一次)更勤;二选一即可——要"分钟级监控"用这个。
+[Unit]
+Description=WHD live refresh (poll OKX + recompute reports)
+After=network.target
+
+[Service]
+Type=simple
+User=whd
+WorkingDirectory=/srv/whd
+Environment=LIVE_REFRESH_SYMBOLS=BTC-USDT,ETH-USDT
+Environment=LIVE_REFRESH_BARS=1D,4H,8H
+Environment=LIVE_REFRESH_INTERVAL_SEC=300
+ExecStart=/usr/bin/env uv run python -m backend_py.live_refresh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
