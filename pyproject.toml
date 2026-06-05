@@ -9,11 +9,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Telegram bot (optional): conversational interface over the radar.
+# Bot adapters (optional): conversational interface over the radar.
 # Pluggable LLM core via BOT_LLM_PROVIDER: claude (anthropic) | deepseek/openai (openai-compatible).
+# Telegram uses stdlib only; Discord needs discord.py.
 bot = [
   "anthropic>=0.40",
   "openai>=1.40",
+  "discord.py>=2.4",
 ]
 
 [tool.uv]
