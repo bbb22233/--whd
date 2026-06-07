@@ -66,6 +66,62 @@ def ladder_from_fractals(candles: list[dict[str, Any]], width: int = 1) -> dict[
     }
 
 
+def build_strokes(candles: list[dict[str, Any]], width: int = 1, min_gap: int = 4) -> list[dict[str, Any]]:
+    """笔级:把原始分型过滤成交替的顶/底端点(缠论"笔"简化版)。
+    规则:① 同类型分型相邻 → 保留更极端的;② 异类型 → 需间隔 ≥min_gap 根才成新的一笔。
+    返回交替端点列表 [{idx,type,price,date}]。"""
+    tops, bottoms = find_fractals(candles, width)
+    fx: list[tuple[int, str, float]] = []
+    fx += [(i, "top", candles[i]["high"]) for i in tops]
+    fx += [(i, "bot", candles[i]["low"]) for i in bottoms]
+    fx.sort(key=lambda t: t[0])
+
+    ends: list[list[Any]] = []
+    for idx, typ, price in fx:
+        if not ends:
+            ends.append([idx, typ, price])
+            continue
+        last = ends[-1]
+        if typ == last[1]:  # 同类型:取更极端
+            if (typ == "top" and price > last[2]) or (typ == "bot" and price < last[2]):
+                ends[-1] = [idx, typ, price]
+        elif idx - last[0] >= min_gap:  # 异类型且够间隔:成新一笔
+            ends.append([idx, typ, price])
+        # 异类型但太近:忽略(笔内噪音)
+    return [{"idx": i, "type": t, "price": p, "date": candles[i].get("date")} for i, t, p in ends]
+
+
+def latest_stroke_range(candles: list[dict[str, Any]], width: int = 1, min_gap: int = 4) -> dict[str, Any] | None:
+    """最近一笔的 H/L:取最近的 顶端点 high=H、底端点 low=L。"""
+    ends = build_strokes(candles, width, min_gap)
+    last_top = next((e for e in reversed(ends) if e["type"] == "top"), None)
+    last_bot = next((e for e in reversed(ends) if e["type"] == "bot"), None)
+    if not last_top or not last_bot:
+        return None
+    return {
+        "high": last_top["price"], "low": last_bot["price"],
+        "topIdx": last_top["idx"], "botIdx": last_bot["idx"],
+        "topDate": last_top["date"], "botDate": last_bot["date"],
+        "strokes": ends,
+    }
+
+
+def ladder_from_strokes(candles: list[dict[str, Any]], width: int = 1, min_gap: int = 4) -> dict[str, Any] | None:
+    """笔级定 H/L → 逆推灯区 + 当前落档。"""
+    rng = latest_stroke_range(candles, width, min_gap)
+    if not rng:
+        return None
+    ladder = reverse_fib_ladder(rng["high"], rng["low"])
+    price = candles[-1]["close"]
+    return {
+        "strokeRange": {k: rng[k] for k in ("high", "low", "topIdx", "botIdx", "topDate", "botDate")},
+        "ladder": ladder,
+        "currentPrice": price,
+        "currentZone": classify_price(price, rng["high"], rng["low"]),
+        "strokeCount": len(rng["strokes"]),
+    }
+
+
 if __name__ == "__main__":  # 离线 demo:读冻结 fixture 跑一遍
     import json
     import sys
