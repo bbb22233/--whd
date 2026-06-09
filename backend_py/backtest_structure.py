@@ -35,7 +35,9 @@ def _first_tp(structure: dict[str, Any], side: str) -> float | None:
 
 
 def backtest(candles: list[dict[str, Any]], warmup: int = 250, fee_bps: float = 5.0,
-             slip_bps: float = 5.0, max_hold: int = 60, buffer_pct: float = 0.05) -> dict[str, Any]:
+             slip_bps: float = 5.0, max_hold: int = 60, buffer_pct: float = 0.05,
+             risk_budget: float | None = None, max_leverage: float = 3.0) -> dict[str, Any]:
+    """risk_budget=None → 裸打满仓(v1);risk_budget=0.02 → 每笔固定赌 2% 风险(v2,仓位按止损距离反推)。"""
     cost = (fee_bps + slip_bps) / 10000.0  # 单边成本(比例)
     trades: list[dict[str, Any]] = []
     open_pos: dict[str, Any] | None = None
@@ -65,7 +67,7 @@ def backtest(candles: list[dict[str, Any]], warmup: int = 250, fee_bps: float = 
                 gross = (exit_px / p["entry"] - 1) * d
                 net = gross - 2 * cost  # 进+出两边成本
                 trades.append({"side": p["side"], "entry": p["entry"], "exit": round(exit_px, 2),
-                               "reason": reason, "ret": net, "bars": t - p["entryIdx"]})
+                               "stop": p["stop"], "reason": reason, "ret": net, "bars": t - p["entryIdx"]})
                 open_pos = None
 
         # 没有持仓时:看突破信号(状态刚变 confirmed)
@@ -85,22 +87,29 @@ def backtest(candles: list[dict[str, Any]], warmup: int = 250, fee_bps: float = 
                     open_pos = {"side": side, "entry": entry, "stop": stop, "tp": tp, "entryIdx": t}
             prev_state = st if st else prev_state
 
-    return _stats(trades)
+    return _stats(trades, risk_budget, max_leverage)
 
 
-def _stats(trades: list[dict[str, Any]]) -> dict[str, Any]:
+def _stats(trades: list[dict[str, Any]], risk_budget: float | None = None,
+           max_leverage: float = 3.0) -> dict[str, Any]:
     n = len(trades)
     if n == 0:
         return {"trades": 0, "note": "没有触发任何交易"}
     rets = [t["ret"] for t in trades]
     wins = [r for r in rets if r > 0]
     losses = [r for r in rets if r <= 0]
-    # 复利净值 + 最大回撤(每笔满仓名义)
+    # 复利净值 + 最大回撤。固定风险时:仓位 = risk_budget / 止损距离(上限 max_leverage)
     eq = 1.0
     peak = 1.0
     maxdd = 0.0
-    for r in rets:
-        eq *= (1 + r)
+    for tr in trades:
+        r = tr["ret"]
+        if risk_budget:
+            stop_dist = abs(tr["entry"] - tr["stop"]) / tr["entry"]
+            f = min(max_leverage, risk_budget / stop_dist) if stop_dist > 0 else 0.0
+            eq *= (1 + f * r)
+        else:
+            eq *= (1 + r)
         peak = max(peak, eq)
         maxdd = max(maxdd, (peak - eq) / peak)
     gross_win = sum(wins)
