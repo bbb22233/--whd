@@ -193,6 +193,66 @@ def backtest_chips(candles: list[dict[str, Any]], warmup: int = 250, fee_bps: fl
     return _stats(trades, risk_budget, max_leverage)
 
 
+def backtest_grid(candles: list[dict[str, Any]], warmup: int = 250, fee_bps: float = 5.0,
+                  slip_bps: float = 5.0, n_levels: int = 8, buffer_pct: float = 0.05,
+                  grid_stake: float = 0.5) -> dict[str, Any]:
+    """v4 循环网格(震荡模式,框架主菜):
+    inside 时在箱子里铺 n_levels 格 → 价格落到一格买、涨一格卖、清掉回来再接(循环收割震荡);
+    跌破箱底(边际线)全平止损;突破箱顶则收尾。grid_stake = 整个网格占用资金比例。
+    """
+    cost = (fee_bps + slip_bps) / 10000.0
+    eq, peak, maxdd = 1.0, 1.0, 0.0
+    cycles, blowups = 0, 0
+    grid: dict[str, Any] | None = None
+
+    def apply(r: float) -> None:
+        nonlocal eq, peak, maxdd
+        eq *= (1 + r)
+        peak = max(peak, eq)
+        maxdd = max(maxdd, (peak - eq) / peak)
+
+    for t in range(warmup, len(candles)):
+        bar = candles[t]
+        if grid is None:
+            s = analyze_structure(candles[: t + 1])
+            st = (s.get("breakout") or {}).get("state", "") if s else ""
+            piv = s.get("latestPivot") if s else None
+            if st == "inside" and piv and piv["high"] > piv["low"]:
+                lo, hi = piv["low"], piv["high"]
+                levels = [lo + i * (hi - lo) / n_levels for i in range(n_levels + 1)]
+                grid = {"levels": levels, "spacing": (hi - lo) / n_levels,
+                        "holding": [False] * (n_levels + 1), "buy": [0.0] * (n_levels + 1),
+                        "marginLo": lo - buffer_pct * (hi - lo), "marginHi": hi + buffer_pct * (hi - lo)}
+        if grid:
+            unit = grid_stake / n_levels
+            if bar["low"] <= grid["marginLo"]:                 # 跌破边际线 → 全平止损
+                for i, h in enumerate(grid["holding"]):
+                    if h:
+                        apply(unit * ((grid["marginLo"] / grid["buy"][i] - 1) - 2 * cost))
+                blowups += 1
+                grid = None
+                continue
+            if bar["high"] >= grid["marginHi"]:                # 突破箱顶 → 收尾(剩余按箱顶平)
+                for i, h in enumerate(grid["holding"]):
+                    if h:
+                        apply(unit * ((grid["marginHi"] / grid["buy"][i] - 1) - 2 * cost))
+                grid = None
+                continue
+            # 网格成交:先卖(已持仓涨一格止盈),再买(空格落到位)
+            for i, b in enumerate(grid["levels"]):
+                if grid["holding"][i] and bar["high"] >= grid["buy"][i] + grid["spacing"]:
+                    apply(unit * (grid["spacing"] / grid["buy"][i] - 2 * cost))
+                    grid["holding"][i] = False
+                    cycles += 1
+            for i, b in enumerate(grid["levels"]):
+                if not grid["holding"][i] and bar["low"] <= b:
+                    grid["holding"][i] = True
+                    grid["buy"][i] = b
+
+    return {"cycles": cycles, "blowups": blowups,
+            "totalReturnPct": round(100 * (eq - 1), 1), "maxDrawdownPct": round(100 * maxdd, 1)}
+
+
 if __name__ == "__main__":
     path = sys.argv[1] if len(sys.argv) > 1 else "tests/fixtures/data/clean/BTC_USDT_1D_clean.json"
     warmup = int(sys.argv[2]) if len(sys.argv) > 2 else 250
