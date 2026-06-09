@@ -68,6 +68,48 @@ def cluster_levels(strokes: list[dict[str, Any]], tol: float = 0.015) -> list[di
     return sorted(out, key=lambda x: x["count"], reverse=True)
 
 
+def classify_breakout(candles: list[dict[str, Any]], pivot: dict[str, Any],
+                      confirm_bars: int = 2, buffer_pct: float = 0.05) -> dict[str, Any]:
+    """真假突破判定(默认规则,可调):
+    - 在箱子里 → inside(震荡/埋伏模式)。
+    - 收盘越过箱边 + 缓冲,且连续 ≥confirm_bars 根站稳 → confirmed(真突破)。
+    - 越过箱边但还没站稳 → pending(待确认,可能假)。
+    - 近期越过又缩回箱内 → fakeout(假突破)。
+    buffer = buffer_pct × 箱高,防止贴边毛刺误判。
+    """
+    hi, lo = pivot["high"], pivot["low"]
+    buf = buffer_pct * (hi - lo)
+    recent = candles[-(confirm_bars + 3):]
+    closes = [c["close"] for c in recent]
+    last = closes[-1]
+
+    def consec_beyond(edge: float, up: bool) -> int:
+        n = 0
+        for c in reversed(closes):
+            if (up and c > edge) or (not up and c < edge):
+                n += 1
+            else:
+                break
+        return n
+
+    if last > hi + buf:
+        held = consec_beyond(hi, True)
+        return {"state": "confirmed_up" if held >= confirm_bars else "pending_up",
+                "side": "up", "heldBars": held, "edge": hi}
+    if last < lo - buf:
+        held = consec_beyond(lo, False)
+        return {"state": "confirmed_down" if held >= confirm_bars else "pending_down",
+                "side": "down", "heldBars": held, "edge": lo}
+    # 现价在箱内:看近期有没有"冲出又缩回"= 假突破
+    poked_up = any(c["high"] > hi + buf for c in recent[:-1])
+    poked_dn = any(c["low"] < lo - buf for c in recent[:-1])
+    if poked_up and last <= hi:
+        return {"state": "fakeout_up", "side": "up", "edge": hi}
+    if poked_dn and last >= lo:
+        return {"state": "fakeout_down", "side": "down", "edge": lo}
+    return {"state": "inside", "side": "range", "edge": None}
+
+
 def analyze_structure(candles: list[dict[str, Any]], width: int = 2, min_gap: int = 4,
                       sr_tol: float = 0.015, sr_lookback: int = 40) -> dict[str, Any] | None:
     strokes = build_strokes(candles, width, min_gap)
@@ -78,17 +120,10 @@ def analyze_structure(candles: list[dict[str, Any]], width: int = 2, min_gap: in
     clusters = cluster_levels(strokes[-sr_lookback:], sr_tol)
     price = candles[-1]["close"]
     latest = pivots[-1] if pivots else None
-    broke = None
-    if latest:
-        if price > latest["high"]:
-            broke = "up"
-        elif price < latest["low"]:
-            broke = "down"
-        else:
-            broke = "inside"
+    breakout = classify_breakout(candles, latest) if latest else None
     return {
         "strokes": strokes, "pivots": pivots, "srClusters": clusters,
-        "latestPivot": latest, "price": price, "breakout": broke,
+        "latestPivot": latest, "price": price, "breakout": breakout,
     }
 
 
@@ -100,7 +135,7 @@ if __name__ == "__main__":
     path = sys.argv[1] if len(sys.argv) > 1 else "tests/fixtures/data/clean/BTC_USDT_1D_clean.json"
     candles = json.loads(Path(path).read_text(encoding="utf-8"))["candles"]
     r = analyze_structure(candles)
-    print("中枢数:", len(r["pivots"]), "| 现价:", r["price"], "| 相对最近中枢:", r["breakout"])
+    print("中枢数:", len(r["pivots"]), "| 现价:", r["price"], "| 突破判定:", r["breakout"]["state"])
     if r["latestPivot"]:
         p = r["latestPivot"]
         print("最近中枢: zone", round(p["zoneLow"]), "-", round(p["zoneHigh"]),
