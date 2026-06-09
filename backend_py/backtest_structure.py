@@ -123,8 +123,74 @@ def _stats(trades: list[dict[str, Any]], risk_budget: float | None = None,
         "profitFactor": round(gross_win / gross_loss, 2) if gross_loss > 0 else None,
         "totalReturnPct": round(100 * (eq - 1), 1),
         "maxDrawdownPct": round(100 * maxdd, 1),
-        "byReason": {k: sum(1 for t in trades if t["reason"] == k) for k in ("tp", "stop", "timeout")},
+        "byReason": {k: sum(1 for t in trades if t.get("reason") == k) for k in ("tp", "stop", "timeout")},
     }
+
+
+def backtest_chips(candles: list[dict[str, Any]], warmup: int = 250, fee_bps: float = 5.0,
+                   slip_bps: float = 5.0, max_hold: int = 80, buffer_pct: float = 0.05,
+                   risk_budget: float = 0.02, max_leverage: float = 3.0,
+                   tp_fracs: tuple[float, ...] = (1 / 3, 1 / 3, 1 / 3)) -> dict[str, Any]:
+    """v3 完整筹码:多次清算(逆推三档各止盈)+ 留底仓 + 保护(TP1→保本、TP2→TP1)。
+    冲着"让赢的跑、亏的截断"——把 v2 的'到TP1全平、赢得太小'改成'分批止盈+底仓吃大顺势'。"""
+    cost = (fee_bps + slip_bps) / 10000.0
+    trades: list[dict[str, Any]] = []
+    pos: dict[str, Any] | None = None
+    prev_state = ""
+
+    for t in range(warmup, len(candles)):
+        bar = candles[t]
+        if pos:
+            d = 1 if pos["side"] == "long" else -1
+            # 1) 止损打在剩余仓上
+            stopped = (pos["side"] == "long" and bar["low"] <= pos["stop"]) or \
+                      (pos["side"] == "short" and bar["high"] >= pos["stop"])
+            if stopped and pos["remaining"] > 1e-9:
+                pos["realized"] += pos["remaining"] * ((pos["stop"] / pos["entry"] - 1) * d)
+                pos["remaining"] = 0.0
+            # 2) 逆推三档分批止盈(按顺序)
+            for k, tp in enumerate(pos["tps"]):
+                if k in pos["filledTps"] or pos["remaining"] <= 1e-9:
+                    continue
+                reach = (pos["side"] == "long" and bar["high"] >= tp) or \
+                        (pos["side"] == "short" and bar["low"] <= tp)
+                if reach:
+                    portion = min(pos["tpFracs"][k], pos["remaining"])
+                    pos["realized"] += portion * ((tp / pos["entry"] - 1) * d)
+                    pos["remaining"] -= portion
+                    pos["filledTps"].add(k)
+                    if k == 0:
+                        pos["stop"] = pos["entry"]       # TP1 后保本
+                    elif k == 1:
+                        pos["stop"] = pos["tps"][0]       # TP2 后移到 TP1(锁底仓利润)
+            # 3) 超时平剩余
+            if pos["remaining"] > 1e-9 and t - pos["entryIdx"] >= max_hold:
+                pos["realized"] += pos["remaining"] * ((bar["close"] / pos["entry"] - 1) * d)
+                pos["remaining"] = 0.0
+            if pos["remaining"] <= 1e-9:
+                trades.append({"side": pos["side"], "entry": pos["entry"], "stop": pos["initStop"],
+                               "ret": pos["realized"] - 2 * cost})
+                pos = None
+
+        if pos is None:
+            s = analyze_structure(candles[: t + 1])
+            st = (s.get("breakout") or {}).get("state", "") if s else ""
+            if st in ("confirmed_up", "confirmed_down") and st != prev_state:
+                side = "long" if st == "confirmed_up" else "short"
+                piv = s["latestPivot"]
+                buf = buffer_pct * (piv["high"] - piv["low"])
+                lad = reverse_fib_ladder(piv["high"], piv["low"])
+                tps = [x["price"] for x in (lad["up"] if side == "long" else lad["down"])]
+                stop = (piv["low"] - buf) if side == "long" else (piv["high"] + buf)
+                entry = bar["close"]
+                ok = (side == "long" and tps[0] > entry > stop) or (side == "short" and tps[0] < entry < stop)
+                if ok:
+                    pos = {"side": side, "entry": entry, "stop": stop, "initStop": stop, "tps": tps,
+                           "tpFracs": list(tp_fracs), "filledTps": set(), "remaining": 1.0,
+                           "realized": 0.0, "entryIdx": t}
+            prev_state = st if st else prev_state
+
+    return _stats(trades, risk_budget, max_leverage)
 
 
 if __name__ == "__main__":
